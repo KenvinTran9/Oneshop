@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${SQLSERVER_URL:jdbc:sqlserver://localhost:1433;databaseName=oneshop;encrypt=true;trustServerCertificate=true}
+    username: ${SQLSERVER_USERNAME:sa}
+    password: ${SQLSERVER_PASSWORD:Your_password123}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Cua hang - OneShop</title>
+</head>
+<body>
+<section class="page-title py-5">
+    <div class="container">
+        <span class="eyebrow">Store chain</span>
+        <h1 class="fw-bold mb-2">He thong cua hang</h1>
+        <p class="text-muted mb-0">Danh sach chi nhanh OneShop va thong tin lien he.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" th:each="store : ${stores}">
+                <article class="store-card store-card-large">
+                    <div class="store-icon"><i class="bi bi-shop"></i></div>
+                    <h2 class="h5" th:text="${store.name}">Ten cua hang</h2>
+                    <p th:text="${store.address}">Dia chi</p>
+                    <div class="small text-muted">
+                        <span th:text="${store.district}">Quan</span>,
+                        <span th:text="${store.city}">Thanh pho</span>
+                    </div>
+                    <a class="btn btn-outline-dark btn-sm rounded-pill mt-3" th:href="'tel:' + ${store.phone}">
+                        <i class="bi bi-telephone"></i>
+                        <span th:text="${store.phone}">028 0000 0000</span>
+                    </a>
+                </article>
+            </div>
+            <div class="col-12" th:if="${#lists.isEmpty(stores)}">
+                <div class="empty-state">Chua co cua hang nao.</div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

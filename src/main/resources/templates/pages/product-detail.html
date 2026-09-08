@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${product.name} + ' - OneShop'">Chi tiet san pham - OneShop</title>
+</head>
+<body>
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5 align-items-start">
+            <div class="col-lg-6">
+                <img class="product-detail-image" th:src="${product.imageUrl}" th:alt="${product.name}">
+            </div>
+            <div class="col-lg-6">
+                <span class="eyebrow" th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span>
+                <h1 class="fw-bold mt-3" th:text="${product.name}">Ten san pham</h1>
+                <p class="text-muted" th:text="${product.shortDescription}">Mo ta ngan</p>
+                <div class="detail-price" th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' d'">0 d</div>
+                <div class="d-flex gap-2 flex-wrap mt-4">
+                    <button class="btn btn-dark rounded-pill px-4" type="button">
+                        <i class="bi bi-cart-plus"></i>
+                        Them vao gio
+                    </button>
+                    <a class="btn btn-outline-dark rounded-pill px-4" th:href="@{/stores}">
+                        <i class="bi bi-shop"></i>
+                        Kiem tra cua hang
+                    </a>
+                </div>
+                <hr class="my-4">
+                <h2 class="h5">Thong tin san pham</h2>
+                <p th:text="${product.description}">Mo ta san pham</p>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

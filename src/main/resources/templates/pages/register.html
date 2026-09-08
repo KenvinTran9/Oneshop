@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dang ky - OneShop</title>
+</head>
+<body>
+<section class="auth-section py-5">
+    <div class="container">
+        <div class="auth-card mx-auto">
+            <span class="eyebrow">Thanh vien</span>
+            <h1 class="h3 fw-bold mt-2">Tao tai khoan</h1>
+            <form action="#" class="d-grid gap-3">
+                <div>
+                    <label class="form-label" for="fullName">Ho ten</label>
+                    <input class="form-control" id="fullName" type="text" placeholder="Nguyen Van A">
+                </div>
+                <div>
+                    <label class="form-label" for="email">Email</label>
+                    <input class="form-control" id="email" type="email" placeholder="ban@example.com">
+                </div>
+                <div>
+                    <label class="form-label" for="phone">So dien thoai</label>
+                    <input class="form-control" id="phone" type="tel" placeholder="09xxxxxxxx">
+                </div>
+                <div>
+                    <label class="form-label" for="password">Mat khau</label>
+                    <input class="form-control" id="password" type="password">
+                </div>
+                <button class="btn btn-dark rounded-pill" type="button">Tao tai khoan</button>
+            </form>
+            <p class="small text-muted mt-3 mb-0">Da co tai khoan? <a th:href="@{/login}">Dang nhap</a></p>
+        </div>
+    </div>
+</section>
+</body>
+</html>

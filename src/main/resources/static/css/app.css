@@ -1,0 +1,231 @@
+:root {
+    --os-ink: #191719;
+    --os-muted: #6f6870;
+    --os-blush: #f7dfe4;
+    --os-rose: #c85b73;
+    --os-mint: #dff2e9;
+    --os-cream: #fffaf6;
+    --os-line: #ece5e8;
+}
+
+body {
+    color: var(--os-ink);
+    background: #fff;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--os-rose);
+}
+
+.brand-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+}
+
+.brand-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--os-rose), #214e45);
+    display: inline-block;
+}
+
+.site-header .nav-link {
+    font-weight: 500;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, var(--os-cream), #fff 48%, var(--os-mint));
+}
+
+.eyebrow {
+    color: var(--os-rose);
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.hero-visual {
+    position: relative;
+    min-height: 430px;
+}
+
+.hero-visual img,
+.product-detail-image {
+    width: 100%;
+    height: 100%;
+    min-height: 430px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 24px 70px rgba(25, 23, 25, .14);
+}
+
+.hero-badge {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+    display: grid;
+    gap: .15rem;
+    background: #fff;
+    border: 1px solid var(--os-line);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    box-shadow: 0 16px 40px rgba(25, 23, 25, .12);
+}
+
+.hero-badge span {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.hero-badge small {
+    color: var(--os-muted);
+}
+
+.section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.section-heading h2 {
+    font-weight: 800;
+    margin: .35rem 0 0;
+}
+
+.product-card,
+.store-card,
+.auth-card {
+    border: 1px solid var(--os-line);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.product-card {
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 45px rgba(25, 23, 25, .1);
+}
+
+.product-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    background: #f8f5f5;
+}
+
+.product-card-body {
+    padding: 1rem;
+}
+
+.product-card-body p {
+    color: var(--os-muted);
+    font-size: .92rem;
+    min-height: 44px;
+}
+
+.product-category {
+    color: #214e45;
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.store-band {
+    background: #f6fbf8;
+}
+
+.store-card {
+    padding: 1.25rem;
+}
+
+.store-card span,
+.store-card p {
+    color: var(--os-muted);
+}
+
+.store-card-large {
+    height: 100%;
+}
+
+.store-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: var(--os-mint);
+    color: #214e45;
+    margin-bottom: 1rem;
+}
+
+.page-title {
+    background: var(--os-cream);
+    border-bottom: 1px solid var(--os-line);
+}
+
+.detail-price {
+    color: var(--os-rose);
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+.auth-section {
+    min-height: 68vh;
+    background: linear-gradient(135deg, var(--os-cream), #fff, var(--os-blush));
+}
+
+.auth-card {
+    max-width: 480px;
+    padding: 2rem;
+    box-shadow: 0 18px 50px rgba(25, 23, 25, .08);
+}
+
+.empty-state {
+    border: 1px dashed var(--os-line);
+    border-radius: 8px;
+    padding: 2rem;
+    color: var(--os-muted);
+    text-align: center;
+    background: #fff;
+}
+
+.site-footer {
+    background: var(--os-ink);
+    color: #fff;
+}
+
+.site-footer .text-muted {
+    color: rgba(255, 255, 255, .66) !important;
+}
+
+.footer-link {
+    display: block;
+    color: rgba(255, 255, 255, .78);
+    margin-bottom: .45rem;
+}
+
+@media (max-width: 767.98px) {
+    .hero-visual,
+    .hero-visual img,
+    .product-detail-image {
+        min-height: 300px;
+    }
+
+    .section-heading {
+        display: block;
+    }
+}

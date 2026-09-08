@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dang nhap - OneShop</title>
+</head>
+<body>
+<section class="auth-section py-5">
+    <div class="container">
+        <div class="auth-card mx-auto">
+            <span class="eyebrow">Tai khoan</span>
+            <h1 class="h3 fw-bold mt-2">Dang nhap</h1>
+            <p class="text-muted">Dung tai khoan admin mau: admin@oneshop.vn / 123456</p>
+            <div class="alert alert-danger" th:if="${param.error}">Email hoac mat khau khong dung.</div>
+            <form th:action="@{/login}" method="post" class="d-grid gap-3">
+                <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <div>
+                    <label class="form-label" for="username">Email</label>
+                    <input class="form-control" id="username" name="username" type="email" placeholder="admin@oneshop.vn" required>
+                </div>
+                <div>
+                    <label class="form-label" for="password">Mat khau</label>
+                    <input class="form-control" id="password" name="password" type="password" placeholder="123456" required>
+                </div>
+                <button class="btn btn-dark rounded-pill" type="submit">Dang nhap</button>
+            </form>
+            <p class="small text-muted mt-3 mb-0">Chua co tai khoan? <a th:href="@{/register}">Dang ky</a></p>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard - OneShop Admin</title>
+</head>
+<body>
+<div class="admin-page-title">
+    <span class="small text-muted">Tong quan</span>
+    <h2>Dashboard</h2>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6 col-xl-3">
+        <div class="metric-card">
+            <i class="bi bi-bag"></i>
+            <span>San pham</span>
+            <strong th:text="${productCount}">0</strong>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="metric-card">
+            <i class="bi bi-shop"></i>
+            <span>Cua hang</span>
+            <strong th:text="${storeCount}">0</strong>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="metric-card">
+            <i class="bi bi-receipt"></i>
+            <span>Don hang</span>
+            <strong th:text="${orderCount}">0</strong>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="metric-card">
+            <i class="bi bi-people"></i>
+            <span>Tai khoan</span>
+            <strong th:text="${customerCount}">0</strong>
+        </div>
+    </div>
+</div>
+
+<section class="admin-panel mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="h5 mb-1">Cong viec tiep theo</h3>
+            <p class="text-muted mb-0">Mo rong CRUD san pham, gio hang, don hang va phan quyen theo cua hang.</p>
+        </div>
+        <a class="btn btn-dark btn-sm" th:href="@{/admin/products}">
+            <i class="bi bi-plus-circle"></i>
+            Quan ly san pham
+        </a>
+    </div>
+</section>
+</body>
+</html>

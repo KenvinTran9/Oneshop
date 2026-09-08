@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: oneshop
+  profiles:
+    active: dev
+  thymeleaf:
+    cache: false
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:b25lc2hvcC1qd3Qtc2VjcmV0LW11c3QtYmUtMzItYnl0ZXMtbG9uZy0xMjM0NTY=}
+    expiration-millis: 86400000
+  cloudinary:
+    cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+    api-key: ${CLOUDINARY_API_KEY:}
+    api-secret: ${CLOUDINARY_API_SECRET:}
+
+sitemesh:
+  integration: filter
+  decorator:
+    prefix: /decorators/
+    default: main.html
+    exclusions: /css/*,/js/*,/images/*,/webjars/*,/h2-console/*,/decorators/*
+    mappings:
+      - path: /admin/*
+        decorator: admin.html

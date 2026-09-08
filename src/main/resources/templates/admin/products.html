@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>San pham - OneShop Admin</title>
+</head>
+<body>
+<div class="admin-page-title">
+    <span class="small text-muted">Catalog</span>
+    <h2>Quan ly san pham</h2>
+</div>
+
+<section class="admin-panel">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <p class="text-muted mb-0">Bang mau lay du lieu tu JPA repository.</p>
+        <button class="btn btn-dark btn-sm" type="button">
+            <i class="bi bi-plus-circle"></i>
+            Them san pham
+        </button>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+            <tr>
+                <th>SKU</th>
+                <th>San pham</th>
+                <th>Danh muc</th>
+                <th>Gia</th>
+                <th>Trang thai</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="product : ${productPage.content}">
+                <td th:text="${product.sku}">SKU</td>
+                <td>
+                    <div class="d-flex align-items-center gap-3">
+                        <img class="admin-thumb" th:src="${product.imageUrl}" th:alt="${product.name}">
+                        <span th:text="${product.name}">Ten san pham</span>
+                    </div>
+                </td>
+                <td th:text="${product.category != null ? product.category.name : '-'}">Danh muc</td>
+                <td th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' d'">0 d</td>
+                <td><span class="badge text-bg-success" th:text="${product.status}">ACTIVE</span></td>
+            </tr>
+            <tr th:if="${productPage.empty}">
+                <td colspan="5" class="text-center text-muted py-4">Chua co san pham.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

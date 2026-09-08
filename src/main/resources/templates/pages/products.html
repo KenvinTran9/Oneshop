@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>San pham - OneShop</title>
+</head>
+<body>
+<section class="page-title py-5">
+    <div class="container">
+        <span class="eyebrow">Catalog</span>
+        <h1 class="fw-bold mb-2">San pham</h1>
+        <p class="text-muted mb-0">Danh sach my pham dang kinh doanh tren toan he thong OneShop.</p>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-sm-6 col-lg-3" th:each="product : ${productPage.content}">
+                <article class="product-card h-100">
+                    <a th:href="@{/products/{slug}(slug=${product.slug})}">
+                        <img th:src="${product.imageUrl}" th:alt="${product.name}">
+                    </a>
+                    <div class="product-card-body">
+                        <span class="product-category" th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span>
+                        <h2 class="h6 mt-2">
+                            <a th:href="@{/products/{slug}(slug=${product.slug})}" th:text="${product.name}">Ten san pham</a>
+                        </h2>
+                        <p th:text="${product.shortDescription}">Mo ta ngan</p>
+                        <strong th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' d'">0 d</strong>
+                    </div>
+                </article>
+            </div>
+            <div class="col-12" th:if="${productPage.empty}">
+                <div class="empty-state">Chua co san pham phu hop.</div>
+            </div>
+        </div>
+
+        <nav class="mt-5" th:if="${productPage.totalPages > 1}" aria-label="Phan trang san pham">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${productPage.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/products(page=${productPage.number - 1})}">Truoc</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link" th:text="${productPage.number + 1} + '/' + ${productPage.totalPages}">1/1</span>
+                </li>
+                <li class="page-item" th:classappend="${productPage.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/products(page=${productPage.number + 1})}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</section>
+</body>
+</html>
