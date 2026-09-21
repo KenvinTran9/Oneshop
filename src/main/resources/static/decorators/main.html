@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><sitemesh:write property="title">OneShop</sitemesh:write></title>
+    <title><sitemesh:write property="title">OneShop - Mỹ phẩm chính hãng</sitemesh:write></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="/css/app.css" rel="stylesheet">
@@ -17,22 +17,67 @@
                 <span class="brand-dot"></span>OneShop
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                    aria-controls="mainNav" aria-expanded="false" aria-label="Mo menu">
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Mở menu">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
-                    <li class="nav-item"><a class="nav-link" href="/products">San pham</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/stores">Cua hang</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin">Quan tri</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/stores">Cửa hàng</a></li>
+                    <li class="nav-item" id="adminNavLink" style="display: none !important;"><a class="nav-link text-primary fw-medium" href="/admin"><i class="bi bi-shield-check me-1"></i>Quản trị</a></li>
                 </ul>
                 <div class="navbar-icons">
-                    <button class="btn-icon" type="button" aria-label="Tim kiem"><i class="bi bi-search"></i></button>
-                    <button class="btn-icon" type="button" aria-label="Gio hang"><i class="bi bi-bag"></i></button>
-                    <a class="btn btn-sm btn-dark rounded-pill px-3 ms-1" href="/login">
-                        <i class="bi bi-person"></i>
-                        Dang nhap
-                    </a>
+                    <a class="btn-icon" href="/products" title="Tìm kiếm sản phẩm" aria-label="Tìm kiếm"><i class="bi bi-search"></i></a>
+                    <a class="btn-icon" href="/products" title="Giỏ hàng" aria-label="Giỏ hàng"><i class="bi bi-bag"></i></a>
+                    
+                    <!-- Khách chưa đăng nhập -->
+                    <div id="navGuest" class="d-inline-block">
+                        <a class="btn btn-sm btn-dark rounded-pill px-3 ms-1" href="/login" id="navLoginBtn">
+                            <i class="bi bi-person me-1"></i>
+                            Đăng nhập
+                        </a>
+                    </div>
+
+                    <!-- Người dùng đã đăng nhập -->
+                    <div class="dropdown d-inline-block ms-1" id="navUserDropdown" style="display: none !important;">
+                        <button class="btn btn-sm btn-outline-dark rounded-pill px-3 dropdown-toggle d-inline-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="userMenuBtn">
+                            <span class="user-avatar-circle">
+                                <i class="bi bi-person-fill"></i>
+                            </span>
+                            <span class="user-display-email small fw-medium" id="userEmailLabel">Tài khoản</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 mt-2 py-2" style="min-width: 230px;">
+                            <li class="px-3 py-2 border-bottom mb-1 bg-light rounded-top">
+                                <div class="small text-muted" style="font-size: 0.75rem;">ĐÃ ĐĂNG NHẬP VỚI</div>
+                                <div class="fw-semibold text-truncate small text-dark" id="userEmailFull">user@oneshop.vn</div>
+                            </li>
+                            <li id="adminMenuItem" style="display: none !important;">
+                                <a class="dropdown-item py-2 small d-flex align-items-center gap-2 fw-medium text-primary" href="/admin">
+                                    <i class="bi bi-speedometer2"></i>
+                                    <span>Trang quản trị (Admin)</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 small d-flex align-items-center gap-2" href="/products">
+                                    <i class="bi bi-bag-heart"></i>
+                                    <span>Mua sắm sản phẩm</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 small d-flex align-items-center gap-2" href="/stores">
+                                    <i class="bi bi-shop"></i>
+                                    <span>Hệ thống cửa hàng</span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li>
+                                <a class="dropdown-item py-2 small d-flex align-items-center gap-2 text-danger fw-medium" href="/logout" id="logoutBtn">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Đăng xuất</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -48,7 +93,7 @@
         <div class="row g-4">
             <div class="col-lg-4">
                 <h5 class="fw-bold mb-3">OneShop</h5>
-                <p class="text-muted mb-0">Chuoi cua hang my pham voi ton kho theo chi nhanh, san pham chinh hang va dich vu tu van tai cua hang.</p>
+                <p class="text-muted mb-0">Chuỗi cửa hàng mỹ phẩm với tồn kho theo chi nhánh, sản phẩm chính hãng và dịch vụ tư vấn tận tâm.</p>
                 <div class="footer-social">
                     <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
                     <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
@@ -57,28 +102,28 @@
                 </div>
             </div>
             <div class="col-6 col-lg-2">
-                <h6 class="fw-semibold mb-3">Mua sam</h6>
-                <a class="footer-link" href="/products">Tat ca san pham</a>
-                <a class="footer-link" href="/products">Skincare</a>
-                <a class="footer-link" href="/products">Makeup</a>
-                <a class="footer-link" href="/products">Sets</a>
+                <h6 class="fw-semibold mb-3">Mua sắm</h6>
+                <a class="footer-link" href="/products">Tất cả sản phẩm</a>
+                <a class="footer-link" href="/products">Chăm sóc da</a>
+                <a class="footer-link" href="/products">Trang điểm</a>
+                <a class="footer-link" href="/products">Bộ quà tặng</a>
             </div>
             <div class="col-6 col-lg-2">
-                <h6 class="fw-semibold mb-3">Kham pha</h6>
-                <a class="footer-link" href="/stores">He thong cua hang</a>
-                <a class="footer-link" href="#">Ve chung toi</a>
-                <a class="footer-link" href="#">Blog</a>
+                <h6 class="fw-semibold mb-3">Khám phá</h6>
+                <a class="footer-link" href="/stores">Hệ thống cửa hàng</a>
+                <a class="footer-link" href="#">Về chúng tôi</a>
+                <a class="footer-link" href="#">Cẩm nang làm đẹp</a>
             </div>
             <div class="col-lg-4">
-                <h6 class="fw-semibold mb-3">Ho tro</h6>
+                <h6 class="fw-semibold mb-3">Hỗ trợ khách hàng</h6>
                 <p class="text-muted mb-1"><i class="bi bi-telephone me-2"></i>Hotline: 1900 1000</p>
                 <p class="text-muted mb-1"><i class="bi bi-envelope me-2"></i>Email: support@oneshop.vn</p>
-                <p class="text-muted mb-0"><i class="bi bi-clock me-2"></i>8:00 - 22:00, T2 - CN</p>
+                <p class="text-muted mb-0"><i class="bi bi-clock me-2"></i>8:00 - 22:00, Thứ 2 - Chủ Nhật</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 OneShop. All rights reserved.</p>
-            <p>Made with <i class="bi bi-heart-fill" style="color:var(--os-rose)"></i> in Vietnam</p>
+            <p>&copy; 2024 OneShop. Bản quyền thuộc về OneShop.</p>
+            <p>Thiết kế với <i class="bi bi-heart-fill" style="color:var(--os-rose)"></i> tại Việt Nam</p>
         </div>
     </div>
 </footer>
