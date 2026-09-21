@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Cua hang - OneShop</title>
+    <title>Hệ thống cửa hàng - OneShop</title>
 </head>
 <body>
 <section class="collection-hero">
     <div class="container">
-        <h1>He thong cua hang</h1>
-        <p>Danh sach chi nhanh OneShop va thong tin lien he.</p>
+        <h1>Hệ thống cửa hàng</h1>
+        <p>Danh sách các chi nhánh OneShop và thông tin liên hệ trực tiếp.</p>
     </div>
 </section>
 
@@ -17,11 +17,11 @@
             <div class="col-md-6 col-lg-4" th:each="store : ${stores}">
                 <article class="store-card store-card-large">
                     <div class="store-icon"><i class="bi bi-shop"></i></div>
-                    <h2 class="h5" th:text="${store.name}">Ten cua hang</h2>
-                    <p th:text="${store.address}">Dia chi</p>
+                    <h2 class="h5" th:text="${store.name}">Tên cửa hàng</h2>
+                    <p th:text="${store.address}">Địa chỉ</p>
                     <div class="small text-muted">
-                        <span th:text="${store.district}">Quan</span>,
-                        <span th:text="${store.city}">Thanh pho</span>
+                        <span th:text="${store.district}">Quận/Huyện</span>,
+                        <span th:text="${store.city}">Thành phố</span>
                     </div>
                     <a class="btn btn-outline-dark btn-sm rounded-pill mt-3" th:href="'tel:' + ${store.phone}">
                         <i class="bi bi-telephone me-1"></i>
@@ -30,7 +30,7 @@
                 </article>
             </div>
             <div class="col-12" th:if="${#lists.isEmpty(stores)}">
-                <div class="empty-state">Chua co cua hang nao.</div>
+                <div class="empty-state">Chưa có cửa hàng nào được cập nhật.</div>
             </div>
         </div>
     </div>

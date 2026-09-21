@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>San pham - OneShop</title>
+    <title>Sản phẩm - OneShop</title>
 </head>
 <body>
 <!-- Collection Hero -->
 <section class="collection-hero">
     <div class="container">
-        <h1>Skincare</h1>
-        <p>Danh sach my pham dang kinh doanh tren toan he thong OneShop.</p>
+        <h1>Skincare & Beauty</h1>
+        <p>Danh sách mỹ phẩm chính hãng đang kinh doanh trên toàn hệ thống OneShop.</p>
     </div>
 </section>
 
@@ -17,21 +17,21 @@
     <div class="container">
         <div class="filter-bar">
             <div class="filter-bar-left">
-                <span class="filter-label">Bo loc</span>
-                <button class="filter-pill active" type="button">Tat ca</button>
-                <button class="filter-pill" type="button">Skincare</button>
-                <button class="filter-pill" type="button">Makeup</button>
+                <span class="filter-label">Bộ lọc:</span>
+                <button class="filter-pill active" type="button">Tất cả</button>
+                <button class="filter-pill" type="button">Chăm sóc da</button>
+                <button class="filter-pill" type="button">Trang điểm</button>
                 <button class="filter-pill" type="button">Serum</button>
-                <button class="filter-pill" type="button">Kem duong</button>
-                <button class="filter-pill" type="button">Sua rua mat</button>
+                <button class="filter-pill" type="button">Kem dưỡng</button>
+                <button class="filter-pill" type="button">Sữa rửa mặt</button>
             </div>
             <div class="filter-bar-right">
-                <span class="product-count" th:text="${productPage.totalElements} + ' san pham'">0 san pham</span>
-                <select class="sort-select" aria-label="Sap xep">
-                    <option>Moi nhat</option>
-                    <option>Pho bien</option>
-                    <option>Gia: Thap - Cao</option>
-                    <option>Gia: Cao - Thap</option>
+                <span class="product-count" th:text="${productPage.totalElements} + ' sản phẩm'">0 sản phẩm</span>
+                <select class="sort-select" aria-label="Sắp xếp">
+                    <option>Mới nhất</option>
+                    <option>Phổ biến nhất</option>
+                    <option>Giá: Thấp đến Cao</option>
+                    <option>Giá: Cao đến Thấp</option>
                 </select>
             </div>
         </div>
@@ -50,30 +50,30 @@
                     <div class="product-card-body">
                         <span class="product-category" th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span>
                         <h2 class="h6 mt-2 mb-1">
-                            <a th:href="@{/products/{slug}(slug=${product.slug})}" th:text="${product.name}">Ten san pham</a>
+                            <a th:href="@{/products/{slug}(slug=${product.slug})}" th:text="${product.name}">Tên sản phẩm</a>
                         </h2>
-                        <p th:text="${product.shortDescription}">Mo ta ngan</p>
+                        <p th:text="${product.shortDescription}">Mô tả ngắn</p>
                         <div class="product-rating">
                             <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
                             <span class="rating-count">(4.5)</span>
                         </div>
                         <div class="product-price-row">
-                            <span class="product-price" th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' d'">0 d</span>
-                            <button class="btn-add-bag" type="button" aria-label="Them vao gio"><i class="bi bi-plus"></i></button>
+                            <span class="product-price" th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                            <button class="btn-add-bag" type="button" aria-label="Thêm vào giỏ"><i class="bi bi-plus"></i></button>
                         </div>
                     </div>
                 </article>
             </div>
             <div class="col-12" th:if="${productPage.empty}">
-                <div class="empty-state">Chua co san pham phu hop.</div>
+                <div class="empty-state">Chưa có sản phẩm phù hợp.</div>
             </div>
         </div>
 
-        <nav class="mt-5" th:if="${productPage.totalPages > 1}" aria-label="Phan trang san pham">
+        <nav class="mt-5" th:if="${productPage.totalPages > 1}" aria-label="Phân trang sản phẩm">
             <ul class="pagination justify-content-center">
                 <li class="page-item" th:classappend="${productPage.first} ? 'disabled'">
                     <a class="page-link" th:href="@{/products(page=${productPage.number - 1})}">
-                        <i class="bi bi-chevron-left"></i> Truoc
+                        <i class="bi bi-chevron-left me-1"></i> Trước
                     </a>
                 </li>
                 <li class="page-item disabled">
@@ -81,7 +81,7 @@
                 </li>
                 <li class="page-item" th:classappend="${productPage.last} ? 'disabled'">
                     <a class="page-link" th:href="@{/products(page=${productPage.number + 1})}">
-                        Sau <i class="bi bi-chevron-right"></i>
+                        Sau <i class="bi bi-chevron-right ms-1"></i>
                     </a>
                 </li>
             </ul>
