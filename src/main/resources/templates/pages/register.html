@@ -1,36 +1,41 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Dang ky - OneShop</title>
+    <title>Đăng ký tài khoản - OneShop</title>
 </head>
 <body>
 <section class="auth-section py-5">
     <div class="container">
         <div class="auth-card mx-auto">
             <div class="text-center mb-4">
-                <span class="eyebrow">Thanh vien</span>
-                <h1 class="h3 fw-bold mt-2">Tao tai khoan</h1>
+                <span class="eyebrow">Thành viên mới</span>
+                <h1 class="h3 fw-bold mt-2">Tạo tài khoản</h1>
+                <p class="text-muted small mb-0">Tham gia OneShop để nhận ưu đãi đặc quyền</p>
             </div>
             <form action="#" class="d-grid gap-3">
                 <div>
-                    <label class="form-label" for="fullName">Ho ten</label>
-                    <input class="form-control" id="fullName" type="text" placeholder="Nguyen Van A">
+                    <label class="form-label small fw-medium" for="fullName">Họ và tên</label>
+                    <input class="form-control" id="fullName" type="text" placeholder="Nguyễn Văn A" required>
                 </div>
                 <div>
-                    <label class="form-label" for="email">Email</label>
-                    <input class="form-control" id="email" type="email" placeholder="ban@example.com">
+                    <label class="form-label small fw-medium" for="email">Địa chỉ Email</label>
+                    <input class="form-control" id="email" type="email" placeholder="example@email.com" required>
                 </div>
                 <div>
-                    <label class="form-label" for="phone">So dien thoai</label>
-                    <input class="form-control" id="phone" type="tel" placeholder="09xxxxxxxx">
+                    <label class="form-label small fw-medium" for="phone">Số điện thoại</label>
+                    <input class="form-control" id="phone" type="tel" placeholder="09xxxxxxxx" required>
                 </div>
                 <div>
-                    <label class="form-label" for="password">Mat khau</label>
-                    <input class="form-control" id="password" type="password">
+                    <label class="form-label small fw-medium" for="password">Mật khẩu</label>
+                    <input class="form-control" id="password" type="password" placeholder="Tối thiểu 6 ký tự" required>
                 </div>
-                <button class="btn btn-dark rounded-pill py-2" type="button">Tao tai khoan</button>
+                <button class="btn btn-dark rounded-pill py-2 mt-2 fw-medium" type="button">
+                    Tạo tài khoản
+                </button>
             </form>
-            <p class="small text-muted mt-3 mb-0 text-center">Da co tai khoan? <a th:href="@{/login}">Dang nhap</a></p>
+            <p class="small text-muted mt-4 mb-0 text-center">
+                Đã có tài khoản? <a class="fw-semibold text-decoration-underline" th:href="@{/login}">Đăng nhập ngay</a>
+            </p>
         </div>
     </div>
 </section>
