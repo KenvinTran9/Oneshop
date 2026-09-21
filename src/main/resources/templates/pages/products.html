@@ -4,29 +4,63 @@
     <title>San pham - OneShop</title>
 </head>
 <body>
-<section class="page-title py-5">
+<!-- Collection Hero -->
+<section class="collection-hero">
     <div class="container">
-        <span class="eyebrow">Catalog</span>
-        <h1 class="fw-bold mb-2">San pham</h1>
-        <p class="text-muted mb-0">Danh sach my pham dang kinh doanh tren toan he thong OneShop.</p>
+        <h1>Skincare</h1>
+        <p>Danh sach my pham dang kinh doanh tren toan he thong OneShop.</p>
     </div>
 </section>
 
-<section class="py-5">
+<!-- Filter Bar -->
+<section class="py-0">
+    <div class="container">
+        <div class="filter-bar">
+            <div class="filter-bar-left">
+                <span class="filter-label">Bo loc</span>
+                <button class="filter-pill active" type="button">Tat ca</button>
+                <button class="filter-pill" type="button">Skincare</button>
+                <button class="filter-pill" type="button">Makeup</button>
+                <button class="filter-pill" type="button">Serum</button>
+                <button class="filter-pill" type="button">Kem duong</button>
+                <button class="filter-pill" type="button">Sua rua mat</button>
+            </div>
+            <div class="filter-bar-right">
+                <span class="product-count" th:text="${productPage.totalElements} + ' san pham'">0 san pham</span>
+                <select class="sort-select" aria-label="Sap xep">
+                    <option>Moi nhat</option>
+                    <option>Pho bien</option>
+                    <option>Gia: Thap - Cao</option>
+                    <option>Gia: Cao - Thap</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Product Grid -->
+<section class="py-4 pb-5">
     <div class="container">
         <div class="row g-4">
-            <div class="col-sm-6 col-lg-3" th:each="product : ${productPage.content}">
+            <div class="col-6 col-lg-3" th:each="product : ${productPage.content}">
                 <article class="product-card h-100">
                     <a th:href="@{/products/{slug}(slug=${product.slug})}">
                         <img th:src="${product.imageUrl}" th:alt="${product.name}">
                     </a>
                     <div class="product-card-body">
                         <span class="product-category" th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span>
-                        <h2 class="h6 mt-2">
+                        <h2 class="h6 mt-2 mb-1">
                             <a th:href="@{/products/{slug}(slug=${product.slug})}" th:text="${product.name}">Ten san pham</a>
                         </h2>
                         <p th:text="${product.shortDescription}">Mo ta ngan</p>
-                        <strong th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' d'">0 d</strong>
+                        <div class="product-rating">
+                            <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+                            <span class="rating-count">(4.5)</span>
+                        </div>
+                        <div class="product-price-row">
+                            <span class="product-price" th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' d'">0 d</span>
+                            <button class="btn-add-bag" type="button" aria-label="Them vao gio"><i class="bi bi-plus"></i></button>
+                        </div>
                     </div>
                 </article>
             </div>
@@ -38,13 +72,17 @@
         <nav class="mt-5" th:if="${productPage.totalPages > 1}" aria-label="Phan trang san pham">
             <ul class="pagination justify-content-center">
                 <li class="page-item" th:classappend="${productPage.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/products(page=${productPage.number - 1})}">Truoc</a>
+                    <a class="page-link" th:href="@{/products(page=${productPage.number - 1})}">
+                        <i class="bi bi-chevron-left"></i> Truoc
+                    </a>
                 </li>
                 <li class="page-item disabled">
-                    <span class="page-link" th:text="${productPage.number + 1} + '/' + ${productPage.totalPages}">1/1</span>
+                    <span class="page-link" th:text="${productPage.number + 1} + ' / ' + ${productPage.totalPages}">1 / 1</span>
                 </li>
                 <li class="page-item" th:classappend="${productPage.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{/products(page=${productPage.number + 1})}">Sau</a>
+                    <a class="page-link" th:href="@{/products(page=${productPage.number + 1})}">
+                        Sau <i class="bi bi-chevron-right"></i>
+                    </a>
                 </li>
             </ul>
         </nav>

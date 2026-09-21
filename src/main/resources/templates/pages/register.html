@@ -7,8 +7,10 @@
 <section class="auth-section py-5">
     <div class="container">
         <div class="auth-card mx-auto">
-            <span class="eyebrow">Thanh vien</span>
-            <h1 class="h3 fw-bold mt-2">Tao tai khoan</h1>
+            <div class="text-center mb-4">
+                <span class="eyebrow">Thanh vien</span>
+                <h1 class="h3 fw-bold mt-2">Tao tai khoan</h1>
+            </div>
             <form action="#" class="d-grid gap-3">
                 <div>
                     <label class="form-label" for="fullName">Ho ten</label>
@@ -26,9 +28,9 @@
                     <label class="form-label" for="password">Mat khau</label>
                     <input class="form-control" id="password" type="password">
                 </div>
-                <button class="btn btn-dark rounded-pill" type="button">Tao tai khoan</button>
+                <button class="btn btn-dark rounded-pill py-2" type="button">Tao tai khoan</button>
             </form>
-            <p class="small text-muted mt-3 mb-0">Da co tai khoan? <a th:href="@{/login}">Dang nhap</a></p>
+            <p class="small text-muted mt-3 mb-0 text-center">Da co tai khoan? <a th:href="@{/login}">Dang nhap</a></p>
         </div>
     </div>
 </section>

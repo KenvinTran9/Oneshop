@@ -7,17 +7,17 @@
 <section class="hero-section py-5">
     <div class="container">
         <div class="row align-items-center g-5">
-            <div class="col-lg-6">
+            <div class="col-lg-6 home-heading">
                 <span class="eyebrow">Chuoi cua hang my pham</span>
-                <h1 class="display-5 fw-bold mt-3 mb-3">OneShop</h1>
+                <h1 class="mt-3 mb-3">OneShop</h1>
                 <p class="lead text-muted">Mua sam my pham chinh hang, kiem tra ton kho theo chi nhanh va nhan tu van tai cua hang gan ban.</p>
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <a class="btn btn-dark rounded-pill px-4" th:href="@{/products}">
-                        <i class="bi bi-bag"></i>
+                        <i class="bi bi-bag me-1"></i>
                         Xem san pham
                     </a>
                     <a class="btn btn-outline-dark rounded-pill px-4" th:href="@{/stores}">
-                        <i class="bi bi-geo-alt"></i>
+                        <i class="bi bi-geo-alt me-1"></i>
                         Tim cua hang
                     </a>
                 </div>
@@ -39,22 +39,32 @@
 <section class="py-5">
     <div class="container">
         <div class="section-heading">
-            <span class="eyebrow">Noi bat</span>
-            <h2>San pham moi</h2>
+            <div>
+                <span class="eyebrow">Noi bat</span>
+                <h2>San pham moi</h2>
+            </div>
+            <a class="section-link" th:href="@{/products}">Xem tat ca <i class="bi bi-arrow-right"></i></a>
         </div>
         <div class="row g-4">
-            <div class="col-sm-6 col-lg-3" th:each="product : ${featuredProducts}">
+            <div class="col-6 col-lg-3" th:each="product : ${featuredProducts}">
                 <article class="product-card h-100">
                     <a th:href="@{/products/{slug}(slug=${product.slug})}">
                         <img th:src="${product.imageUrl}" th:alt="${product.name}">
                     </a>
                     <div class="product-card-body">
                         <span class="product-category" th:text="${product.category != null ? product.category.name : 'My pham'}">My pham</span>
-                        <h3 class="h6 mt-2">
+                        <h3 class="h6 mt-2 mb-1">
                             <a th:href="@{/products/{slug}(slug=${product.slug})}" th:text="${product.name}">Ten san pham</a>
                         </h3>
                         <p th:text="${product.shortDescription}">Mo ta ngan</p>
-                        <strong th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' d'">0 d</strong>
+                        <div class="product-rating">
+                            <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+                            <span class="rating-count">(4.5)</span>
+                        </div>
+                        <div class="product-price-row">
+                            <span class="product-price" th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' d'">0 d</span>
+                            <button class="btn-add-bag" type="button" aria-label="Them vao gio"><i class="bi bi-plus"></i></button>
+                        </div>
                     </div>
                 </article>
             </div>
@@ -70,13 +80,15 @@
         <div class="row align-items-center g-4">
             <div class="col-lg-5">
                 <span class="eyebrow">He thong cua hang</span>
-                <h2>Quan ly ton kho theo tung chi nhanh</h2>
+                <h2 class="mt-2">Quan ly ton kho theo tung chi nhanh</h2>
                 <p class="text-muted">Khung du lieu da tach cua hang, san pham va ton kho de ban co the phat trien tinh nang dat hang tai chi nhanh gan nhat.</p>
+                <a class="section-link" th:href="@{/stores}">Xem tat ca cua hang <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="col-lg-7">
                 <div class="row g-3">
                     <div class="col-md-6" th:each="store : ${stores}">
                         <div class="store-card">
+                            <div class="store-icon"><i class="bi bi-shop"></i></div>
                             <h3 class="h6 mb-1" th:text="${store.name}">OneShop Quan 1</h3>
                             <p class="mb-1" th:text="${store.address}">Dia chi</p>
                             <span th:text="${store.city}">TP. Ho Chi Minh</span>
