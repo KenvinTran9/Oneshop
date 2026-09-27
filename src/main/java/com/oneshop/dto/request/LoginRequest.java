@@ -1,4 +1,4 @@
-package com.oneshop.web.dto;
+package com.oneshop.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

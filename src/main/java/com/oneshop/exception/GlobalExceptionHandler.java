@@ -1,4 +1,4 @@
-package com.oneshop.web;
+package com.oneshop.exception;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
