@@ -1,4 +1,4 @@
-package com.oneshop.web;
+package com.oneshop.controller;
 
 import com.oneshop.service.ProductService;
 import org.springframework.data.domain.PageRequest;
