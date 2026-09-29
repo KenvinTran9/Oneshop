@@ -1,6 +1,7 @@
 package com.oneshop.api.controller;
 
 import com.oneshop.dto.request.LoginRequest;
+import com.oneshop.dto.request.RefreshTokenRequest;
 import com.oneshop.dto.response.AuthenticationStatusResponse;
 import com.oneshop.dto.response.CurrentUserResponse;
 import com.oneshop.dto.response.TokenResponse;
@@ -29,6 +30,11 @@ public class AuthApiController {
     @PostMapping("/login")
     public TokenResponse login(@Valid @RequestBody LoginRequest request) {
         return authenticationService.login(request);
+    }
+
+    @PostMapping("/refresh")
+    public TokenResponse refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return authenticationService.refresh(request);
     }
 
     @GetMapping("/me")

@@ -1,8 +1,6 @@
 spring:
   application:
     name: oneshop
-  profiles:
-    active: dev
   thymeleaf:
     cache: false
   servlet:
@@ -22,8 +20,10 @@ server:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:b25lc2hvcC1qd3Qtc2VjcmV0LW11c3QtYmUtMzItYnl0ZXMtbG9uZy0xMjM0NTY=}
-    expiration-millis: 86400000
+    secret: ${JWT_SECRET}
+    issuer: ${JWT_ISSUER}
+    access-token-expiration-millis: ${JWT_ACCESS_TOKEN_EXPIRATION_MILLIS}
+    refresh-token-expiration-millis: ${JWT_REFRESH_TOKEN_EXPIRATION_MILLIS}
   cloudinary:
     cloud-name: ${CLOUDINARY_CLOUD_NAME:}
     api-key: ${CLOUDINARY_API_KEY:}

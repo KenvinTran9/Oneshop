@@ -29,14 +29,10 @@
 - **JDK:** Java Development Kit 21 trở lên
 - **Maven:** 3.8+ (hoặc dùng Maven Wrapper)
 
-### 1. Khởi chạy nhanh với H2 In-Memory (Mặc định)
+### 1. Khởi chạy nhanh với H2 In-Memory (profile `dev`)
 
-Chỉ cần chạy lệnh sau, hệ thống sẽ tự động khởi tạo cơ sở dữ liệu mẫu và nạp dữ liệu demo (Sản phẩm, Thương hiệu, Danh mục, Cửa hàng, Tài khoản):
+Profile không còn được chọn mặc định để tránh vô tình chạy cấu hình phát triển ở production. Chạy profile `dev` để hệ thống tự động khởi tạo H2 và nạp dữ liệu demo:
 
-```bash
-mvn spring-boot:run
-```
-*(Hoặc chỉ định rõ profile)*:
 ```bash
 mvn spring-boot:run "-Dspring-boot.run.profiles=dev"
 ```
@@ -76,6 +72,37 @@ Khi chạy với profile `dev`, hệ thống tự động khởi tạo 2 tài kh
 
 ---
 
+## 🔐 Cấu hình JWT
+
+Production bắt buộc cung cấp đủ bốn biến môi trường sau; ứng dụng sẽ không khởi động nếu thiếu hoặc không hợp lệ:
+
+| Biến | Ý nghĩa | Giá trị gợi ý |
+| :--- | :--- | :--- |
+| `JWT_SECRET` | Khóa ngẫu nhiên mã hóa Base64, tối thiểu 32 byte sau khi giải mã | Không có mặc định production |
+| `JWT_ISSUER` | Định danh hệ thống phát token | `oneshop` |
+| `JWT_ACCESS_TOKEN_EXPIRATION_MILLIS` | Thời hạn access token | `900000` (15 phút) |
+| `JWT_REFRESH_TOKEN_EXPIRATION_MILLIS` | Thời hạn refresh token | `604800000` (7 ngày) |
+
+Tạo secret an toàn bằng OpenSSL:
+
+```bash
+openssl rand -base64 32
+```
+
+Hoặc PowerShell:
+
+```powershell
+$bytes = New-Object byte[] 32
+[Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
+[Convert]::ToBase64String($bytes)
+```
+
+Không commit secret thật. File [.env.example](.env.example) chỉ liệt kê tên biến và giá trị mẫu; Spring Boot không tự động nạp `.env`, vì vậy hãy cấu hình biến trong shell, IDE, container hoặc secret manager của môi trường triển khai.
+
+Profile `dev` có một khóa công khai chỉ dành cho local để khởi chạy nhanh. Không sử dụng profile hoặc khóa này trong môi trường dùng chung/production.
+
+---
+
 ## 🎨 Giao diện & Các màn hình chính
 
 ### 1. Phân hệ Khách hàng (Storefront) - Glossier Style
@@ -94,7 +121,10 @@ Khi chạy với profile `dev`, hệ thống tự động khởi tạo 2 tài kh
 - **Quản lý Sản phẩm (`/admin/products`):** Xem danh sách, thêm/sửa/xóa sản phẩm và tích hợp tải ảnh lên Cloudinary.
 
 ### 3. REST API
-- **Đăng nhập cấp JWT Token:** `POST /api/auth/login` (Body: `{ "email": "...", "password": "..." }`)
+- **Đăng nhập cấp access và refresh token:** `POST /api/auth/login` (Body: `{ "email": "...", "password": "..." }`)
+- **Đổi refresh token:** `POST /api/auth/refresh` (Body: `{ "refreshToken": "..." }`)
+
+Access token được gửi bằng header `Authorization: Bearer <access-token>`. Refresh token chỉ được chấp nhận tại endpoint refresh và không thể dùng để truy cập tài nguyên được bảo vệ.
 
 ---
 
@@ -122,7 +152,7 @@ OneShop/
 │   └── templates/                   # Giao diện Thymeleaf
 │       ├── pages/                   # Giao diện người dùng (home, products, login...)
 │       └── admin/                   # Giao diện trang quản trị
-├── .env                             # Biến môi trường mẫu (JWT, Cloudinary, DB)
+├── .env.example                     # Tên biến môi trường và giá trị mẫu giả
 └── pom.xml                          # Quản lý thư viện Maven
 ```
 

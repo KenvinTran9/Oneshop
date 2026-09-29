@@ -8,3 +8,11 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+app:
+  jwt:
+    # Public development-only key. Override JWT_SECRET for shared environments.
+    secret: ${JWT_SECRET:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=}
+    issuer: ${JWT_ISSUER:oneshop-dev}
+    access-token-expiration-millis: ${JWT_ACCESS_TOKEN_EXPIRATION_MILLIS:900000}
+    refresh-token-expiration-millis: ${JWT_REFRESH_TOKEN_EXPIRATION_MILLIS:604800000}
