@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:oneshop-test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+app:
+  jwt:
+    secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+    issuer: oneshop-test
+    access-token-expiration-millis: 900000
+    refresh-token-expiration-millis: 604800000
