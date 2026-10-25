@@ -160,6 +160,33 @@ OneShop/
 
 ## 💡 Ghi chú mở rộng phát triển
 
+### Danh mục 100 sản phẩm và giỏ hàng
+
+Profile `dev` nạp 100 sản phẩm từ `src/main/resources/catalog/products.json`: 5 danh mục, 20 sản phẩm mỗi danh mục và 59 thương hiệu. Dữ liệu được trích từ workbook `Tong_hop_100_san_pham_my_pham.xlsx`, sheet `Danh sách 100`, dòng 5–104; các sheet danh mục được đối chiếu để không nhập lặp.
+
+Mỗi sản phẩm có ảnh cục bộ, một giá bán cố định bằng VNĐ, quy cách, thành phần, công dụng, loại da phù hợp và cách dùng. 19 sản phẩm trang điểm có mã màu để chọn; màu trên màn hình chỉ dùng minh họa. Quốc gia thương hiệu không được diễn giải thành nơi sản xuất. Không tạo đánh giá hoặc tồn kho giả.
+
+Trang bán hàng không hiển thị thông tin đối chiếu bên ngoài. Các trường `priceSourceUrl`, `imageSourceUrl` và ngày kiểm tra chỉ được giữ nội bộ trong dữ liệu. Các giá ngoại tệ đã được khởi tạo thành một mức VNĐ, làm tròn 1.000 đồng, theo tỷ giá bán Vietcombank được đối chiếu ngày 26/10/2026 (USD 26.020; GBP 35.132,35); các trường gốc được giữ để kiểm tra nội bộ. Có thể chỉnh giá bán trong JSON trước khi nạp hoặc qua dữ liệu quản trị. Quy cách được chuẩn hóa theo phiên bản niêm yết, gồm COSRX Vitamin C 23 (20 g), ILLIYOON (230 ml) và Eucerin UreaRepair 5% (kem dưỡng tay 75 ml).
+
+Giao diện có tìm sản phẩm/thương hiệu, lọc danh mục, sắp xếp tên/giá, chọn màu và số lượng. `/cart` cho phép thêm hàng, gộp đúng SKU/quy cách/màu, đổi số lượng 1–99, xóa/khôi phục và tính tổng. Giỏ lưu trong `localStorage` trên trình duyệt hiện tại, không đồng bộ tài khoản. Giá và lựa chọn trong giỏ là dữ liệu giao diện, cần được máy chủ kiểm tra lại khi triển khai đặt hàng thật. Hộp thông tin giao hàng chỉ là UI; nút xác nhận bị vô hiệu hóa, không gọi API đặt hàng, không lưu thông tin nhận hàng và không thanh toán.
+
+Ảnh sản phẩm nằm trong `src/main/resources/static/images/catalog/`. CSS/JS mới tại `static/css/shop.css` và `static/js/shop.js`. Kiểm thử giỏ độc lập: `node tools/test_shop_cart.cjs`; kiểm thử danh mục và giao diện: `mvn test`.
+
+Khởi động lại profile `dev` sẽ nạp lại dữ liệu khi dùng H2 in-memory. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
+
+Để cập nhật nội dung từ một workbook cùng cấu trúc (Python cần `openpyxl`):
+
+```powershell
+python tools/import_product_catalog.py "duong-dan-file.xlsx"
+```
+
+Script giữ lại giá và ảnh đã nghiên cứu khi SKU và slug còn trùng khớp. Sau khi sửa dữ liệu JSON, khởi động lại bản dev mới để xem thay đổi. Trên máy Windows này, nếu Java báo lỗi socket nội bộ, có thể dùng:
+
+```powershell
+$env:JAVA_HOME = 'C:\Program Files\Java\jdk-21'
+mvn spring-boot:run "-Dspring-boot.run.profiles=dev" "-Dspring-boot.run.jvmArguments=-Djdk.net.unixdomain.tmpdir=C:\OneShop\target"
+```
+
 1. **Cloudinary:** Cập nhật thông tin `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` trong `.env` để kích hoạt tính năng upload ảnh thực tế.
 2. **Logic Giỏ hàng & Đơn hàng:** Các Entity `Order`, `OrderItem`, `StoreStock` đã được chuẩn bị sẵn để mở rộng quy trình đặt hàng chọn chi nhánh nhận hàng / giao hàng.
 

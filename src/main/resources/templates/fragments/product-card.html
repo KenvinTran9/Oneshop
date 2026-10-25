@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<article th:fragment="card(product)" class="shop-card" data-product-card
+         th:attr="data-sku=${product.sku},data-name=${product.name},data-price=${product.sellingPrice},data-image=${product.imageUrl},data-url=@{/products/{slug}(slug=${product.slug})},data-size=${!#lists.isEmpty(product.sizes) ? product.sizes[0] : product.packageSize}">
+    <a class="shop-card-image" th:href="@{/products/{slug}(slug=${product.slug})}">
+        <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}" loading="lazy" th:alt="${product.name}">
+        <span class="shop-category-tag" th:text="${product.category != null ? product.category.name : 'Mỹ phẩm'}">Mỹ phẩm</span>
+    </a>
+    <div class="shop-card-content">
+        <span class="shop-card-brand" th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span>
+        <h2><a th:href="@{/products/{slug}(slug=${product.slug})}" th:text="${product.name}">Tên sản phẩm</a></h2>
+        <p class="shop-card-size" th:text="${!#lists.isEmpty(product.sizes) ? product.sizes[0] : product.packageSize}"></p>
+        <div class="shop-card-swatches" th:if="${!#lists.isEmpty(product.shades)}" aria-label="Các màu sản phẩm">
+            <span th:each="shade, iter : ${product.shades}" th:if="${iter.index < 4}" class="mini-swatch"
+                  th:style="${'--swatch: ' + shade.color}" th:title="${shade.label}"></span>
+            <span class="small text-muted" th:text="${#lists.size(product.shades)} + ' màu'"></span>
+        </div>
+        <div class="shop-card-bottom">
+            <strong class="shop-card-price" th:text="${product.displayPrice}">0 ₫</strong>
+            <a th:if="${product.requiresSelection}" class="shop-card-add" th:href="@{/products/{slug}(slug=${product.slug})}" aria-label="Chọn màu sản phẩm"><i class="bi bi-arrow-up-right"></i><span>Chọn màu</span></a>
+            <button th:unless="${product.requiresSelection}" class="shop-card-add" type="button" data-quick-add th:attr="aria-label=${'Thêm ' + product.name + ' vào giỏ hàng'}"><i class="bi bi-bag-plus"></i><span>Thêm vào giỏ</span></button>
+        </div>
+    </div>
+</article>
+</body>
+</html>

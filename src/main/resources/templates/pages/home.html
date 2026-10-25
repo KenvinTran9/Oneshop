@@ -10,7 +10,7 @@
             <div class="col-lg-6 home-heading">
                 <span class="eyebrow">Chuỗi cửa hàng mỹ phẩm</span>
                 <h1 class="mt-3 mb-3">OneShop</h1>
-                <p class="lead text-muted">Mua sắm mỹ phẩm chính hãng, kiểm tra tồn kho theo từng chi nhánh và nhận tư vấn làm đẹp chuyên sâu.</p>
+                <p class="lead text-muted">Khám phá mỹ phẩm chăm sóc da và trang điểm tại OneShop. Chọn sản phẩm yêu thích, thêm vào giỏ và nhận tư vấn phù hợp với bạn.</p>
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <a class="btn btn-dark rounded-pill px-4" th:href="@{/products}">
                         <i class="bi bi-bag me-1"></i>
@@ -27,8 +27,8 @@
                     <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1200&q=80"
                          alt="Kệ trưng bày mỹ phẩm OneShop">
                     <div class="hero-badge">
-                        <span>3+</span>
-                        <small>chi nhánh hiện có</small>
+                        <span>100</span>
+                        <small>sản phẩm làm đẹp</small>
                     </div>
                 </div>
             </div>
@@ -47,26 +47,7 @@
         </div>
         <div class="row g-4">
             <div class="col-6 col-lg-3" th:each="product : ${featuredProducts}">
-                <article class="product-card h-100">
-                    <a th:href="@{/products/{slug}(slug=${product.slug})}">
-                        <img th:src="${product.imageUrl}" th:alt="${product.name}">
-                    </a>
-                    <div class="product-card-body">
-                        <span class="product-category" th:text="${product.category != null ? product.category.name : 'Mỹ phẩm'}">Mỹ phẩm</span>
-                        <h3 class="h6 mt-2 mb-1">
-                            <a th:href="@{/products/{slug}(slug=${product.slug})}" th:text="${product.name}">Tên sản phẩm</a>
-                        </h3>
-                        <p th:text="${product.shortDescription}">Mô tả ngắn</p>
-                        <div class="product-rating">
-                            <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
-                            <span class="rating-count">(4.5)</span>
-                        </div>
-                        <div class="product-price-row">
-                            <span class="product-price" th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
-                            <button class="btn-add-bag" type="button" aria-label="Thêm vào giỏ"><i class="bi bi-plus"></i></button>
-                        </div>
-                    </div>
-                </article>
+                <article th:replace="~{fragments/product-card :: card(${product})}"></article>
             </div>
             <div class="col-12" th:if="${#lists.isEmpty(featuredProducts)}">
                 <div class="empty-state">Chưa có sản phẩm. Hãy thêm sản phẩm trong trang quản trị.</div>
@@ -80,8 +61,8 @@
         <div class="row align-items-center g-4">
             <div class="col-lg-5">
                 <span class="eyebrow">Hệ thống cửa hàng</span>
-                <h2 class="mt-2">Quản lý tồn kho theo từng chi nhánh</h2>
-                <p class="text-muted">Hệ thống phân bổ tồn kho đa chi nhánh giúp bạn dễ dàng tìm kiếm và đặt mua sản phẩm tại cửa hàng gần nhất.</p>
+                <h2 class="mt-2">Ghé OneShop, chọn điều bạn yêu thích.</h2>
+                <p class="text-muted">Trải nghiệm sản phẩm và nhận tư vấn trực tiếp tại cửa hàng OneShop gần bạn.</p>
                 <a class="section-link" th:href="@{/stores}">Xem tất cả cửa hàng <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="col-lg-7">

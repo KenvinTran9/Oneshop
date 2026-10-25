@@ -1,90 +1,52 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Sản phẩm - OneShop</title>
-</head>
+<head><title>Mua sắm mỹ phẩm - OneShop</title></head>
 <body>
-<!-- Collection Hero -->
-<section class="collection-hero">
+<section class="shop-collection-heading">
     <div class="container">
-        <h1>Skincare & Beauty</h1>
-        <p>Danh sách mỹ phẩm chính hãng đang kinh doanh trên toàn hệ thống OneShop.</p>
+        <div class="shop-collection-heading-inner">
+            <div><span class="eyebrow">OneShop Beauty Store</span><h1>Chăm chút vẻ đẹp mỗi ngày.</h1><p>Khám phá mỹ phẩm từ những thương hiệu bạn yêu thích.</p></div>
+            <div class="collection-decoration" aria-hidden="true"><span>SKINCARE</span><span>MAKEUP</span><i class="bi bi-flower1"></i></div>
+        </div>
+        <form class="shop-search" method="get" th:action="@{/products}">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input name="q" type="search" th:value="${searchQuery}" placeholder="Tìm sản phẩm hoặc thương hiệu..." aria-label="Tìm sản phẩm hoặc thương hiệu">
+            <input name="category" type="hidden" th:value="${selectedCategory}">
+            <input name="sort" type="hidden" th:value="${selectedSort}">
+            <button type="submit">Tìm kiếm</button>
+        </form>
     </div>
 </section>
-
-<!-- Filter Bar -->
-<section class="py-0">
+<section class="shop-collection">
     <div class="container">
-        <div class="filter-bar">
-            <div class="filter-bar-left">
-                <span class="filter-label">Bộ lọc:</span>
-                <button class="filter-pill active" type="button">Tất cả</button>
-                <button class="filter-pill" type="button">Chăm sóc da</button>
-                <button class="filter-pill" type="button">Trang điểm</button>
-                <button class="filter-pill" type="button">Serum</button>
-                <button class="filter-pill" type="button">Kem dưỡng</button>
-                <button class="filter-pill" type="button">Sữa rửa mặt</button>
-            </div>
-            <div class="filter-bar-right">
-                <span class="product-count" th:text="${productPage.totalElements} + ' sản phẩm'">0 sản phẩm</span>
-                <select class="sort-select" aria-label="Sắp xếp">
-                    <option>Mới nhất</option>
-                    <option>Phổ biến nhất</option>
-                    <option>Giá: Thấp đến Cao</option>
-                    <option>Giá: Cao đến Thấp</option>
+        <nav class="shop-category-nav" aria-label="Danh mục sản phẩm">
+            <a th:classappend="${selectedCategory == ''} ? 'active'" th:href="@{/products(q=${searchQuery},sort=${selectedSort})}">Tất cả</a>
+            <a th:each="category : ${categories}" th:text="${category.name}" th:classappend="${selectedCategory == category.slug} ? 'active'"
+               th:href="@{/products(category=${category.slug},q=${searchQuery},sort=${selectedSort})}"></a>
+        </nav>
+        <div class="shop-results-bar">
+            <p><strong th:text="${productPage.totalElements}">100</strong> sản phẩm <span th:if="${searchQuery != ''}">cho “<span th:text="${searchQuery}"></span>”</span></p>
+            <form method="get" th:action="@{/products}" class="shop-sort-form">
+                <input type="hidden" name="category" th:value="${selectedCategory}">
+                <input type="hidden" name="q" th:value="${searchQuery}">
+                <label for="catalog-sort">Sắp xếp</label>
+                <select id="catalog-sort" name="sort" data-auto-submit>
+                    <option value="newest" th:selected="${selectedSort == 'newest'}">Mới nhất</option>
+                    <option value="name" th:selected="${selectedSort == 'name'}">Tên A–Z</option>
+                    <option value="price-asc" th:selected="${selectedSort == 'price-asc'}">Giá thấp đến cao</option>
+                    <option value="price-desc" th:selected="${selectedSort == 'price-desc'}">Giá cao đến thấp</option>
                 </select>
-            </div>
+                <noscript><button type="submit">Áp dụng</button></noscript>
+            </form>
         </div>
-    </div>
-</section>
-
-<!-- Product Grid -->
-<section class="py-4 pb-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-6 col-lg-3" th:each="product : ${productPage.content}">
-                <article class="product-card h-100">
-                    <a th:href="@{/products/{slug}(slug=${product.slug})}">
-                        <img th:src="${product.imageUrl}" th:alt="${product.name}">
-                    </a>
-                    <div class="product-card-body">
-                        <span class="product-category" th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span>
-                        <h2 class="h6 mt-2 mb-1">
-                            <a th:href="@{/products/{slug}(slug=${product.slug})}" th:text="${product.name}">Tên sản phẩm</a>
-                        </h2>
-                        <p th:text="${product.shortDescription}">Mô tả ngắn</p>
-                        <div class="product-rating">
-                            <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
-                            <span class="rating-count">(4.5)</span>
-                        </div>
-                        <div class="product-price-row">
-                            <span class="product-price" th:text="${#numbers.formatDecimal(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
-                            <button class="btn-add-bag" type="button" aria-label="Thêm vào giỏ"><i class="bi bi-plus"></i></button>
-                        </div>
-                    </div>
-                </article>
-            </div>
-            <div class="col-12" th:if="${productPage.empty}">
-                <div class="empty-state">Chưa có sản phẩm phù hợp.</div>
-            </div>
+        <div class="shop-product-grid">
+            <th:block th:each="product : ${productPage.content}"><article th:replace="~{fragments/product-card :: card(${product})}"></article></th:block>
         </div>
-
-        <nav class="mt-5" th:if="${productPage.totalPages > 1}" aria-label="Phân trang sản phẩm">
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${productPage.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/products(page=${productPage.number - 1})}">
-                        <i class="bi bi-chevron-left me-1"></i> Trước
-                    </a>
-                </li>
-                <li class="page-item disabled">
-                    <span class="page-link" th:text="${productPage.number + 1} + ' / ' + ${productPage.totalPages}">1 / 1</span>
-                </li>
-                <li class="page-item" th:classappend="${productPage.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{/products(page=${productPage.number + 1})}">
-                        Sau <i class="bi bi-chevron-right ms-1"></i>
-                    </a>
-                </li>
-            </ul>
+        <div class="shop-empty-state" th:if="${productPage.empty}"><i class="bi bi-search"></i><h2>Chưa tìm thấy sản phẩm</h2><p>Thử một tên sản phẩm, thương hiệu hoặc danh mục khác nhé.</p><a class="shop-button primary" href="/products">Xem tất cả sản phẩm</a></div>
+        <nav class="shop-pagination" th:if="${productPage.totalPages > 1}" aria-label="Phân trang sản phẩm">
+            <a th:if="${!productPage.first}" th:href="@{/products(page=${productPage.number - 1},category=${selectedCategory},q=${searchQuery},sort=${selectedSort})}"><i class="bi bi-arrow-left"></i> Trước</a>
+            <span th:text="${'Trang ' + (productPage.number + 1) + ' / ' + productPage.totalPages}"></span>
+            <a th:if="${!productPage.last}" th:href="@{/products(page=${productPage.number + 1},category=${selectedCategory},q=${searchQuery},sort=${selectedSort})}">Tiếp theo <i class="bi bi-arrow-right"></i></a>
         </nav>
     </div>
 </section>

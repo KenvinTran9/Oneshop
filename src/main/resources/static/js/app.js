@@ -46,20 +46,4 @@ document.addEventListener("DOMContentLoaded", () => {
         if (userDropdown) userDropdown.style.setProperty("display", "none", "important");
         if (adminNavLink) adminNavLink.style.setProperty("display", "none", "important");
     });
-
-    // 2. Xu ly tuong tac them vao gio hang
-    document.addEventListener("click", (event) => {
-        const addButton = event.target.closest("[data-add-cart], .btn-add-bag");
-        if (!addButton) return;
-        
-        addButton.classList.add("btn-added");
-        const icon = addButton.querySelector("i");
-        if (icon) {
-            icon.className = "bi bi-check2";
-        }
-        setTimeout(() => {
-            addButton.classList.remove("btn-added");
-            if (icon) icon.className = "bi bi-plus";
-        }, 1500);
-    });
 });

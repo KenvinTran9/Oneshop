@@ -10,6 +10,13 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.OrderColumn;
 
 @Entity
 @Table(name = "products")
@@ -30,13 +37,61 @@ public class Product extends BaseEntity {
     @Lob
     private String description;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal price = BigDecimal.ZERO;
+    @Column(precision = 12, scale = 2)
+    private BigDecimal price;
 
     @Column(precision = 12, scale = 2)
     private BigDecimal salePrice;
 
     private String imageUrl;
+
+    @ElementCollection
+    @CollectionTable(name = "product_shades", joinColumns = @JoinColumn(name = "product_id"))
+    @OrderColumn(name = "shade_order")
+    private List<ProductShade> shades = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "product_sizes", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "size_label", length = 100)
+    @OrderColumn(name = "size_order")
+    private List<String> sizes = new ArrayList<>();
+
+    @Column(length = 1000)
+    private String priceSourceUrl;
+
+    @Column(length = 1000)
+    private String imageSourceUrl;
+
+    private String priceVariant;
+
+    private String priceCheckedOn;
+
+    private boolean priceFrom;
+
+    @Column(length = 3)
+    private String priceCurrency = "VND";
+
+    private String brandCountry;
+
+    private String packageSize;
+
+    @Lob
+    private String ingredients;
+
+    @Lob
+    private String suitableFor;
+
+    @Lob
+    private String directions;
+
+    @Lob
+    private String precautions;
+
+    @Column(length = 1000)
+    private String sourceUrl;
+
+    @Column(length = 1500)
+    private String imageSearchUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -112,6 +167,65 @@ public class Product extends BaseEntity {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public List<ProductShade> getShades() { return shades; }
+    public void setShades(List<ProductShade> shades) { this.shades = new ArrayList<>(shades); }
+    public List<String> getSizes() { return sizes; }
+    public void setSizes(List<String> sizes) { this.sizes = new ArrayList<>(sizes); }
+    public boolean isRequiresSelection() { return !shades.isEmpty() || sizes.size() > 1; }
+    public BigDecimal getSellingPrice() { return salePrice != null ? salePrice : price; }
+
+    public String getBrandCountry() { return brandCountry; }
+    public void setBrandCountry(String brandCountry) { this.brandCountry = brandCountry; }
+
+    public String getPackageSize() { return packageSize; }
+    public void setPackageSize(String packageSize) { this.packageSize = packageSize; }
+
+    public String getIngredients() { return ingredients; }
+    public void setIngredients(String ingredients) { this.ingredients = ingredients; }
+
+    public String getSuitableFor() { return suitableFor; }
+    public void setSuitableFor(String suitableFor) { this.suitableFor = suitableFor; }
+
+    public String getDirections() { return directions; }
+    public void setDirections(String directions) { this.directions = directions; }
+
+    public String getPrecautions() { return precautions; }
+    public void setPrecautions(String precautions) { this.precautions = precautions; }
+
+    public String getSourceUrl() { return sourceUrl; }
+    public void setSourceUrl(String sourceUrl) { this.sourceUrl = sourceUrl; }
+
+    public String getImageSearchUrl() { return imageSearchUrl; }
+    public void setImageSearchUrl(String imageSearchUrl) { this.imageSearchUrl = imageSearchUrl; }
+
+    public String getPriceSourceUrl() { return priceSourceUrl; }
+    public void setPriceSourceUrl(String priceSourceUrl) { this.priceSourceUrl = priceSourceUrl; }
+
+    public String getImageSourceUrl() { return imageSourceUrl; }
+    public void setImageSourceUrl(String imageSourceUrl) { this.imageSourceUrl = imageSourceUrl; }
+
+    public String getPriceVariant() { return priceVariant; }
+    public void setPriceVariant(String priceVariant) { this.priceVariant = priceVariant; }
+
+    public String getPriceCheckedOn() { return priceCheckedOn; }
+    public void setPriceCheckedOn(String priceCheckedOn) { this.priceCheckedOn = priceCheckedOn; }
+
+    public boolean isPriceFrom() { return priceFrom; }
+    public void setPriceFrom(boolean priceFrom) { this.priceFrom = priceFrom; }
+
+    public String getPriceCurrency() { return priceCurrency; }
+    public void setPriceCurrency(String priceCurrency) { this.priceCurrency = priceCurrency; }
+
+    public String getDisplayPrice() {
+        BigDecimal amount = salePrice != null ? salePrice : price;
+        if (amount == null) { return "Liên hệ"; }
+        boolean vnd = priceCurrency == null || "VND".equals(priceCurrency);
+        NumberFormat format = NumberFormat.getNumberInstance(vnd ? Locale.forLanguageTag("vi-VN") : Locale.UK);
+        format.setMinimumFractionDigits(vnd ? 0 : 2);
+        format.setMaximumFractionDigits(vnd ? 0 : 2);
+        return format.format(amount) + (vnd ? " ₫" : " " + priceCurrency);
     }
 
     public ProductStatus getStatus() {

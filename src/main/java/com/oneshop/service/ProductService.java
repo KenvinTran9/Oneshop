@@ -24,6 +24,17 @@ public class ProductService {
         return productRepository.findByStatus(ProductStatus.ACTIVE, pageable);
     }
 
+    public Page<Product> findActiveProducts(String categorySlug, Pageable pageable) {
+        return categorySlug == null || categorySlug.isBlank()
+                ? findActiveProducts(pageable)
+                : productRepository.findByStatusAndCategory_Slug(ProductStatus.ACTIVE, categorySlug, pageable);
+    }
+
+    public Page<Product> searchCatalog(String category, String search, Pageable pageable) {
+        return productRepository.searchCatalog(ProductStatus.ACTIVE,
+                category == null ? "" : category.trim(), search == null ? "" : search.trim(), pageable);
+    }
+
     public List<Product> findFeaturedProducts() {
         return productRepository.findTop8ByStatusOrderByCreatedAtDesc(ProductStatus.ACTIVE);
     }

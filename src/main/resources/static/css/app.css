@@ -701,6 +701,18 @@ a:hover {
     margin: 0;
 }
 
+.product-card img, .product-detail-image { object-fit: contain; background: #faf8f6; }
+.detail-section .product-detail-image { height: min(80vw, 520px); min-height: 0; }
+.filter-pill { text-decoration: none; }
+.product-facts { margin: 0 0 1rem; }
+.product-facts > div { display: grid; grid-template-columns: minmax(120px, 36%) 1fr; gap: 1rem; padding: .7rem 0; border-bottom: 1px solid #eee7e3; }
+.product-facts dt { font-weight: 500; }
+.product-facts dd { margin: 0; color: #68605d; overflow-wrap: anywhere; }
+.product-info-section { margin-top: 1.5rem; }
+.product-info-section h2 { font-size: 1.05rem; }
+.product-info-section p { line-height: 1.75; color: #68605d; }
+.price-reference { font-size: .8rem; color: #756966; line-height: 1.6; }
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 991.98px) {
     .collection-hero h1 {

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><title>Giỏ hàng của bạn - OneShop</title></head>
+<body>
+<section class="shop-cart-page">
+<div class="container">
+    <nav class="shop-breadcrumb" aria-label="Điều hướng"><a href="/">Trang chủ</a><i class="bi bi-chevron-right"></i><span>Giỏ hàng</span></nav>
+    <div class="cart-page-heading"><div><span class="eyebrow">Mua sắm cùng OneShop</span><h1>Giỏ hàng của bạn<span data-cart-count-label></span></h1></div><a href="/products"><i class="bi bi-arrow-left"></i> Tiếp tục mua sắm</a></div>
+    <div class="shop-empty-state cart-empty" data-cart-empty hidden><i class="bi bi-bag-heart"></i><h2>Giỏ hàng đang trống</h2><p>Chọn những sản phẩm phù hợp để bắt đầu chăm sóc bản thân.</p><a class="shop-button primary" href="/products">Khám phá sản phẩm</a></div>
+    <div class="cart-layout" data-cart-content hidden>
+        <section class="cart-items-panel" aria-label="Sản phẩm trong giỏ"><div class="cart-table-heading"><span>Sản phẩm</span><span>Thành tiền</span></div><div data-cart-list></div></section>
+        <aside class="cart-summary">
+            <span class="eyebrow">OneShop</span><h2>Tóm tắt giỏ hàng</h2>
+            <div class="summary-line"><span>Tạm tính</span><strong data-cart-subtotal>0 ₫</strong></div>
+            <div class="summary-line"><span>Phí giao hàng</span><span class="text-muted small">Xác nhận khi đặt hàng</span></div>
+            <div class="cart-total-line"><span>Tổng tiền sản phẩm</span><strong data-cart-total>0 ₫</strong></div>
+            <button class="shop-button primary w-100" type="button" data-open-checkout>Tiến hành đặt hàng <i class="bi bi-arrow-right"></i></button>
+            <p class="cart-summary-note"><i class="bi bi-bookmark-heart"></i> Giỏ hàng được lưu để bạn tiếp tục mua sắm bất cứ lúc nào trên trình duyệt này.</p>
+            <a class="cart-store-link" href="/stores"><i class="bi bi-chat-dots"></i> Cần tư vấn? Ghé OneShop</a>
+        </aside>
+    </div>
+    <noscript><div class="shop-empty-state">Bật JavaScript để xem và cập nhật giỏ hàng của bạn.</div></noscript>
+</div>
+</section>
+<dialog class="checkout-dialog" data-checkout-dialog>
+    <button class="dialog-close" type="button" data-close-checkout aria-label="Đóng thông tin đặt hàng"><i class="bi bi-x-lg"></i></button>
+    <span class="eyebrow">Mua sắm online</span><h2>Thông tin nhận hàng</h2>
+    <form class="checkout-form">
+        <label>Họ và tên<input type="text" autocomplete="name" placeholder="Nhập họ và tên"></label>
+        <div class="checkout-field-row"><label>Số điện thoại<input type="tel" autocomplete="tel" placeholder="Số điện thoại nhận hàng"></label><label>Email<input type="email" autocomplete="email" placeholder="Email của bạn"></label></div>
+        <label>Địa chỉ giao hàng<textarea rows="2" autocomplete="street-address" placeholder="Số nhà, đường, phường/xã, tỉnh/thành"></textarea></label>
+        <label>Ghi chú<textarea rows="2" placeholder="Lời nhắn dành cho OneShop"></textarea></label>
+        <div class="checkout-payment"><i class="bi bi-cash-coin"></i><div><strong>Thanh toán khi nhận hàng</strong><p>Kiểm tra thông tin trước khi hoàn tất.</p></div></div>
+        <p class="checkout-status"><i class="bi bi-info-circle"></i> Đặt hàng trực tuyến sẽ sớm được mở. Hiện bạn có thể lưu giỏ hàng và liên hệ cửa hàng để hoàn tất mua hàng.</p>
+        <button class="shop-button primary w-100" type="button" disabled>Xác nhận đặt hàng</button>
+    </form>
+</dialog>
+</body>
+</html>
