@@ -126,7 +126,7 @@ a:hover {
     border-radius: 6px;
     margin: 2px 6px;
     width: calc(100% - 12px);
-    transition: all 0.15s ease;
+    transition: background-color .15s ease, color .15s ease;
 }
 
 #navUserDropdown .dropdown-item:hover {
@@ -238,7 +238,7 @@ a:hover {
     font-weight: 500;
     color: var(--os-ink);
     cursor: pointer;
-    transition: all .2s;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease;
 }
 
 .filter-pill:hover,
@@ -462,7 +462,7 @@ a:hover {
     font-size: .85rem;
     color: var(--os-ink);
     cursor: pointer;
-    transition: all .2s;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease;
 }
 
 .btn-add-bag:hover {
@@ -677,7 +677,7 @@ a:hover {
     border: 1px solid rgba(255,255,255,.2);
     color: rgba(255,255,255,.7);
     font-size: 1rem;
-    transition: all .2s;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease;
 }
 
 .footer-social a:hover {

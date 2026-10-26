@@ -1,0 +1,95 @@
+/* One shared rhythm for storefront interactions. */
+:root {
+    --motion-fast: 150ms;
+    --motion-normal: 240ms;
+    --motion-ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+html { scrollbar-gutter: stable; }
+html:has(dialog[open]) { overflow: hidden; }
+
+.shop-card, .product-card, .store-card {
+    transition: transform var(--motion-normal) var(--motion-ease),
+                border-color var(--motion-fast) ease;
+}
+
+/* Keep a static shadow instead of repainting a growing shadow each frame. */
+.shop-card:hover { transform: none; box-shadow: none; }
+.shop-card:hover .shop-card-image img { transform: none; }
+.shop-card-image img { transition: transform 360ms var(--motion-ease); }
+
+.shop-button, .shop-card-add, .shop-search button, .shop-pagination a,
+.shop-category-nav a, .quantity-stepper button, .dialog-close, .btn-icon {
+    transition: transform var(--motion-fast) var(--motion-ease),
+                background-color var(--motion-fast) ease,
+                border-color var(--motion-fast) ease,
+                color var(--motion-fast) ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.option-chip > span, .shade-choice-body {
+    transition: border-color var(--motion-fast) ease,
+                background-color var(--motion-fast) ease,
+                color var(--motion-fast) ease;
+}
+
+.shade-check { display: block; opacity: 0; transform: scale(.65); width: 12px; }
+.shade-choice input:checked + .shade-choice-body .shade-check { opacity: 1; transform: scale(1); }
+.shade-check, .shop-accordions summary i {
+    transition: transform var(--motion-normal) var(--motion-ease), opacity var(--motion-fast) ease;
+}
+
+.shop-card-add:active, .shop-button:active:not(:disabled),
+.quantity-stepper button:active:not(:disabled), .dialog-close:active {
+    transform: scale(.97);
+}
+
+.shop-card:focus-within { border-color: #acbca4; }
+.cart-item-total, .cart-total-line strong, .quantity-stepper input { font-variant-numeric: tabular-nums; }
+.shop-cart-count { transform-origin: center; }
+
+.section-link { transition: color var(--motion-fast) ease; }
+.section-link:hover { gap: .3rem; }
+.section-link i { transition: transform var(--motion-normal) var(--motion-ease); }
+
+dialog::backdrop { backdrop-filter: none; }
+dialog[open]::backdrop { animation: shop-backdrop-in var(--motion-normal) ease both; }
+dialog[data-motion-closing]::backdrop { animation: shop-backdrop-out var(--motion-fast) ease both; }
+
+@keyframes shop-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shop-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+
+@media (hover: hover) and (pointer: fine) {
+    .shop-card:hover { transform: translateY(-4px); border-color: #c9d4c2; box-shadow: 0 8px 24px #263c340a; }
+    .shop-card:hover .shop-card-image img { transform: scale(1.035); }
+    .shop-button:hover:not(:disabled), .shop-card-add:hover { transform: translateY(-1px); }
+    .shop-button:active:not(:disabled), .shop-card-add:active { transform: scale(.97); }
+    .shop-image-stage .zoom-icon { transition: transform var(--motion-normal) var(--motion-ease); }
+    .shop-image-stage:hover .zoom-icon { transform: scale(1.08); }
+    .section-link:hover i { transform: translateX(4px); }
+}
+
+@media (hover: none), (pointer: coarse) {
+    .product-card:hover, .store-card:hover { transform: none; box-shadow: none; }
+}
+
+/* Includes Bootstrap transitions and existing account-menu animations. */
+@media (prefers-reduced-motion: reduce) {
+    html:focus-within { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        transition-delay: 0ms !important;
+        scroll-behavior: auto !important;
+    }
+    .shop-card:hover, .shop-card:hover .shop-card-image img,
+    .product-card:hover, .store-card:hover, .shop-button:hover:not(:disabled),
+    .shop-card-add:hover, .section-link:hover i, .shop-image-stage:hover .zoom-icon {
+        transform: none;
+    }
+    .shop-card-add:active, .shop-button:active:not(:disabled),
+    .quantity-stepper button:active:not(:disabled), .dialog-close:active { transform: none; }
+}

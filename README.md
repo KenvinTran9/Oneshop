@@ -172,6 +172,8 @@ Giao diện có tìm sản phẩm/thương hiệu, lọc danh mục, sắp xếp
 
 Ảnh sản phẩm nằm trong `src/main/resources/static/images/catalog/`. CSS/JS mới tại `static/css/shop.css` và `static/js/shop.js`. Kiểm thử giỏ độc lập: `node tools/test_shop_cart.cjs`; kiểm thử danh mục và giao diện: `mvn test`.
 
+Hiệu ứng dùng chung nằm ở `static/css/motion.css` và `static/js/motion.js`: thẻ xuất hiện một lần khi vào vùng nhìn, phản hồi nút/giỏ hàng và mở/đóng hộp thoại. Hiệu ứng chuyển động dùng transform/opacity, không thêm thư viện. Nội dung luôn hiện được khi JavaScript hoặc IntersectionObserver không có; hiệu ứng dừng khi tab ở nền hoặc người dùng bật giảm chuyển động. Giỏ cập nhật từng dòng theo mã sản phẩm/quy cách/màu để giữ vị trí nhập và focus. Kiểm tra các tình huống ngắt hiệu ứng, thao tác nhanh và giảm chuyển động: `node tools/test_shop_motion.cjs`.
+
 Khởi động lại profile `dev` sẽ nạp lại dữ liệu khi dùng H2 in-memory. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
 
 Để cập nhật nội dung từ một workbook cùng cấu trúc (Python cần `openpyxl`):
