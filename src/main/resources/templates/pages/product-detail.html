@@ -25,8 +25,9 @@
         <h1 th:text="${product.name}">Tên sản phẩm</h1>
         <p class="shop-product-intro" th:text="${product.shortDescription}"></p>
         <div class="shop-detail-price" th:text="${product.displayPrice}">0 ₫</div>
-        <form class="shop-product-form" data-product-form
+        <form class="shop-product-form" data-product-form th:action="@{/cart/items}" method="post"
               th:attr="data-sku=${product.sku},data-name=${product.name},data-price=${product.sellingPrice},data-image=${product.imageUrl},data-url=@{/products/{slug}(slug=${product.slug})}">
+            <input type="hidden" name="productId" th:value="${product.id}">
             <fieldset class="product-option-group" th:if="${!#lists.isEmpty(product.sizes)}">
                 <legend>Quy cách</legend>
                 <div class="product-option-list"><label class="option-chip" th:each="size, iter : ${product.sizes}">
@@ -50,6 +51,7 @@
                 </button>
                 <p class="shade-photo-status" data-shade-photo-status aria-live="polite">Chọn một màu để xem ảnh tương ứng. Bạn có thể bấm ảnh lớn để phóng to.</p>
             </fieldset>
+            <p class="small text-muted" th:if="${product.requiresSelection}">Giỏ hàng hiện lưu theo SKU sản phẩm; màu sắc/quy cách chưa có SKU tồn kho riêng.</p>
             <div class="purchase-quantity-row">
                 <label for="product-quantity">Số lượng</label>
                 <div class="quantity-stepper">
@@ -60,7 +62,6 @@
             </div>
             <div class="shop-purchase-actions">
                 <button class="shop-button primary" type="submit"><i class="bi bi-bag-plus"></i> Thêm vào giỏ hàng</button>
-                <button class="shop-button secondary" type="submit" data-buy-now>Mua ngay</button>
             </div>
         </form>
         <div class="shop-service-notes"><span><i class="bi bi-box-seam"></i> Giao hàng tận nơi</span><a href="/stores"><i class="bi bi-chat-heart"></i> Tư vấn tại OneShop</a></div>

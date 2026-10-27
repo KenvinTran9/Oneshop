@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><title th:text="${formTitle} + ' - OneShop Admin'">Sản phẩm - OneShop Admin</title></head>
+<body>
+<div class="admin-page-title d-flex flex-wrap justify-content-between align-items-end gap-2">
+    <div><span class="small text-muted">Danh mục</span><h2 th:text="${formTitle}">Sản phẩm</h2></div>
+    <a class="btn btn-outline-dark btn-sm" th:href="@{/admin/products}"><i class="bi bi-arrow-left me-1"></i>Danh sách</a>
+</div>
+
+<section class="admin-panel">
+    <form th:action="${formAction}" th:object="${productForm}" method="post" enctype="multipart/form-data" novalidate>
+        <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></div>
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label" for="name">Tên sản phẩm <span class="text-danger">*</span></label>
+                <input class="form-control" id="name" th:field="*{name}" maxlength="180" required>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="sku">SKU <span class="text-danger">*</span></label>
+                <input class="form-control font-monospace" id="sku" th:field="*{sku}" maxlength="80" required>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('sku')}" th:errors="*{sku}"></div>
+            </div>
+            <div class="col-md-8">
+                <label class="form-label" for="slug">Slug <span class="text-danger">*</span></label>
+                <input class="form-control" id="slug" th:field="*{slug}" maxlength="200" required>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}"></div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="status">Trạng thái kinh doanh <span class="text-danger">*</span></label>
+                <select class="form-select" id="status" th:field="*{status}" required>
+                    <option value="">Chọn trạng thái</option>
+                    <option th:each="statusOption : ${T(com.oneshop.entity.ProductStatus).values()}" th:value="${statusOption}" th:text="${statusOption}"></option>
+                </select>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="categoryId">Danh mục <span class="text-danger">*</span></label>
+                <select class="form-select" id="categoryId" th:field="*{categoryId}" required>
+                    <option value="">Chọn danh mục</option>
+                    <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                </select>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="brandId">Thương hiệu</label>
+                <select class="form-select" id="brandId" th:field="*{brandId}">
+                    <option value="">Không chọn thương hiệu</option>
+                    <option th:each="brand : ${brands}" th:value="${brand.id}" th:text="${brand.name}"></option>
+                </select>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('brandId')}" th:errors="*{brandId}"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="price">Giá bán (VND) <span class="text-danger">*</span></label>
+                <input class="form-control" id="price" type="number" min="0" step="0.01" th:field="*{price}" required>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="salePrice">Giá khuyến mãi (VND)</label>
+                <input class="form-control" id="salePrice" type="number" min="0" step="0.01" th:field="*{salePrice}">
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('salePrice')}" th:errors="*{salePrice}"></div>
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="shortDescription">Mô tả ngắn</label>
+                <input class="form-control" id="shortDescription" th:field="*{shortDescription}" maxlength="300">
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('shortDescription')}" th:errors="*{shortDescription}"></div>
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="description">Mô tả chi tiết</label>
+                <textarea class="form-control" id="description" rows="5" th:field="*{description}" maxlength="10000"></textarea>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+            </div>
+            <div class="col-md-8">
+                <label class="form-label" for="image">Ảnh sản phẩm</label>
+                <input class="form-control" id="image" type="file" th:field="*{image}" accept="image/jpeg,image/png,image/gif,image/webp">
+                <div class="form-text">Tối đa 5 MB. Ảnh mới sẽ được lưu qua Cloudinary.</div>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></div>
+            </div>
+            <div class="col-md-4" th:if="${currentImageUrl != null}">
+                <span class="form-label d-block">Ảnh hiện tại</span>
+                <img class="admin-thumb admin-product-preview" th:src="${currentImageUrl}" alt="Ảnh sản phẩm hiện tại">
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            <button class="btn btn-dark" type="submit"><i class="bi bi-check2 me-1"></i>Lưu sản phẩm</button>
+            <a class="btn btn-outline-secondary" th:href="@{/admin/products}">Hủy</a>
+        </div>
+    </form>
+</section>
+</body>
+</html>

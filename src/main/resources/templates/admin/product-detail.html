@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><title th:text="${product.name} + ' - OneShop Admin'">Chi tiết sản phẩm</title></head>
+<body>
+<div class="admin-page-title d-flex flex-wrap justify-content-between align-items-end gap-2">
+    <div><span class="small text-muted">SKU <span class="font-monospace" th:text="${product.sku}">SKU</span></span><h2 th:text="${product.name}">Sản phẩm</h2></div>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-dark btn-sm" th:href="@{/admin/products}">Danh sách</a>
+        <a class="btn btn-dark btn-sm" th:href="@{/admin/products/{id}/edit(id=${product.id})}"><i class="bi bi-pencil me-1"></i>Chỉnh sửa</a>
+    </div>
+</div>
+<div class="alert alert-success" role="status" th:if="${successMessage}" th:text="${successMessage}"></div>
+<section class="admin-panel">
+    <div class="row g-4">
+        <div class="col-md-4"><img class="admin-product-detail-image" th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}" th:alt="${product.name}"></div>
+        <div class="col-md-8">
+            <dl class="row mb-0">
+                <dt class="col-sm-4">SKU</dt><dd class="col-sm-8 font-monospace" th:text="${product.sku}">SKU</dd>
+                <dt class="col-sm-4">Slug</dt><dd class="col-sm-8" th:text="${product.slug}">slug</dd>
+                <dt class="col-sm-4">Danh mục</dt><dd class="col-sm-8" th:text="${product.category != null ? product.category.name : '-'}">Danh mục</dd>
+                <dt class="col-sm-4">Thương hiệu</dt><dd class="col-sm-8" th:text="${product.brand != null ? product.brand.name : '-'}">Thương hiệu</dd>
+                <dt class="col-sm-4">Giá bán</dt><dd class="col-sm-8" th:text="${product.price != null ? #numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' ₫' : '-'}">0 ₫</dd>
+                <dt class="col-sm-4">Giá khuyến mãi</dt><dd class="col-sm-8" th:text="${product.salePrice != null ? #numbers.formatDecimal(product.salePrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : '-'}">-</dd>
+                <dt class="col-sm-4">Trạng thái</dt><dd class="col-sm-8" th:text="${product.status}">ACTIVE</dd>
+                <dt class="col-sm-4">Mô tả ngắn</dt><dd class="col-sm-8" th:text="${product.shortDescription ?: '-'}">-</dd>
+            </dl>
+            <hr>
+            <h3 class="h6">Mô tả chi tiết</h3>
+            <p class="text-muted" style="white-space:pre-line" th:text="${product.description ?: 'Chưa có mô tả.'}">Mô tả</p>
+        </div>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mt-4">
+        <form th:action="@{/admin/products/{id}/status(id=${product.id})}" method="post">
+            <button class="btn btn-outline-primary" type="submit" th:text="${product.active and product.status.name() == 'ACTIVE'} ? 'Ngừng kinh doanh' : 'Mở kinh doanh'">Đổi trạng thái</button>
+        </form>
+        <form th:action="@{/admin/products/{id}/deactivate(id=${product.id})}" method="post"
+              onsubmit="return confirm('Đưa sản phẩm về trạng thái ngừng kinh doanh? Dữ liệu sẽ được giữ lại.');">
+            <button class="btn btn-outline-danger" type="submit">Ngừng kinh doanh (giữ dữ liệu)</button>
+        </form>
+    </div>
+</section>
+</body>
+</html>

@@ -6,7 +6,10 @@ import com.oneshop.dto.response.AuthenticationStatusResponse;
 import com.oneshop.dto.response.CurrentUserResponse;
 import com.oneshop.dto.response.TokenResponse;
 import com.oneshop.service.AuthenticationService;
+import com.oneshop.service.CartService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.Locale;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +25,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthApiController {
 
     private final AuthenticationService authenticationService;
+    private final CartService cartService;
 
-    public AuthApiController(AuthenticationService authenticationService) {
+    public AuthApiController(AuthenticationService authenticationService, CartService cartService) {
         this.authenticationService = authenticationService;
+        this.cartService = cartService;
     }
 
     @PostMapping("/login")
-    public TokenResponse login(@Valid @RequestBody LoginRequest request) {
-        return authenticationService.login(request);
+    public TokenResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        TokenResponse tokens = authenticationService.login(request);
+        var session = httpRequest.getSession(false);
+        if (session != null) {
+            cartService.mergeGuestCart(request.email().trim().toLowerCase(Locale.ROOT), session);
+            session.removeAttribute(CartService.GUEST_CART_SESSION_ATTRIBUTE);
+        }
+        return tokens;
     }
 
     @PostMapping("/refresh")

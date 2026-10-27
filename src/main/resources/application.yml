@@ -2,15 +2,15 @@ spring:
   application:
     name: oneshop
   thymeleaf:
-    cache: false
+    cache: true
   servlet:
     multipart:
       max-file-size: 5MB
       max-request-size: 20MB
   jpa:
     hibernate:
-      ddl-auto: update
-    open-in-view: true
+      ddl-auto: none
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true

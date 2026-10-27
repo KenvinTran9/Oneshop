@@ -1,36 +1,30 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>San pham - OneShop Admin</title>
+    <title>Quản lý sản phẩm - OneShop Admin</title>
 </head>
 <body>
 <div class="admin-page-title">
-    <span class="small text-muted">Catalog</span>
-    <h2>Quan ly san pham</h2>
+    <span class="small text-muted">Danh mục</span>
+    <h2>Quản lý sản phẩm</h2>
 </div>
 
+<div class="alert alert-success" role="status" th:if="${successMessage}" th:text="${successMessage}"></div>
 <section class="admin-panel">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <p class="text-muted mb-0" th:text="${productPage.totalElements} + ' sản phẩm trong danh mục'"></p>
-        <button class="btn btn-dark btn-sm" type="button">
-            <i class="bi bi-plus-circle"></i>
-            Them san pham
-        </button>
+        <a class="btn btn-dark btn-sm" th:href="@{/admin/products/new}">
+            <i class="bi bi-plus-circle me-1"></i>Thêm sản phẩm
+        </a>
     </div>
     <div class="table-responsive">
         <table class="table align-middle">
             <thead>
-            <tr>
-                <th>SKU</th>
-                <th>San pham</th>
-                <th>Danh muc</th>
-                <th>Gia</th>
-                <th>Trang thai</th>
-            </tr>
+            <tr><th>SKU</th><th>Sản phẩm</th><th>Danh mục</th><th>Giá</th><th>Trạng thái</th><th>Thao tác</th></tr>
             </thead>
             <tbody>
             <tr th:each="product : ${productPage.content}">
-                <td th:text="${product.sku}">SKU</td>
+                <td class="font-monospace" th:text="${product.sku}">SKU</td>
                 <td>
                     <div class="d-flex align-items-center gap-3">
                         <img class="admin-thumb" th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}" loading="lazy" th:alt="${product.name}">
@@ -40,10 +34,18 @@
                 <td th:text="${product.category != null ? product.category.name : '-'}">Danh muc</td>
                 <td><span th:text="${product.displayPrice}">Liên hệ</span></td>
                 <td><span class="badge text-bg-success" th:text="${product.status}">ACTIVE</span></td>
+                <td>
+                    <div class="d-flex flex-wrap gap-1">
+                        <a class="btn btn-outline-secondary btn-sm" th:href="@{/admin/products/{id}(id=${product.id})}">Chi tiết</a>
+                        <a class="btn btn-outline-dark btn-sm" th:href="@{/admin/products/{id}/edit(id=${product.id})}">Sửa</a>
+                        <form th:action="@{/admin/products/{id}/status(id=${product.id})}" method="post">
+                            <button class="btn btn-outline-primary btn-sm" type="submit"
+                                    th:text="${product.active and product.status.name() == 'ACTIVE'} ? 'Ngừng bán' : 'Mở bán'">Đổi trạng thái</button>
+                        </form>
+                    </div>
+                </td>
             </tr>
-            <tr th:if="${productPage.empty}">
-                <td colspan="5" class="text-center text-muted py-4">Chua co san pham.</td>
-            </tr>
+            <tr th:if="${productPage.empty}"><td colspan="6" class="text-center text-muted py-4">Chưa có sản phẩm.</td></tr>
             </tbody>
         </table>
     </div>

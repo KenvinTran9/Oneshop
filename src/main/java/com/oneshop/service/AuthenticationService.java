@@ -6,6 +6,7 @@ import com.oneshop.dto.response.CurrentUserResponse;
 import com.oneshop.dto.response.TokenResponse;
 import com.oneshop.security.JwtService;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,10 +36,11 @@ public class AuthenticationService {
     }
 
     public TokenResponse login(LoginRequest request) {
+        String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                new UsernamePasswordAuthenticationToken(normalizedEmail, request.password())
         );
-        return issueTokens(request.email());
+        return issueTokens(normalizedEmail);
     }
 
     public TokenResponse refresh(RefreshTokenRequest request) {

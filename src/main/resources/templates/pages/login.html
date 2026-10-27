@@ -20,6 +20,10 @@
                 <i class="bi bi-check-circle-fill flex-shrink-0"></i>
                 <span>Bạn đã đăng xuất thành công.</span>
             </div>
+            <div class="alert alert-success d-flex align-items-center gap-2 py-2 px-3 small rounded-3"
+                 th:if="${registrationSuccessMessage}" th:text="${registrationSuccessMessage}">
+                Đăng ký thành công. Vui lòng đăng nhập.
+            </div>
             <form th:action="@{/login}" method="post" class="d-grid gap-3">
                 <div>
                     <label class="form-label small fw-medium" for="username">Địa chỉ Email</label>

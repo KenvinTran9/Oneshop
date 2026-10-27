@@ -29,6 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
             menuToggle.focus();
         });
     }
+    const cartCountBadge = document.querySelector("[data-cart-count]");
+    fetch("/cart/count", { headers: { "Accept": "application/json" } })
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            if (cartCountBadge && data) {
+                cartCountBadge.textContent = data.itemCount > 99 ? "99+" : String(data.itemCount);
+                cartCountBadge.hidden = data.itemCount < 1;
+            }
+        })
+        .catch(() => {});
     // 1. Kiem tra trang thai dang nhap qua API /api/auth/me
     fetch("/api/auth/me", {
         headers: { "Accept": "application/json" }

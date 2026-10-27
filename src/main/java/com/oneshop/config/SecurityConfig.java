@@ -1,5 +1,6 @@
 package com.oneshop.config;
 
+import com.oneshop.security.CartLoginSuccessHandler;
 import com.oneshop.security.JwtAuthenticationFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -25,12 +26,13 @@ public class SecurityConfig {
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                        JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+                        JwtAuthenticationFilter jwtAuthenticationFilter,
+                        CartLoginSuccessHandler cartLoginSuccessHandler) throws Exception {
                 http
                                 .csrf(csrf -> csrf
                                                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                                                 .ignoringRequestMatchers(
-                                                                "/api/**",
+                                                                "/api/auth/refresh",
                                                                 "/h2-console/**"))
                                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                                 .authorizeHttpRequests(auth -> auth
@@ -41,6 +43,7 @@ public class SecurityConfig {
                                                                 "/stores/**",
                                                                 "/login",
                                                                 "/register",
+                                                                "/cart/**",
                                                                 "/api/auth/**",
                                                                 "/css/**",
                                                                 "/js/**",
@@ -53,7 +56,7 @@ public class SecurityConfig {
                                                 .anyRequest().authenticated())
                                 .formLogin(login -> login
                                                 .loginPage("/login")
-                                                .defaultSuccessUrl("/", true)
+                                                .successHandler(cartLoginSuccessHandler)
                                                 .permitAll())
                                 .logout(logout -> logout
                                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
