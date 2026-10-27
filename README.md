@@ -186,6 +186,8 @@ Các bước tiếp theo dự kiến: bộ lọc danh mục → trang chi tiết
 
 Bảng màu storefront dùng nền kem `#FFFCF9`, vùng nhấn hồng đào `#F8E5E1`, nút đỏ hồng `#AD4F62` và chữ nâu đậm `#342B2D`. Các biến `--os-*` trong `app.css` là màu gốc; `shop.css` tham chiếu lại để đồng bộ các trang. Thẻ sản phẩm và nền ảnh giữ màu trắng; nút thêm giỏ có nền đặc, nút chọn màu có viền. Đã kiểm tra trực quan desktop, 390/320 px và độ tương phản các cặp chữ/nền chính; chữ trắng trên nút chính đạt 5,16:1.
 
+Cỡ chữ storefront đã tăng nhẹ để dễ đọc: tên sản phẩm 16 px trên desktop và 14 px trên mobile, giá 19/17 px, nút trong thẻ 14/12 px; mô tả trang chủ 17/15 px. Tiêu đề, nhãn lựa chọn và thông tin giỏ được tăng tương ứng, vùng tên sản phẩm đủ chỗ cho hai dòng. Đã đóng gói bằng `mvn package -DskipTests` và kiểm tra trình duyệt ở desktop, 992, 390, 320 px, gồm nút mua trang chi tiết và giỏ có sản phẩm.
+
 Khởi động lại profile `dev` sẽ nạp lại dữ liệu khi dùng H2 in-memory. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
 
 Để cập nhật nội dung từ một workbook cùng cấu trúc (Python cần `openpyxl`):
