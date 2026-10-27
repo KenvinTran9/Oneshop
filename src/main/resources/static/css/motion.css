@@ -45,7 +45,7 @@ html:has(dialog[open]) { overflow: hidden; }
     transform: scale(.97);
 }
 
-.shop-card:focus-within { border-color: #acbca4; }
+.shop-card:focus-within { border-color: var(--shop-focus); }
 .cart-item-total, .cart-total-line strong, .quantity-stepper input { font-variant-numeric: tabular-nums; }
 .shop-cart-count { transform-origin: center; }
 
@@ -61,7 +61,7 @@ dialog[data-motion-closing]::backdrop { animation: shop-backdrop-out var(--motio
 @keyframes shop-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
 
 @media (hover: hover) and (pointer: fine) {
-    .shop-card:hover { transform: translateY(-4px); border-color: #c9d4c2; box-shadow: 0 8px 24px #263c340a; }
+    .shop-card:hover { transform: translateY(-4px); border-color: var(--shop-outline); box-shadow: 0 8px 24px #6f3e520d; }
     .shop-card:hover .shop-card-image img { transform: scale(1.035); }
     .shop-button:hover:not(:disabled), .shop-card-add:hover { transform: translateY(-1px); }
     .shop-button:active:not(:disabled), .shop-card-add:active { transform: scale(.97); }
