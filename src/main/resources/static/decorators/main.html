@@ -9,78 +9,88 @@
     <link href="/css/app.css" rel="stylesheet">
     <link href="/css/shop.css" rel="stylesheet">
     <link href="/css/motion.css" rel="stylesheet">
+    <link href="/css/header.css" rel="stylesheet">
     <sitemesh:write property="head"/>
 </head>
 <body>
 <header class="site-header border-bottom bg-white sticky-top">
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
+    <nav class="navbar navbar-expand-lg header-navbar" aria-label="Điều hướng chính">
+        <div class="container header-shell">
             <a class="navbar-brand fw-bold brand-mark" href="/">
-                <span class="brand-dot"></span>OneShop
+                <span class="brand-dot" aria-hidden="true"></span>OneShop
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                    aria-controls="mainNav" aria-expanded="false" aria-label="Mở menu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-1">
-                    <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/stores">Cửa hàng</a></li>
-                    <li class="nav-item" id="adminNavLink" style="display: none !important;"><a class="nav-link text-primary fw-medium" href="/admin"><i class="bi bi-shield-check me-1"></i>Quản trị</a></li>
-                </ul>
-                <div class="navbar-icons">
-                    <a class="btn-icon" href="/products" title="Tìm kiếm sản phẩm" aria-label="Tìm kiếm"><i class="bi bi-search"></i></a>
-                    <a class="btn-icon shop-cart-link" href="/cart" title="Giỏ hàng" aria-label="Giỏ hàng"><i class="bi bi-bag"></i><span class="shop-cart-count" data-cart-count hidden>0</span></a>
-                    
-                    <!-- Khách chưa đăng nhập -->
-                    <div id="navGuest" class="d-inline-block">
-                        <a class="btn btn-sm btn-dark rounded-pill px-3 ms-1" href="/login" id="navLoginBtn">
-                            <i class="bi bi-person me-1"></i>
-                            Đăng nhập
-                        </a>
-                    </div>
+            <form class="header-search" role="search" aria-label="Tìm kiếm sản phẩm" action="/products" method="get">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input id="header-search" type="search" name="q" maxlength="120" placeholder="Tìm sản phẩm hoặc thương hiệu..." aria-label="Tìm sản phẩm hoặc thương hiệu">
+                <button class="header-search-submit" type="submit" aria-label="Tìm kiếm"><i class="bi bi-search" aria-hidden="true"></i><span>Tìm kiếm</span></button>
+            </form>
+            <div class="navbar-icons">
+                <a class="btn-icon shop-cart-link" href="/cart" title="Giỏ hàng" aria-label="Giỏ hàng"><i class="bi bi-bag" aria-hidden="true"></i><span class="shop-cart-count" data-cart-count hidden>0</span></a>
 
-                    <!-- Người dùng đã đăng nhập -->
-                    <div class="dropdown d-inline-block ms-1" id="navUserDropdown" style="display: none !important;">
-                        <button class="btn btn-sm btn-outline-dark rounded-pill px-3 dropdown-toggle d-inline-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="userMenuBtn">
-                            <span class="user-avatar-circle">
-                                <i class="bi bi-person-fill"></i>
-                            </span>
-                            <span class="user-display-email small fw-medium" id="userEmailLabel">Tài khoản</span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 mt-2 py-2" style="min-width: 230px;">
-                            <li class="px-3 py-2 border-bottom mb-1 bg-light rounded-top">
-                                <div class="small text-muted" style="font-size: 0.75rem;">ĐÃ ĐĂNG NHẬP VỚI</div>
-                                <div class="fw-semibold text-truncate small text-dark" id="userEmailFull">user@oneshop.vn</div>
-                            </li>
-                            <li id="adminMenuItem" style="display: none !important;">
-                                <a class="dropdown-item py-2 small d-flex align-items-center gap-2 fw-medium text-primary" href="/admin">
-                                    <i class="bi bi-speedometer2"></i>
-                                    <span>Trang quản trị (Admin)</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item py-2 small d-flex align-items-center gap-2" href="/products">
-                                    <i class="bi bi-bag-heart"></i>
-                                    <span>Mua sắm sản phẩm</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item py-2 small d-flex align-items-center gap-2" href="/stores">
-                                    <i class="bi bi-shop"></i>
-                                    <span>Hệ thống cửa hàng</span>
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider my-1"></li>
-                            <li>
-                                <a class="dropdown-item py-2 small d-flex align-items-center gap-2 text-danger fw-medium" href="/logout" id="logoutBtn">
-                                    <i class="bi bi-box-arrow-right"></i>
-                                    <span>Đăng xuất</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                <!-- Khách chưa đăng nhập -->
+                <div id="navGuest" class="d-inline-block">
+                    <a class="btn btn-sm btn-dark rounded-pill px-3 header-account-button" href="/login" id="navLoginBtn" aria-label="Đăng nhập">
+                        <i class="bi bi-person" aria-hidden="true"></i>
+                        <span class="header-account-label">Đăng nhập</span>
+                    </a>
                 </div>
+
+                <!-- Người dùng đã đăng nhập -->
+                <div class="dropdown d-inline-block ms-1" id="navUserDropdown" style="display: none !important;">
+                    <button class="btn btn-sm btn-outline-dark rounded-pill px-3 dropdown-toggle header-account-button" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="userMenuBtn" aria-label="Tài khoản">
+                        <span class="user-avatar-circle">
+                            <i class="bi bi-person-fill"></i>
+                        </span>
+                        <span class="user-display-email small fw-medium header-account-label" id="userEmailLabel">Tài khoản</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 mt-2 py-2" style="min-width: 230px;">
+                        <li class="px-3 py-2 border-bottom mb-1 bg-light rounded-top">
+                            <div class="small text-muted" style="font-size: 0.75rem;">ĐÃ ĐĂNG NHẬP VỚI</div>
+                            <div class="fw-semibold text-truncate small text-dark" id="userEmailFull">user@oneshop.vn</div>
+                        </li>
+                        <li id="adminMenuItem" style="display: none !important;">
+                            <a class="dropdown-item py-2 small d-flex align-items-center gap-2 fw-medium text-primary" href="/admin">
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Trang quản trị (Admin)</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 small d-flex align-items-center gap-2" href="/products">
+                                <i class="bi bi-bag-heart"></i>
+                                <span>Mua sắm sản phẩm</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 small d-flex align-items-center gap-2" href="/stores">
+                                <i class="bi bi-shop"></i>
+                                <span>Hệ thống cửa hàng</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <a class="dropdown-item py-2 small d-flex align-items-center gap-2 text-danger fw-medium" href="/logout" id="logoutBtn">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Đăng xuất</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button class="navbar-toggler header-menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Mở menu">
+                    <span class="navbar-toggler-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse header-links" id="mainNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/products">Tất cả sản phẩm</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products?category=cham-soc-da">Chăm sóc da</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products?category=trang-diem">Trang điểm</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products?category=serum">Serum</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products?category=kem-duong">Kem dưỡng</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products?category=sua-rua-mat">Sữa rửa mặt</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/stores">Cửa hàng</a></li>
+                    <li class="nav-item" id="adminNavLink" style="display: none !important;"><a class="nav-link text-primary fw-medium" href="/admin"><i class="bi bi-shield-check me-1" aria-hidden="true"></i>Quản trị</a></li>
+                </ul>
             </div>
         </div>
     </nav>

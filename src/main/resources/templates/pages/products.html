@@ -8,13 +8,6 @@
             <div><span class="eyebrow">OneShop Beauty Store</span><h1>Chăm chút vẻ đẹp mỗi ngày.</h1><p>Khám phá mỹ phẩm từ những thương hiệu bạn yêu thích.</p></div>
             <div class="collection-decoration" aria-hidden="true"><span>SKINCARE</span><span>MAKEUP</span><i class="bi bi-flower1"></i></div>
         </div>
-        <form class="shop-search" method="get" th:action="@{/products}">
-            <i class="bi bi-search" aria-hidden="true"></i>
-            <input name="q" type="search" th:value="${searchQuery}" placeholder="Tìm sản phẩm hoặc thương hiệu..." aria-label="Tìm sản phẩm hoặc thương hiệu">
-            <input name="category" type="hidden" th:value="${selectedCategory}">
-            <input name="sort" type="hidden" th:value="${selectedSort}">
-            <button type="submit">Tìm kiếm</button>
-        </form>
     </div>
 </section>
 <section class="shop-collection">

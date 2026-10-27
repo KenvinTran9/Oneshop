@@ -1,4 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const headerSearch = document.getElementById("header-search");
+    const mainMenu = document.getElementById("mainNav");
+    const menuToggle = document.querySelector('[aria-controls="mainNav"]');
+    const siteHeader = document.querySelector(".site-header");
+    if (siteHeader) {
+        const updateHeaderHeight = () => document.documentElement.style.setProperty("--site-header-height", `${siteHeader.offsetHeight}px`);
+        updateHeaderHeight();
+        if ("ResizeObserver" in window) new ResizeObserver(updateHeaderHeight).observe(siteHeader);
+        else window.addEventListener("resize", updateHeaderHeight);
+    }
+    const currentUrl = new URL(window.location.href);
+    if (headerSearch && currentUrl.pathname === "/products") {
+        headerSearch.value = currentUrl.searchParams.get("q") || "";
+    }
+    mainMenu?.querySelectorAll("a.nav-link").forEach(link => {
+        const destination = new URL(link.href);
+        const sameCategory = (destination.searchParams.get("category") || "") === (currentUrl.searchParams.get("category") || "");
+        const isDetail = currentUrl.pathname.startsWith("/products/") && destination.pathname === "/products" && !destination.search;
+        if ((destination.pathname === currentUrl.pathname && sameCategory) || isDetail) link.setAttribute("aria-current", "page");
+    });
+    if (mainMenu && menuToggle) {
+        mainMenu.addEventListener("shown.bs.collapse", () => menuToggle.setAttribute("aria-label", "Đóng menu"));
+        mainMenu.addEventListener("hidden.bs.collapse", () => menuToggle.setAttribute("aria-label", "Mở menu"));
+        siteHeader?.addEventListener("keydown", event => {
+            if (event.key !== "Escape" || !mainMenu.classList.contains("show") || !window.bootstrap?.Collapse) return;
+            event.preventDefault();
+            window.bootstrap.Collapse.getOrCreateInstance(mainMenu, { toggle: false }).hide();
+            menuToggle.focus();
+        });
+    }
     // 1. Kiem tra trang thai dang nhap qua API /api/auth/me
     fetch("/api/auth/me", {
         headers: { "Accept": "application/json" }

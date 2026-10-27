@@ -174,6 +174,12 @@ Giao diện có tìm sản phẩm/thương hiệu, lọc danh mục, sắp xếp
 
 Hiệu ứng dùng chung nằm ở `static/css/motion.css` và `static/js/motion.js`: thẻ xuất hiện một lần khi vào vùng nhìn, phản hồi nút/giỏ hàng và mở/đóng hộp thoại. Hiệu ứng chuyển động dùng transform/opacity, không thêm thư viện. Nội dung luôn hiện được khi JavaScript hoặc IntersectionObserver không có; hiệu ứng dừng khi tab ở nền hoặc người dùng bật giảm chuyển động. Giỏ cập nhật từng dòng theo mã sản phẩm/quy cách/màu để giữ vị trí nhập và focus. Kiểm tra các tình huống ngắt hiệu ứng, thao tác nhanh và giảm chuyển động: `node tools/test_shop_motion.cjs`.
 
+### Nâng cấp UI theo từng bước
+
+Bước 1: header dùng chung có tìm kiếm toàn danh mục bằng `GET /products?q=...`, giỏ hàng và tài khoản nằm ngoài menu thu gọn. Menu dẫn tới 5 danh mục và cửa hàng, đánh dấu trang hiện tại và hỗ trợ đóng bằng Esc. Trang danh mục dùng ô tìm kiếm trên header để tránh lặp. CSS riêng ở `static/css/header.css`; chiều cao header được theo dõi để nội dung cố định bên dưới không bị che. Đã kiểm tra luồng tìm kiếm từ trang cửa hàng, giữ từ khóa trên kết quả, menu/Esc, mở giỏ trực tiếp và bố cục ở 320, 390, 992 px cùng desktop.
+
+Các bước tiếp theo dự kiến: trang chủ và gợi ý sản phẩm đa danh mục → bộ lọc danh mục → trang chi tiết → thông tin hỗ trợ và luồng checkout UI. Mỗi bước được hoàn tất và commit riêng để kiểm tra trước khi tiếp tục.
+
 Khởi động lại profile `dev` sẽ nạp lại dữ liệu khi dùng H2 in-memory. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
 
 Để cập nhật nội dung từ một workbook cùng cấu trúc (Python cần `openpyxl`):
