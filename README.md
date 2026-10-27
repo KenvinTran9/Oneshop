@@ -184,6 +184,8 @@ Bước 2: trang chủ có phần giới thiệu tông hồng nhẹ dùng ảnh 
 
 Các bước tiếp theo dự kiến: bộ lọc danh mục → trang chi tiết → thông tin hỗ trợ và luồng checkout UI. Mỗi bước được hoàn tất và commit riêng để kiểm tra trước khi tiếp tục.
 
+Bảng màu storefront dùng nền kem `#FFFCF9`, vùng nhấn hồng đào `#F8E5E1`, nút đỏ hồng `#AD4F62` và chữ nâu đậm `#342B2D`. Các biến `--os-*` trong `app.css` là màu gốc; `shop.css` tham chiếu lại để đồng bộ các trang. Thẻ sản phẩm và nền ảnh giữ màu trắng; nút thêm giỏ có nền đặc, nút chọn màu có viền. Đã kiểm tra trực quan desktop, 390/320 px và độ tương phản các cặp chữ/nền chính; chữ trắng trên nút chính đạt 5,16:1.
+
 Khởi động lại profile `dev` sẽ nạp lại dữ liệu khi dùng H2 in-memory. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
 
 Để cập nhật nội dung từ một workbook cùng cấu trúc (Python cần `openpyxl`):

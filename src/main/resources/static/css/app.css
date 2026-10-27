@@ -1,16 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    --os-ink: #45323a;
-    --os-muted: #79656f;
-    --os-blush: #f9e4eb;
-    --os-rose: #a34f6a;
-    --os-mint: #f9e9ef;
-    --os-cream: #fff7f5;
-    --os-line: #eddee4;
-    --os-warm-bg: #fff4f6;
-    --os-card-bg: #fffafb;
-    --os-accent: #a34f6a;
+    /* Cream foundations, peach highlights and a clear purchase accent. */
+    --os-ink: #342b2d;
+    --os-muted: #74665f;
+    --os-blush: #f8e5e1;
+    --os-rose: #ad4f62;
+    --os-rose-hover: #933c4e;
+    --os-rose-active: #7c3040;
+    --os-outline: #cfb5aa;
+    --os-mint: #f5eee7;
+    --os-cream: #fffcf9;
+    --os-line: #e9dfd8;
+    --os-warm-bg: #faf3ed;
+    --os-card-bg: #fffaf6;
+    --os-accent: var(--os-rose);
     --bs-secondary-color: var(--os-muted);
     --bs-body-color: var(--os-ink);
     --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
@@ -19,7 +23,7 @@
 
 body {
     color: var(--os-ink);
-    background: #fff;
+    background: var(--os-cream);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
 }
@@ -34,24 +38,24 @@ a:hover {
     color: var(--os-rose);
 }
 
-/* Keep Bootstrap storefront buttons in the same rose palette. */
+/* Shared storefront action colors, including Bootstrap buttons. */
 .site-header .btn-dark, main .btn-dark {
     --bs-btn-bg: var(--os-rose);
     --bs-btn-border-color: var(--os-rose);
-    --bs-btn-hover-bg: #8e405a;
-    --bs-btn-hover-border-color: #8e405a;
-    --bs-btn-active-bg: #80364f;
-    --bs-btn-active-border-color: #80364f;
-    --bs-btn-focus-shadow-rgb: 163, 79, 106;
+    --bs-btn-hover-bg: var(--os-rose-hover);
+    --bs-btn-hover-border-color: var(--os-rose-hover);
+    --bs-btn-active-bg: var(--os-rose-active);
+    --bs-btn-active-border-color: var(--os-rose-active);
+    --bs-btn-focus-shadow-rgb: 173, 79, 98;
 }
 main .btn-outline-dark, .site-header .btn-outline-dark {
     --bs-btn-color: var(--os-rose);
-    --bs-btn-border-color: #cda5b5;
+    --bs-btn-border-color: var(--os-outline);
     --bs-btn-hover-bg: var(--os-rose);
     --bs-btn-hover-border-color: var(--os-rose);
-    --bs-btn-active-bg: #8e405a;
-    --bs-btn-active-border-color: #8e405a;
-    --bs-btn-focus-shadow-rgb: 163, 79, 106;
+    --bs-btn-active-bg: var(--os-rose-hover);
+    --bs-btn-active-border-color: var(--os-rose-hover);
+    --bs-btn-focus-shadow-rgb: 173, 79, 98;
 }
 
 /* ========== BRAND ========== */
@@ -68,7 +72,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #e8bdcd, var(--os-rose));
+    background: linear-gradient(135deg, #e7b6aa, var(--os-rose));
     display: inline-block;
 }
 
@@ -193,7 +197,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
     transform: translateX(-50%);
     width: 120%;
     height: 120%;
-    background: radial-gradient(ellipse at center, rgba(247,223,228,.5) 0%, transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(248,229,225,.5) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -495,7 +499,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
 
 /* ========== STORE SECTION ========== */
 .store-band {
-    background: linear-gradient(180deg, #fff1f5 0%, #fff 100%);
+    background: linear-gradient(180deg, var(--os-warm-bg) 0%, var(--os-cream) 100%);
 }
 
 .store-band h2 {
@@ -615,7 +619,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
 
 .auth-card .form-control:focus {
     border-color: var(--os-rose);
-    box-shadow: 0 0 0 3px rgba(163, 79, 106, .12);
+    box-shadow: 0 0 0 3px rgba(173, 79, 98, .12);
 }
 
 /* ========== EMPTY STATE ========== */
