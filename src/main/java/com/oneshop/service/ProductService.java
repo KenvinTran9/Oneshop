@@ -4,7 +4,6 @@ import com.oneshop.entity.Product;
 import com.oneshop.entity.ProductStatus;
 import com.oneshop.exception.ProductNotFoundException;
 import com.oneshop.repository.ProductRepository;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,10 +32,6 @@ public class ProductService {
     public Page<Product> searchCatalog(String category, String search, Pageable pageable) {
         return productRepository.searchCatalog(ProductStatus.ACTIVE,
                 category == null ? "" : category.trim(), search == null ? "" : search.trim(), pageable);
-    }
-
-    public List<Product> findFeaturedProducts() {
-        return productRepository.findTop8ByStatusOrderByCreatedAtDesc(ProductStatus.ACTIVE);
     }
 
     public Product findActiveProductBySlug(String slug) {

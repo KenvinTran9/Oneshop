@@ -1,84 +1,94 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>OneShop - Mỹ phẩm chính hãng & Chăm sóc da</title>
+    <title>OneShop - Mỹ phẩm chăm sóc da &amp; trang điểm</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
 </head>
 <body>
-<section class="hero-section py-5">
-    <div class="container">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6 home-heading">
-                <span class="eyebrow">Chuỗi cửa hàng mỹ phẩm</span>
-                <h1 class="mt-3 mb-3">OneShop</h1>
-                <p class="lead text-muted">Khám phá mỹ phẩm chăm sóc da và trang điểm tại OneShop. Chọn sản phẩm yêu thích, thêm vào giỏ và nhận tư vấn phù hợp với bạn.</p>
-                <div class="d-flex flex-wrap gap-2 mt-4">
-                    <a class="btn btn-dark rounded-pill px-4" th:href="@{/products}">
-                        <i class="bi bi-bag me-1"></i>
-                        Xem sản phẩm
-                    </a>
-                    <a class="btn btn-outline-dark rounded-pill px-4" th:href="@{/stores}">
-                        <i class="bi bi-geo-alt me-1"></i>
-                        Tìm cửa hàng
-                    </a>
+<div class="home-page">
+    <section class="home-hero" aria-labelledby="home-title">
+        <div class="container home-hero-layout">
+            <div class="home-heading">
+                <span class="eyebrow">Một chút yêu chiều, mỗi ngày</span>
+                <h1 id="home-title">Chăm chút làn da.<br><em>Tô điểm nét riêng.</em></h1>
+                <p>Từ bước chăm da quen thuộc đến sắc màu yêu thích, tìm điều phù hợp với bạn tại OneShop.</p>
+                <div class="home-hero-actions">
+                    <a class="shop-button primary" th:href="@{/products}">Khám phá sản phẩm <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+                    <a class="home-text-link" href="#home-categories" th:if="${!#lists.isEmpty(home.categories)}">Chọn theo danh mục <i class="bi bi-arrow-down" aria-hidden="true"></i></a>
                 </div>
+                <dl class="home-catalog-stats" aria-label="Danh mục OneShop">
+                    <div><dt th:text="${home.productCount}">0</dt><dd>sản phẩm làm đẹp</dd></div>
+                    <div><dt th:text="${home.brandCount}">0</dt><dd>thương hiệu</dd></div>
+                </dl>
             </div>
-            <div class="col-lg-6">
-                <div class="hero-visual">
-                    <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1200&q=80"
-                         alt="Kệ trưng bày mỹ phẩm OneShop">
-                    <div class="hero-badge">
-                        <span>100</span>
-                        <small>sản phẩm làm đẹp</small>
-                    </div>
+            <a class="home-hero-product" th:if="${home.heroProduct != null}" th:with="product=${home.heroProduct}"
+               th:href="@{/products/{slug}(slug=${product.slug})}">
+                <span class="home-hero-note">Khám phá cùng OneShop <i class="bi bi-stars" aria-hidden="true"></i></span>
+                <div class="home-hero-image">
+                    <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}"
+                         th:alt="${product.name}" width="420" height="420" fetchpriority="high">
                 </div>
-            </div>
+                <div class="home-hero-caption">
+                    <div><span th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span><h2 th:text="${product.name}">Sản phẩm</h2></div>
+                    <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                </div>
+            </a>
+            <div class="home-hero-empty" th:if="${home.heroProduct == null}" aria-hidden="true"><i class="bi bi-flower1"></i></div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="py-5">
-    <div class="container">
-        <div class="section-heading">
-            <div>
-                <span class="eyebrow">Nổi bật</span>
-                <h2>Sản phẩm mới nhất</h2>
+    <section id="home-categories" class="home-section home-categories" th:if="${!#lists.isEmpty(home.categories)}" aria-labelledby="home-categories-title">
+        <div class="container">
+            <div class="section-heading home-section-heading">
+                <div><span class="eyebrow">Bắt đầu từ điều bạn cần</span><h2 id="home-categories-title">Hôm nay, bạn muốn chăm chút gì?</h2></div>
             </div>
-            <a class="section-link" th:href="@{/products}">Xem tất cả <i class="bi bi-arrow-right"></i></a>
-        </div>
-        <div class="row g-4">
-            <div class="col-6 col-lg-3" th:each="product : ${featuredProducts}">
-                <article th:replace="~{fragments/product-card :: card(${product})}"></article>
-            </div>
-            <div class="col-12" th:if="${#lists.isEmpty(featuredProducts)}">
-                <div class="empty-state">Chưa có sản phẩm. Hãy thêm sản phẩm trong trang quản trị.</div>
+            <div class="home-category-grid">
+                <a class="home-category" th:each="category : ${home.categories}" th:href="@{/products(category=${category.slug})}">
+                    <span class="home-category-icon"><i class="bi" th:classappend="${category.icon}" aria-hidden="true"></i></span>
+                    <h3 th:text="${category.name}">Danh mục</h3>
+                    <p th:text="${category.teaser}"></p>
+                    <span class="home-category-count" th:text="${category.productCount} + ' sản phẩm'"></span>
+                </a>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="store-band py-5">
-    <div class="container">
-        <div class="row align-items-center g-4">
-            <div class="col-lg-5">
-                <span class="eyebrow">Hệ thống cửa hàng</span>
-                <h2 class="mt-2">Ghé OneShop, chọn điều bạn yêu thích.</h2>
-                <p class="text-muted">Trải nghiệm sản phẩm và nhận tư vấn trực tiếp tại cửa hàng OneShop gần bạn.</p>
-                <a class="section-link" th:href="@{/stores}">Xem tất cả cửa hàng <i class="bi bi-arrow-right"></i></a>
+    <section class="home-section home-suggestions" aria-labelledby="home-suggestions-title">
+        <div class="container">
+            <div class="section-heading home-section-heading">
+                <div><span class="eyebrow">Dành một chút thời gian cho mình</span><h2 id="home-suggestions-title">Gợi ý OneShop</h2><p>Khám phá những lựa chọn từ chăm sóc da đến trang điểm.</p></div>
+                <a class="section-link" th:href="@{/products}">Xem tất cả <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
             </div>
-            <div class="col-lg-7">
-                <div class="row g-3">
-                    <div class="col-md-6" th:each="store : ${stores}">
-                        <div class="store-card">
-                            <div class="store-icon"><i class="bi bi-shop"></i></div>
-                            <h3 class="h6 mb-1" th:text="${store.name}">OneShop Quận 1</h3>
-                            <p class="mb-1" th:text="${store.address}">Địa chỉ</p>
-                            <span th:text="${store.city}">TP. Hồ Chí Minh</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="shop-product-grid" th:if="${!#lists.isEmpty(home.suggestions)}">
+                <th:block th:each="product : ${home.suggestions}"><article th:replace="~{fragments/product-card :: card(${product})}"></article></th:block>
+            </div>
+            <div class="empty-state" th:if="${#lists.isEmpty(home.suggestions)}">Danh mục đang được cập nhật. Bạn ghé lại OneShop sau nhé.</div>
+        </div>
+    </section>
+
+    <section class="home-section home-brands" th:if="${!#lists.isEmpty(home.brands)}" aria-labelledby="home-brands-title">
+        <div class="container">
+            <div class="section-heading home-section-heading">
+                <div><span class="eyebrow">Thương hiệu trong shop</span><h2 id="home-brands-title">Tìm cái tên bạn yêu thích</h2><p th:text="${home.brandCount} + ' thương hiệu để bạn khám phá theo phong cách riêng.'"></p></div>
+            </div>
+            <div class="home-brand-grid">
+                <a class="home-brand" th:each="brand : ${home.brands}" th:href="@{/products(q=${brand.name})}">
+                    <strong th:text="${brand.name}">Thương hiệu</strong>
+                    <span><span th:text="${brand.productCount} + ' sản phẩm'"></span><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+                </a>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+
+    <section class="home-section home-visit" aria-labelledby="home-visit-title">
+        <div class="container">
+            <div class="home-visit-panel">
+                <span class="home-visit-icon" aria-hidden="true"><i class="bi bi-shop"></i></span>
+                <div><span class="eyebrow">Gặp nhau tại OneShop</span><h2 id="home-visit-title">Chọn điều bạn yêu thích, theo cách của bạn.</h2><p>Xem sản phẩm online hoặc tìm địa chỉ OneShop để ghé thăm.</p></div>
+                <a class="shop-button secondary" th:href="@{/stores}">Tìm cửa hàng <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+            </div>
+        </div>
+    </section>
+</div>
 </body>
 </html>

@@ -178,7 +178,11 @@ Hiệu ứng dùng chung nằm ở `static/css/motion.css` và `static/js/motion
 
 Bước 1: header dùng chung có tìm kiếm toàn danh mục bằng `GET /products?q=...`, giỏ hàng và tài khoản nằm ngoài menu thu gọn. Menu dẫn tới 5 danh mục và cửa hàng, đánh dấu trang hiện tại và hỗ trợ đóng bằng Esc. Trang danh mục dùng ô tìm kiếm trên header để tránh lặp. CSS riêng ở `static/css/header.css`; chiều cao header được theo dõi để nội dung cố định bên dưới không bị che. Đã kiểm tra luồng tìm kiếm từ trang cửa hàng, giữ từ khóa trên kết quả, menu/Esc, mở giỏ trực tiếp và bố cục ở 320, 390, 992 px cùng desktop.
 
-Các bước tiếp theo dự kiến: trang chủ và gợi ý sản phẩm đa danh mục → bộ lọc danh mục → trang chi tiết → thông tin hỗ trợ và luồng checkout UI. Mỗi bước được hoàn tất và commit riêng để kiểm tra trước khi tiếp tục.
+Bước 2: trang chủ có phần giới thiệu tông hồng nhẹ dùng ảnh sản phẩm cục bộ, lối vào 5 danh mục và khu vực thương hiệu. `HomeCatalogService` lấy lần lượt một sản phẩm mới từ mỗi danh mục rồi thêm lượt thứ hai đến đủ 8 gợi ý; nếu ít danh mục, bổ sung sản phẩm đang bán mới nhất và loại trùng ID. Truy vấn giới hạn kết quả thay vì tải cả danh mục. Số sản phẩm/thương hiệu được đếm từ các sản phẩm `ACTIVE`; khi không có sản phẩm, trang hiển thị thông báo cập nhật. Các ô thương hiệu dẫn tới tìm kiếm hiện có bằng `GET /products?q=...`. Thẻ sản phẩm dùng chung với trang danh mục, giữ chọn màu và thêm giỏ. CSS riêng ở `static/css/home.css`.
+
+Đã kiểm tra bước 2 bằng `mvn verify` (15 kiểm thử, gồm gợi ý đủ 5 danh mục, không trùng, danh mục thưa và không có sản phẩm), cùng trình duyệt ở 320, 390, 992 px và desktop. Đã thử chọn danh mục, tìm thương hiệu và thêm/xóa sản phẩm từ trang chủ trong giỏ.
+
+Các bước tiếp theo dự kiến: bộ lọc danh mục → trang chi tiết → thông tin hỗ trợ và luồng checkout UI. Mỗi bước được hoàn tất và commit riêng để kiểm tra trước khi tiếp tục.
 
 Khởi động lại profile `dev` sẽ nạp lại dữ liệu khi dùng H2 in-memory. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
 

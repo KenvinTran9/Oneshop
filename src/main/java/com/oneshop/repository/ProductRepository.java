@@ -34,7 +34,48 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByStatus(ProductStatus status, Pageable pageable);
 
     @EntityGraph(attributePaths = {"category", "brand"})
-    List<Product> findTop8ByStatusOrderByCreatedAtDesc(ProductStatus status);
+    List<Product> findByStatusOrderByCreatedAtDescIdDesc(ProductStatus status, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category", "brand"})
+    List<Product> findByStatusAndCategory_IdOrderByCreatedAtDescIdDesc(
+            ProductStatus status, Long categoryId, Pageable pageable);
+
+    interface HomeCategory {
+        Long getId();
+        String getName();
+        String getSlug();
+        long getProductCount();
+    }
+
+    interface HomeBrand {
+        String getName();
+        long getProductCount();
+    }
+
+    interface HomeCounts {
+        long getProductCount();
+        long getBrandCount();
+    }
+
+    @Query("""
+            select c.id as id, c.name as name, c.slug as slug, count(p) as productCount
+            from Product p join p.category c where p.status = :status
+            group by c.id, c.name, c.slug order by c.id
+            """)
+    List<HomeCategory> summarizeHomeCategories(@Param("status") ProductStatus status);
+
+    @Query("""
+            select b.name as name, count(p) as productCount
+            from Product p join p.brand b where p.status = :status
+            group by b.id, b.name order by count(p) desc, b.name asc
+            """)
+    List<HomeBrand> summarizeHomeBrands(@Param("status") ProductStatus status, Pageable pageable);
+
+    @Query("""
+            select count(p) as productCount, count(distinct b.id) as brandCount
+            from Product p left join p.brand b where p.status = :status
+            """)
+    HomeCounts summarizeHomeCounts(@Param("status") ProductStatus status);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Optional<Product> findBySlugAndStatus(String slug, ProductStatus status);

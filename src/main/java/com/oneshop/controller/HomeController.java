@@ -1,7 +1,6 @@
 package com.oneshop.controller;
 
-import com.oneshop.service.ProductService;
-import com.oneshop.service.StoreService;
+import com.oneshop.service.HomeCatalogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,18 +8,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
-    private final ProductService productService;
-    private final StoreService storeService;
+    private final HomeCatalogService homeCatalog;
 
-    public HomeController(ProductService productService, StoreService storeService) {
-        this.productService = productService;
-        this.storeService = storeService;
+    public HomeController(HomeCatalogService homeCatalog) {
+        this.homeCatalog = homeCatalog;
     }
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("featuredProducts", productService.findFeaturedProducts());
-        model.addAttribute("stores", storeService.findActiveStores());
+        model.addAttribute("home", homeCatalog.load());
         return "pages/home";
     }
 }

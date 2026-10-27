@@ -15,6 +15,7 @@ import com.oneshop.entity.ProductStatus;
 import com.oneshop.repository.BrandRepository;
 import com.oneshop.repository.CategoryRepository;
 import com.oneshop.repository.ProductRepository;
+import com.oneshop.service.HomeCatalogService;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +40,57 @@ class CatalogIntegrationTests {
     @Autowired CatalogDataInitializer initializer;
     @Autowired ObjectMapper objectMapper;
     @Autowired MockMvc mvc;
+    @Autowired HomeCatalogService homeCatalog;
+
+    @Test
+    void homepageBalancesActiveProductsAndUsesActualCatalogCounts() throws Exception {
+        var home = homeCatalog.load();
+        assertThat(home.productCount()).isEqualTo(100);
+        assertThat(home.brandCount()).isEqualTo(59);
+        assertThat(home.categories()).hasSize(5).allSatisfy(c -> assertThat(c.productCount()).isEqualTo(20));
+        assertThat(home.suggestions()).hasSize(8).extracting(Product::getId).doesNotHaveDuplicates();
+        assertThat(home.suggestions()).extracting(p -> p.getCategory().getSlug()).containsAll(
+                home.categories().stream().map(HomeCatalogService.Category::slug).toList());
+        assertThat(home.brands()).hasSize(8).allSatisfy(b -> assertThat(b.getProductCount()).isPositive());
+        String page = mvc.perform(get("/")).andExpect(status().isOk()).andReturn()
+                .getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(page).contains("Chăm chút làn da.", "Gợi ý OneShop", "Tìm cái tên bạn yêu thích",
+                "data-quick-add", "/products?category=", "/products?q=", "/css/home.css")
+                .doesNotContain("images.unsplash.com", "Sản phẩm mới nhất");
+        assertThat(page.split("data-product-card", -1)).hasSize(9);
+    }
+
+    @Test
+    void homepageFillsSuggestionsFromASparseCatalogWithoutDuplicates() {
+        var keep = products.findBySku("CATALOG-001").orElseThrow().getCategory().getId();
+        var catalog = products.findAll();
+        catalog.stream().filter(p -> !p.getCategory().getId().equals(keep)).forEach(p -> p.setStatus(ProductStatus.DRAFT));
+        products.saveAllAndFlush(catalog);
+        var home = homeCatalog.load();
+        assertThat(home.productCount()).isEqualTo(20);
+        assertThat(home.categories()).hasSize(1);
+        assertThat(home.suggestions()).hasSize(8).extracting(Product::getId).doesNotHaveDuplicates();
+        assertThat(home.suggestions()).allSatisfy(p -> {
+            assertThat(p.getStatus()).isEqualTo(ProductStatus.ACTIVE);
+            assertThat(p.getCategory().getId()).isEqualTo(keep);
+        });
+    }
+
+    @Test
+    void homepageRendersGracefullyWithoutActiveProducts() throws Exception {
+        var catalog = products.findAll();
+        catalog.forEach(p -> p.setStatus(ProductStatus.DRAFT));
+        products.saveAllAndFlush(catalog);
+        var home = homeCatalog.load();
+        assertThat(home.productCount()).isZero();
+        assertThat(home.brandCount()).isZero();
+        assertThat(home.suggestions()).isEmpty();
+        assertThat(home.categories()).isEmpty();
+        assertThat(home.brands()).isEmpty();
+        assertThat(home.heroProduct()).isNull();
+        mvc.perform(get("/")).andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Danh mục đang được cập nhật")));
+    }
 
     @Test
     void importsAllSourceFieldsAndGroupsWithoutDemoProducts() throws Exception {
