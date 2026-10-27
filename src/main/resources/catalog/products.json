@@ -341,15 +341,24 @@
     "shades": [
       {
         "label": "112 Natural Ivory",
-        "color": "#e8c5a4"
+        "color": "#e8c5a4",
+        "imageUrl": "/images/catalog/shades/catalog-011-112-natural-ivory.jpg",
+        "imageAlt": "Maybelline New York Fit Me Matte + Poreless Foundation — màu 112 Natural Ivory",
+        "imageType": "photo"
       },
       {
         "label": "118 Light Beige",
-        "color": "#d8b08a"
+        "color": "#d8b08a",
+        "imageUrl": "/images/catalog/shades/catalog-011-118-light-beige.jpg",
+        "imageAlt": "Maybelline New York Fit Me Matte + Poreless Foundation — màu 118 Light Beige",
+        "imageType": "photo"
       },
       {
         "label": "120 Classic Ivory",
-        "color": "#dfb696"
+        "color": "#dfb696",
+        "imageUrl": "/images/catalog/shades/catalog-011-120-classic-ivory.jpg",
+        "imageAlt": "Maybelline New York Fit Me Matte + Poreless Foundation — màu 120 Classic Ivory",
+        "imageType": "photo"
       }
     ]
   },
@@ -385,15 +394,24 @@
     "shades": [
       {
         "label": "020 Ivory",
-        "color": "#e9c8ae"
+        "color": "#e9c8ae",
+        "imageUrl": "/images/catalog/shades/catalog-012-020-ivory.png",
+        "imageAlt": "L'Oréal Paris Infallible Fresh Wear Foundation — màu 020 Ivory",
+        "imageType": "photo"
       },
       {
         "label": "130 True Beige",
-        "color": "#d4ae88"
+        "color": "#d4ae88",
+        "imageUrl": "/images/catalog/shades/catalog-012-130-true-beige.png",
+        "imageAlt": "L'Oréal Paris Infallible Fresh Wear Foundation — màu 130 True Beige",
+        "imageType": "photo"
       },
       {
         "label": "200 Golden Sand",
-        "color": "#c19b72"
+        "color": "#c19b72",
+        "imageUrl": "/images/catalog/shades/catalog-012-200-golden-sand.png",
+        "imageAlt": "L'Oréal Paris Infallible Fresh Wear Foundation — màu 200 Golden Sand",
+        "imageType": "photo"
       }
     ]
   },
@@ -429,15 +447,24 @@
     "shades": [
       {
         "label": "1W1 Bone",
-        "color": "#eed4b1"
+        "color": "#eed4b1",
+        "imageUrl": "/images/catalog/shades/catalog-013-1w1-bone.jpg",
+        "imageAlt": "Estée Lauder Double Wear Stay-in-Place Foundation — màu 1W1 Bone",
+        "imageType": "photo"
       },
       {
         "label": "1W2 Sand",
-        "color": "#dfbf96"
+        "color": "#dfbf96",
+        "imageUrl": "/images/catalog/shades/catalog-013-1w2-sand.jpg",
+        "imageAlt": "Estée Lauder Double Wear Stay-in-Place Foundation — màu 1W2 Sand",
+        "imageType": "photo"
       },
       {
         "label": "2W0 Warm Vanilla",
-        "color": "#d9b690"
+        "color": "#d9b690",
+        "imageUrl": "/images/catalog/shades/catalog-013-2w0-warm-vanilla.jpg",
+        "imageAlt": "Estée Lauder Double Wear Stay-in-Place Foundation — màu 2W0 Warm Vanilla",
+        "imageType": "photo"
       }
     ]
   },
@@ -473,15 +500,24 @@
     "shades": [
       {
         "label": "Vanilla",
-        "color": "#efd0b7"
+        "color": "#efd0b7",
+        "imageUrl": "/images/catalog/shades/catalog-014-vanilla.jpg",
+        "imageAlt": "NARS Radiant Creamy Concealer — màu Vanilla",
+        "imageType": "photo"
       },
       {
         "label": "Custard",
-        "color": "#e3ba91"
+        "color": "#e3ba91",
+        "imageUrl": "/images/catalog/shades/catalog-014-custard.jpg",
+        "imageAlt": "NARS Radiant Creamy Concealer — màu Custard",
+        "imageType": "photo"
       },
       {
         "label": "Ginger",
-        "color": "#c79972"
+        "color": "#c79972",
+        "imageUrl": "/images/catalog/shades/catalog-014-ginger.jpg",
+        "imageAlt": "NARS Radiant Creamy Concealer — màu Ginger",
+        "imageType": "photo"
       }
     ]
   },
@@ -517,15 +553,24 @@
     "shades": [
       {
         "label": "110 Fair",
-        "color": "#efcfb7"
+        "color": "#efcfb7",
+        "imageUrl": "/images/catalog/shades/catalog-015-110-fair.jpg",
+        "imageAlt": "Maybelline New York Instant Age Rewind Eraser Concealer — màu 110 Fair",
+        "imageType": "photo"
       },
       {
         "label": "120 Light",
-        "color": "#dfbb97"
+        "color": "#dfbb97",
+        "imageUrl": "/images/catalog/shades/catalog-015-120-light.jpg",
+        "imageAlt": "Maybelline New York Instant Age Rewind Eraser Concealer — màu 120 Light",
+        "imageType": "photo"
       },
       {
         "label": "130 Medium",
-        "color": "#c99b77"
+        "color": "#c99b77",
+        "imageUrl": "/images/catalog/shades/catalog-015-130-medium.jpg",
+        "imageAlt": "Maybelline New York Instant Age Rewind Eraser Concealer — màu 130 Medium",
+        "imageType": "photo"
       }
     ]
   },
@@ -561,15 +606,24 @@
     "shades": [
       {
         "label": "03 Bare Grape",
-        "color": "#aa6f7d"
+        "color": "#aa6f7d",
+        "imageUrl": "/images/catalog/shades/catalog-016-03-bare-grape.webp",
+        "imageAlt": "rom&nd The Juicy Lasting Tint — màu 03 Bare Grape",
+        "imageType": "photo"
       },
       {
         "label": "05 Jujube",
-        "color": "#b36364"
+        "color": "#b36364",
+        "imageUrl": "/images/catalog/shades/catalog-016-05-jujube.webp",
+        "imageAlt": "rom&nd The Juicy Lasting Tint — màu 05 Jujube",
+        "imageType": "photo"
       },
       {
         "label": "06 Peeling Angdoo",
-        "color": "#9e394e"
+        "color": "#9e394e",
+        "imageUrl": "/images/catalog/shades/catalog-016-06-peeling-angdoo.webp",
+        "imageAlt": "rom&nd The Juicy Lasting Tint — màu 06 Peeling Angdoo",
+        "imageType": "photo"
       }
     ]
   },
@@ -605,15 +659,24 @@
     "shades": [
       {
         "label": "01 Good Brick",
-        "color": "#a5453b"
+        "color": "#a5453b",
+        "imageUrl": "/images/catalog/shades/catalog-017-01-good-brick.png",
+        "imageAlt": "Peripera Ink Velvet — màu 01 Good Brick",
+        "imageType": "photo"
       },
       {
         "label": "02 Celeb Deep Rose",
-        "color": "#a94453"
+        "color": "#a94453",
+        "imageUrl": "/images/catalog/shades/catalog-017-02-celeb-deep-rose.png",
+        "imageAlt": "Peripera Ink Velvet — màu 02 Celeb Deep Rose",
+        "imageType": "photo"
       },
       {
         "label": "03 Red Only",
-        "color": "#b82c3d"
+        "color": "#b82c3d",
+        "imageUrl": "/images/catalog/shades/catalog-017-03-red-only.png",
+        "imageAlt": "Peripera Ink Velvet — màu 03 Red Only",
+        "imageType": "photo"
       }
     ]
   },
@@ -649,15 +712,24 @@
     "shades": [
       {
         "label": "Laydown",
-        "color": "#b76e62"
+        "color": "#b76e62",
+        "imageUrl": "/images/catalog/shades/catalog-018-laydown.jpg",
+        "imageAlt": "3CE Blur Water Tint — màu Laydown",
+        "imageType": "photo"
       },
       {
         "label": "Sepia",
-        "color": "#8e5145"
+        "color": "#8e5145",
+        "imageUrl": "/images/catalog/shades/catalog-018-sepia.jpg",
+        "imageAlt": "3CE Blur Water Tint — màu Sepia",
+        "imageType": "photo"
       },
       {
         "label": "Spot Player",
-        "color": "#bb473b"
+        "color": "#bb473b",
+        "imageUrl": "/images/catalog/shades/catalog-018-spot-player.jpg",
+        "imageAlt": "3CE Blur Water Tint — màu Spot Player",
+        "imageType": "photo"
       }
     ]
   },
@@ -692,16 +764,25 @@
     ],
     "shades": [
       {
-        "label": "19N Light",
-        "color": "#f1dbc7"
+        "label": "19N Porcelain",
+        "color": "#f1dbc7",
+        "imageUrl": "/images/catalog/shades/catalog-019-19n-porcelain.jpg",
+        "imageAlt": "CLIO Kill Cover Founwear Cushion — màu 19N Porcelain",
+        "imageType": "photo"
       },
       {
         "label": "21N Linen",
-        "color": "#e8c7a7"
+        "color": "#e8c7a7",
+        "imageUrl": "/images/catalog/shades/catalog-019-21n-linen.jpg",
+        "imageAlt": "CLIO Kill Cover Founwear Cushion — màu 21N Linen",
+        "imageType": "photo"
       },
       {
         "label": "23N Ginger",
-        "color": "#d3ae89"
+        "color": "#d3ae89",
+        "imageUrl": "/images/catalog/shades/catalog-019-23n-ginger.jpg",
+        "imageAlt": "CLIO Kill Cover Founwear Cushion — màu 23N Ginger",
+        "imageType": "photo"
       }
     ]
   },
@@ -2022,15 +2103,24 @@
     "shades": [
       {
         "label": "NC15",
-        "color": "#ead0b1"
+        "color": "#ead0b1",
+        "imageUrl": "/images/catalog/shades/catalog-061-nc15.jpg",
+        "imageAlt": "M·A·C Studio Fix Fluid SPF 15 Foundation — màu NC15",
+        "imageType": "photo"
       },
       {
         "label": "NC20",
-        "color": "#dfbd95"
+        "color": "#dfbd95",
+        "imageUrl": "/images/catalog/shades/catalog-061-nc20.jpg",
+        "imageAlt": "M·A·C Studio Fix Fluid SPF 15 Foundation — màu NC20",
+        "imageType": "photo"
       },
       {
         "label": "NC25",
-        "color": "#d5ad81"
+        "color": "#d5ad81",
+        "imageUrl": "/images/catalog/shades/catalog-061-nc25.jpg",
+        "imageAlt": "M·A·C Studio Fix Fluid SPF 15 Foundation — màu NC25",
+        "imageType": "photo"
       }
     ],
     "priceVariant": "30 ml"
@@ -2066,19 +2156,31 @@
     "shades": [
       {
         "label": "120",
-        "color": "#efd1b3"
+        "color": "#efd1b3",
+        "imageUrl": "/images/catalog/shades/catalog-062-120.jpg",
+        "imageAlt": "Fenty Beauty Soft'Lit Naturally Luminous Longwear Foundation — màu 120",
+        "imageType": "photo"
       },
       {
         "label": "150",
-        "color": "#e1bd98"
+        "color": "#e1bd98",
+        "imageUrl": "/images/catalog/shades/catalog-062-150.jpg",
+        "imageAlt": "Fenty Beauty Soft'Lit Naturally Luminous Longwear Foundation — màu 150",
+        "imageType": "photo"
       },
       {
         "label": "190",
-        "color": "#d4ac83"
+        "color": "#d4ac83",
+        "imageUrl": "/images/catalog/shades/catalog-062-190.jpg",
+        "imageAlt": "Fenty Beauty Soft'Lit Naturally Luminous Longwear Foundation — màu 190",
+        "imageType": "photo"
       },
       {
         "label": "315",
-        "color": "#ac7a56"
+        "color": "#ac7a56",
+        "imageUrl": "/images/catalog/shades/catalog-062-315.jpg",
+        "imageAlt": "Fenty Beauty Soft'Lit Naturally Luminous Longwear Foundation — màu 315",
+        "imageType": "photo"
       }
     ],
     "priceVariant": "32 ml"
@@ -2114,19 +2216,31 @@
     "shades": [
       {
         "label": "Hope",
-        "color": "#b37c81"
+        "color": "#b37c81",
+        "imageUrl": "/images/catalog/shades/catalog-063-hope.png",
+        "imageAlt": "Rare Beauty Soft Pinch Liquid Blush — màu Hope",
+        "imageType": "photo"
       },
       {
         "label": "Happy",
-        "color": "#d87a91"
+        "color": "#d87a91",
+        "imageUrl": "/images/catalog/shades/catalog-063-happy.png",
+        "imageAlt": "Rare Beauty Soft Pinch Liquid Blush — màu Happy",
+        "imageType": "photo"
       },
       {
         "label": "Bliss",
-        "color": "#d9968d"
+        "color": "#d9968d",
+        "imageUrl": "/images/catalog/shades/catalog-063-bliss.png",
+        "imageAlt": "Rare Beauty Soft Pinch Liquid Blush — màu Bliss",
+        "imageType": "photo"
       },
       {
         "label": "Joy",
-        "color": "#df8a6d"
+        "color": "#df8a6d",
+        "imageUrl": "/images/catalog/shades/catalog-063-joy.png",
+        "imageAlt": "Rare Beauty Soft Pinch Liquid Blush — màu Joy",
+        "imageType": "photo"
       }
     ],
     "priceVariant": "7.5 ml"
@@ -2166,19 +2280,31 @@
     "shades": [
       {
         "label": "1 Fair Neutral Peach",
-        "color": "#edc9a8"
+        "color": "#edc9a8",
+        "imageUrl": "/images/catalog/shades/catalog-064-1-fair-neutral-peach.png",
+        "imageAlt": "e.l.f. Cosmetics Halo Glow Liquid Filter — màu 1 Fair Neutral Peach",
+        "imageType": "photo"
       },
       {
         "label": "2 Fair / Light",
-        "color": "#e4bc9a"
+        "color": "#e4bc9a",
+        "imageUrl": "/images/catalog/shades/catalog-064-2-fair-light.png",
+        "imageAlt": "e.l.f. Cosmetics Halo Glow Liquid Filter — màu 2 Fair / Light",
+        "imageType": "photo"
       },
       {
         "label": "3 Light / Medium Cool",
-        "color": "#d7a68b"
+        "color": "#d7a68b",
+        "imageUrl": "/images/catalog/shades/catalog-064-3-light-medium-cool.png",
+        "imageAlt": "e.l.f. Cosmetics Halo Glow Liquid Filter — màu 3 Light / Medium Cool",
+        "imageType": "photo"
       },
       {
         "label": "4 Medium Neutral",
-        "color": "#c49a74"
+        "color": "#c49a74",
+        "imageUrl": "/images/catalog/shades/catalog-064-4-medium-neutral.png",
+        "imageAlt": "e.l.f. Cosmetics Halo Glow Liquid Filter — màu 4 Medium Neutral",
+        "imageType": "photo"
       }
     ],
     "priceVariant": "31,5 ml"
@@ -2218,19 +2344,31 @@
     "shades": [
       {
         "label": "1 Fair",
-        "color": "#efd6b7"
+        "color": "#efd6b7",
+        "imageUrl": "/images/catalog/shades/catalog-065-1-fair.png",
+        "imageAlt": "Charlotte Tilbury Hollywood Flawless Filter — màu 1 Fair",
+        "imageType": "photo"
       },
       {
         "label": "2 Fair",
-        "color": "#e6c19f"
+        "color": "#e6c19f",
+        "imageUrl": "/images/catalog/shades/catalog-065-2-fair.png",
+        "imageAlt": "Charlotte Tilbury Hollywood Flawless Filter — màu 2 Fair",
+        "imageType": "photo"
       },
       {
         "label": "3 Light / Medium",
-        "color": "#d5ae89"
+        "color": "#d5ae89",
+        "imageUrl": "/images/catalog/shades/catalog-065-3-light-medium.png",
+        "imageAlt": "Charlotte Tilbury Hollywood Flawless Filter — màu 3 Light / Medium",
+        "imageType": "photo"
       },
       {
         "label": "4 Medium",
-        "color": "#c4946a"
+        "color": "#c4946a",
+        "imageUrl": "/images/catalog/shades/catalog-065-4-medium.png",
+        "imageAlt": "Charlotte Tilbury Hollywood Flawless Filter — màu 4 Medium",
+        "imageType": "photo"
       }
     ],
     "priceVariant": "30 ml"
@@ -2266,15 +2404,24 @@
     "shades": [
       {
         "label": "Banana Bread",
-        "color": "#e7ce98"
+        "color": "#e7ce98",
+        "imageUrl": "/images/catalog/shades/catalog-066-shade-chart.png",
+        "imageAlt": "Bảng màu Huda Beauty Easy Bake Loose Baking & Setting Powder có Banana Bread, Pound Cake và Cherry Blossom Cake",
+        "imageType": "chart"
       },
       {
         "label": "Pound Cake",
-        "color": "#eddbb7"
+        "color": "#eddbb7",
+        "imageUrl": "/images/catalog/shades/catalog-066-shade-chart.png",
+        "imageAlt": "Bảng màu Huda Beauty Easy Bake Loose Baking & Setting Powder có Banana Bread, Pound Cake và Cherry Blossom Cake",
+        "imageType": "chart"
       },
       {
         "label": "Cherry Blossom Cake",
-        "color": "#f1ccd7"
+        "color": "#f1ccd7",
+        "imageUrl": "/images/catalog/shades/catalog-066-shade-chart.png",
+        "imageAlt": "Bảng màu Huda Beauty Easy Bake Loose Baking & Setting Powder có Banana Bread, Pound Cake và Cherry Blossom Cake",
+        "imageType": "chart"
       }
     ],
     "priceVariant": "20 g"
@@ -2310,19 +2457,31 @@
     "shades": [
       {
         "label": "001 Pink",
-        "color": "#e697ac"
+        "color": "#e697ac",
+        "imageUrl": "/images/catalog/shades/catalog-067-001-pink.jpg",
+        "imageAlt": "Dior Dior Addict Lip Glow — màu 001 Pink",
+        "imageType": "photo"
       },
       {
         "label": "012 Rosewood",
-        "color": "#a8656b"
+        "color": "#a8656b",
+        "imageUrl": "/images/catalog/shades/catalog-067-012-rosewood.jpg",
+        "imageAlt": "Dior Dior Addict Lip Glow — màu 012 Rosewood",
+        "imageType": "photo"
       },
       {
         "label": "031 Strawberry",
-        "color": "#db6c7f"
+        "color": "#db6c7f",
+        "imageUrl": "/images/catalog/shades/catalog-067-031-strawberry.jpg",
+        "imageAlt": "Dior Dior Addict Lip Glow — màu 031 Strawberry",
+        "imageType": "photo"
       },
       {
         "label": "075 Gummy",
-        "color": "#b46b8d"
+        "color": "#b46b8d",
+        "imageUrl": "/images/catalog/shades/catalog-067-075-gummy.jpg",
+        "imageAlt": "Dior Dior Addict Lip Glow — màu 075 Gummy",
+        "imageType": "photo"
       }
     ],
     "priceVariant": "3.2 g"
@@ -2358,19 +2517,31 @@
     "shades": [
       {
         "label": "150 Nude Lingerie",
-        "color": "#bc7d72"
+        "color": "#bc7d72",
+        "imageUrl": "/images/catalog/shades/catalog-068-150-nude-lingerie.jpg",
+        "imageAlt": "Yves Saint Laurent Beauté YSL Loveshine Lip Oil Stick — màu 150 Nude Lingerie",
+        "imageType": "photo"
       },
       {
         "label": "154 Love Berry",
-        "color": "#b95270"
+        "color": "#b95270",
+        "imageUrl": "/images/catalog/shades/catalog-068-154-love-berry.jpg",
+        "imageAlt": "Yves Saint Laurent Beauté YSL Loveshine Lip Oil Stick — màu 154 Love Berry",
+        "imageType": "photo"
       },
       {
         "label": "201 Rosewood Blush",
-        "color": "#a85e61"
+        "color": "#a85e61",
+        "imageUrl": "/images/catalog/shades/catalog-068-201-rosewood-blush.jpg",
+        "imageAlt": "Yves Saint Laurent Beauté YSL Loveshine Lip Oil Stick — màu 201 Rosewood Blush",
+        "imageType": "photo"
       },
       {
         "label": "206 Spicy Affair",
-        "color": "#ad4d40"
+        "color": "#ad4d40",
+        "imageUrl": "/images/catalog/shades/catalog-068-206-spicy-affair.jpg",
+        "imageAlt": "Yves Saint Laurent Beauté YSL Loveshine Lip Oil Stick — màu 206 Spicy Affair",
+        "imageType": "photo"
       }
     ],
     "priceVariant": "3.2 g"
@@ -2406,15 +2577,24 @@
     "shades": [
       {
         "label": "01 Pampas Garden",
-        "color": "#d18d75"
+        "color": "#d18d75",
+        "imageUrl": "/images/catalog/shades/catalog-069-01-pampas-garden.jpg",
+        "imageAlt": "rom&nd Better Than Palette — màu 01 Pampas Garden",
+        "imageType": "photo"
       },
       {
         "label": "02 Mahogany Garden",
-        "color": "#8a6051"
+        "color": "#8a6051",
+        "imageUrl": "/images/catalog/shades/catalog-069-02-mahogany-garden.jpg",
+        "imageAlt": "rom&nd Better Than Palette — màu 02 Mahogany Garden",
+        "imageType": "photo"
       },
       {
         "label": "03 Rosebud Garden",
-        "color": "#b17a83"
+        "color": "#b17a83",
+        "imageUrl": "/images/catalog/shades/catalog-069-03-rosebud-garden.jpg",
+        "imageAlt": "rom&nd Better Than Palette — màu 03 Rosebud Garden",
+        "imageType": "photo"
       }
     ],
     "priceVariant": "10 ô"
@@ -2450,11 +2630,17 @@
     "shades": [
       {
         "label": "04 Dark Gray",
-        "color": "#514a48"
+        "color": "#514a48",
+        "imageUrl": "/images/catalog/shades/catalog-070-04-dark-gray.png",
+        "imageAlt": "Etude Drawing Eye Brow — màu 04 Dark Gray",
+        "imageType": "photo"
       },
       {
         "label": "05 Gray",
-        "color": "#77716f"
+        "color": "#77716f",
+        "imageUrl": "/images/catalog/shades/catalog-070-05-gray.png",
+        "imageAlt": "Etude Drawing Eye Brow — màu 05 Gray",
+        "imageType": "photo"
       }
     ],
     "priceVariant": "0.25 g"

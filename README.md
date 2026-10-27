@@ -188,6 +188,16 @@ Bảng màu storefront dùng nền kem `#FFFCF9`, vùng nhấn hồng đào `#F8
 
 Cỡ chữ storefront đã tăng nhẹ để dễ đọc: tên sản phẩm 16 px trên desktop và 14 px trên mobile, giá 19/17 px, nút trong thẻ 14/12 px; mô tả trang chủ 17/15 px. Tiêu đề, nhãn lựa chọn và thông tin giỏ được tăng tương ứng, vùng tên sản phẩm đủ chỗ cho hai dòng. Đã đóng gói bằng `mvn package -DskipTests` và kiểm tra trình duyệt ở desktop, 992, 390, 320 px, gồm nút mua trang chi tiết và giỏ có sản phẩm.
 
+### Ảnh theo màu sản phẩm
+
+19 sản phẩm trang điểm có 62 lựa chọn màu được nối với 60 ảnh cục bộ trong `static/images/catalog/shades/`. Ảnh được đối chiếu theo mã màu, ưu tiên trang hãng; dùng ảnh sản phẩm, ảnh tán màu hoặc ảnh lên da đã công bố, không tô lại ảnh theo mã HEX. Huda Easy Bake dùng chung bảng tán màu có nhãn Banana Bread, Pound Cake và Cherry Blossom Cake; giao diện ghi rõ đây là bảng màu. Đã sửa tên CLIO `19N Light` thành `19N Porcelain` để khớp mã; `Light` thuộc `19C`.
+
+Mỗi `ProductShade` có `imageUrl`, `imageAlt`, `imageType` (`photo`/`chart`). Chọn màu đổi ảnh lớn và ảnh trong hộp phóng to; mobile có thêm ảnh xem ngay dưới lựa chọn. Nút đổi góc xem cho phép quay lại ảnh sản phẩm mà vẫn giữ màu đã chọn. Ảnh màu riêng được dùng trong giỏ; bảng màu chung giữ ảnh đại diện sản phẩm. Màu lên da có thể khác tùy nền da, ánh sáng và màn hình. Khi thiếu/lỗi ảnh, giao diện quay về ảnh sản phẩm và báo rõ để tránh hiện ảnh của màu trước đó.
+
+`catalog/shade-images.json` lưu nội bộ URL trang đối chiếu, URL ảnh, kích thước, ngày kiểm tra và SHA-256 của từng tệp. Storefront không hiển thị các đường dẫn đối chiếu này. Script nhập workbook giữ nguyên phần `shades`, gồm các trường ảnh đã bổ sung. Bộ nạp `dev` chỉ nạp các trường này khi tạo SKU mới, tiếp tục giữ nguyên sản phẩm có sẵn và chỉnh sửa quản trị.
+
+Kiểm tra chức năng ảnh màu: `node tools/test_shade_gallery.cjs`; kiểm tra gộp màu và cập nhật ảnh giỏ: `node tools/test_shop_cart.cjs`. `mvn verify` kiểm tra các trường ảnh và tệp tài nguyên của toàn bộ danh mục cùng trang chi tiết có lựa chọn màu.
+
 Khởi động lại profile `dev` sẽ nạp lại dữ liệu khi dùng H2 in-memory. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
 
 Để cập nhật nội dung từ một workbook cùng cấu trúc (Python cần `openpyxl`):

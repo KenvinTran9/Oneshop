@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head><title th:text="${product.name} + ' - OneShop'">Chi tiết sản phẩm - OneShop</title></head>
+<head><title th:text="${product.name} + ' - OneShop'">Chi tiết sản phẩm - OneShop</title><link rel="stylesheet" href="/css/shade-gallery.css"></head>
 <body>
 <div class="container"><nav class="shop-breadcrumb" aria-label="Điều hướng">
     <a href="/">Trang chủ</a><i class="bi bi-chevron-right"></i><a href="/products">Sản phẩm</a><i class="bi bi-chevron-right"></i><span th:text="${product.name}"></span>
@@ -8,12 +8,17 @@
 <section class="shop-detail">
 <div class="container">
 <div class="shop-detail-layout">
-    <div class="shop-product-gallery">
+    <div class="shop-product-gallery" data-product-gallery th:attr="data-product-name=${product.name}">
         <button class="shop-image-stage" type="button" data-image-zoom aria-label="Phóng to ảnh sản phẩm">
-            <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}" th:alt="${product.name}">
+            <img data-gallery-image th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}" th:alt="${product.name}">
             <span class="zoom-icon"><i class="bi bi-arrows-angle-expand"></i></span>
         </button>
-        <div class="gallery-caption"><span><i class="bi bi-image"></i> Hình ảnh sản phẩm</span><span>Chạm để xem gần hơn</span></div>
+        <div class="gallery-caption"><span data-gallery-caption aria-live="polite"><i class="bi bi-image" aria-hidden="true"></i> Hình ảnh sản phẩm</span><span>Chạm để xem gần hơn</span></div>
+        <div class="product-gallery-views" th:if="${!#lists.isEmpty(product.shades)}" role="group" aria-label="Chọn ảnh xem">
+            <button type="button" class="gallery-view active" data-gallery-original aria-pressed="true"
+                    th:attr="data-image=${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'},data-alt=${product.name}">Ảnh sản phẩm</button>
+            <button type="button" class="gallery-view" data-gallery-shade aria-pressed="false" disabled>Ảnh màu đã chọn</button>
+        </div>
     </div>
     <div class="shop-purchase-panel">
         <div class="shop-product-meta"><span class="shop-card-brand" th:text="${product.brand != null ? product.brand.name : 'OneShop'}"></span><span class="product-category-label" th:if="${product.category != null}" th:text="${product.category.name}"></span></div>
@@ -31,10 +36,19 @@
             <fieldset class="product-option-group" th:if="${!#lists.isEmpty(product.shades)}">
                 <legend>Màu sắc <span data-selected-shade>Chọn màu bạn thích</span></legend>
                 <div class="product-shade-list"><label class="shade-choice" th:each="shade : ${product.shades}">
-                    <input type="radio" name="shade" th:value="${shade.label}" required>
-                    <span class="shade-choice-body"><i class="shade-color" th:style="${'--swatch: ' + shade.color}"></i><span th:text="${shade.label}"></span><i class="bi bi-check2 shade-check"></i></span>
+                    <input type="radio" name="shade" th:value="${shade.label}" required
+                           th:attr="data-shade-image=${shade.imageUrl},data-shade-alt=${shade.imageAlt},data-shade-image-type=${shade.imageType}">
+                    <span class="shade-choice-body">
+                        <img th:if="${shade.imageUrl != null and shade.imageType == 'photo'}" class="shade-photo" th:src="${shade.imageUrl}" alt="" loading="lazy" width="44" height="44">
+                        <i th:unless="${shade.imageUrl != null and shade.imageType == 'photo'}" class="shade-color" th:style="${'--swatch: ' + shade.color}" aria-hidden="true"></i>
+                        <span th:text="${shade.label}"></span><i class="bi bi-check2 shade-check" aria-hidden="true"></i>
+                    </span>
                 </label></div>
-                <p class="option-hint">Màu hiển thị có thể chênh lệch tùy màn hình.</p>
+                <p class="option-hint">Màu lên da có thể khác tùy nền da, ánh sáng và màn hình.</p>
+                <button class="shade-mobile-preview" type="button" data-shade-mobile-preview data-image-zoom hidden aria-label="Phóng to ảnh màu đã chọn">
+                    <img data-shade-mobile-image alt=""><span><i class="bi bi-arrows-angle-expand" aria-hidden="true"></i> Bấm để phóng to ảnh màu</span>
+                </button>
+                <p class="shade-photo-status" data-shade-photo-status aria-live="polite">Chọn một màu để xem ảnh tương ứng. Bạn có thể bấm ảnh lớn để phóng to.</p>
             </fieldset>
             <div class="purchase-quantity-row">
                 <label for="product-quantity">Số lượng</label>
@@ -67,6 +81,6 @@
 </div>
 </div>
 </section>
-<dialog class="product-zoom-dialog" data-product-zoom><button type="button" class="dialog-close" data-close-zoom aria-label="Đóng ảnh"><i class="bi bi-x-lg"></i></button><img th:src="${product.imageUrl}" th:alt="${product.name}"></dialog>
+<dialog class="product-zoom-dialog" data-product-zoom aria-label="Xem ảnh sản phẩm"><button type="button" class="dialog-close" data-close-zoom aria-label="Đóng ảnh"><i class="bi bi-x-lg"></i></button><img th:src="${product.imageUrl}" th:alt="${product.name}"><p data-zoom-caption></p></dialog>
 </body>
 </html>

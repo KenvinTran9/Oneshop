@@ -95,7 +95,7 @@ public class CatalogDataInitializer implements CommandLineRunner {
             product.setImageSourceUrl(entry.imageSourceUrl());
             product.setSizes(entry.sizes() == null ? List.of(entry.packageSize()) : entry.sizes());
             product.setShades(entry.shades() == null ? List.of() : entry.shades().stream()
-                    .map(shade -> new ProductShade(shade.label(), shade.color())).toList());
+                    .map(shade -> new ProductShade(shade.label(), shade.color(), shade.imageUrl(), shade.imageAlt(), shade.imageType())).toList());
             product.setStatus(ProductStatus.ACTIVE);
             products.save(product);
             imported++;
@@ -113,5 +113,5 @@ public class CatalogDataInitializer implements CommandLineRunner {
                                boolean priceFrom, String priceCurrency,
                                List<String> sizes, List<ShadeEntry> shades) { }
 
-    public record ShadeEntry(String label, String color) { }
+    public record ShadeEntry(String label, String color, String imageUrl, String imageAlt, String imageType) { }
 }

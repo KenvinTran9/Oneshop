@@ -123,6 +123,10 @@ class CatalogIntegrationTests {
             assertThat(actual.getShades()).allSatisfy(shade -> {
                 assertThat(shade.getLabel()).isNotBlank();
                 assertThat(shade.getColor()).matches("#[0-9a-fA-F]{6}");
+                assertThat(shade.getImageUrl()).startsWith("/images/catalog/shades/");
+                assertThat(shade.getImageAlt()).contains(actual.getName());
+                assertThat(shade.getImageType()).isIn("photo", "chart");
+                assertThat(new ClassPathResource("static" + shade.getImageUrl()).exists()).isTrue();
             });
             assertThat(new ClassPathResource("static" + actual.getImageUrl()).exists()).isTrue();
         }
@@ -171,7 +175,8 @@ class CatalogIntegrationTests {
         String page = mvc.perform(get("/products/" + product.getSlug())).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
         assertThat(page).contains("Thành phần nổi bật", "Thương hiệu từ", "675.000 ₫",
-                "name=\"shade\"", "Hope", "name=\"quantity\"", "data-buy-now", "data-product-form")
+                "name=\"shade\"", "Hope", "name=\"quantity\"", "data-buy-now", "data-product-form",
+                "data-shade-image=\"/images/catalog/shades/", "data-gallery-image", "data-gallery-original", "data-gallery-shade")
                 .doesNotContain("Giá tham khảo", "Xem giá tại nguồn", product.getPriceSourceUrl(), product.getSourceUrl());
         mvc.perform(get("/cart")).andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("data-cart-list")))

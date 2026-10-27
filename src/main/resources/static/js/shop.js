@@ -56,7 +56,10 @@
         if (!item) return false;
         const items = read();
         const existing = items.find(value => itemKey(value) === itemKey(item));
-        if (existing) existing.quantity = quantity(existing.quantity + item.quantity);
+        if (existing) {
+            existing.quantity = quantity(existing.quantity + item.quantity);
+            existing.image = item.image;
+        }
         else items.push(item);
         write(items);
         return true;
@@ -149,6 +152,8 @@
             updateText(row.querySelector(".cart-item-options"), [item.size, item.shade].filter(Boolean).join(" · "));
             updateText(row.querySelector(".cart-item-unit-price"), money(item.price));
             updateText(row.querySelector(".cart-item-total"), money(item.price * item.quantity), true);
+            const thumbnail = row.querySelector(".cart-item-image img");
+            if (thumbnail.getAttribute("src") !== item.image) thumbnail.src = item.image;
             const input = row.querySelector("[data-cart-quantity]");
             if (input.value !== String(item.quantity)) input.value = String(item.quantity);
             row.querySelector('[data-cart-step="-1"]').disabled = item.quantity <= 1;
