@@ -2,46 +2,51 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Đăng nhập - OneShop</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script th:src="@{/js/auth.js}" defer></script>
 </head>
 <body>
-<section class="auth-section py-5">
+<section class="account-page" aria-labelledby="account-heading">
     <div class="container">
-        <div class="auth-card mx-auto">
-            <div class="text-center mb-4">
-                <span class="eyebrow">Tài khoản</span>
-                <h1 class="h3 fw-bold mt-2">Đăng nhập</h1>
-                <p class="text-muted small mb-0">Chào mừng bạn quay trở lại với OneShop</p>
-            </div>
-            <div class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 small rounded-3" th:if="${param.error}">
-                <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i>
-                <span>Email hoặc mật khẩu không chính xác. Vui lòng thử lại.</span>
-            </div>
-            <div class="alert alert-success d-flex align-items-center gap-2 py-2 px-3 small rounded-3" th:if="${param.logout}">
-                <i class="bi bi-check-circle-fill flex-shrink-0"></i>
-                <span>Bạn đã đăng xuất thành công.</span>
-            </div>
-            <div class="alert alert-success d-flex align-items-center gap-2 py-2 px-3 small rounded-3"
-                 th:if="${registrationSuccessMessage}" th:text="${registrationSuccessMessage}">
-                Đăng ký thành công. Vui lòng đăng nhập.
-            </div>
-            <form th:action="@{/login}" method="post" class="d-grid gap-3">
-                <div>
-                    <label class="form-label small fw-medium" for="username">Địa chỉ Email</label>
-                    <input class="form-control" id="username" name="username" type="email" placeholder="example@email.com" required autocomplete="username">
+        <a class="account-back" th:href="@{/products}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Tiếp tục khám phá sản phẩm</a>
+        <div class="account-shell">
+            <aside th:replace="~{fragments/auth-story :: story}"></aside>
+            <div class="account-panel">
+                <nav class="account-tabs" aria-label="Tài khoản OneShop">
+                    <a th:href="@{/login}" aria-current="page">Đăng nhập</a>
+                    <a th:href="@{/register}">Đăng ký</a>
+                </nav>
+                <div class="account-heading">
+                    <span class="account-kicker">GÓC LÀM ĐẸP CỦA BẠN</span>
+                    <h1 id="account-heading">Mừng bạn trở lại.</h1>
+                    <p>Đăng nhập để tiếp tục mua sắm và lưu giỏ hàng yêu thích của bạn.</p>
                 </div>
-                <div>
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label class="form-label small fw-medium mb-0" for="password">Mật khẩu</label>
+                <div class="account-notice account-notice-error" role="alert" th:if="${param.error}">
+                    <i class="bi bi-exclamation-circle" aria-hidden="true"></i><span>Email hoặc mật khẩu không chính xác. Vui lòng thử lại.</span>
+                </div>
+                <div class="account-notice account-notice-success" role="status" th:if="${param.logout}">
+                    <i class="bi bi-check-circle" aria-hidden="true"></i><span>Bạn đã đăng xuất thành công.</span>
+                </div>
+                <div class="account-notice account-notice-success" role="status" th:if="${registrationSuccessMessage}">
+                    <i class="bi bi-check-circle" aria-hidden="true"></i><span th:text="${registrationSuccessMessage}"></span>
+                </div>
+                <form th:action="@{/login}" method="post" class="account-form" data-account-form>
+                    <div class="account-field">
+                        <label for="username">Email</label>
+                        <input id="username" name="username" type="email" placeholder="ban@email.com" maxlength="120" required autocomplete="username" autocapitalize="none" spellcheck="false">
                     </div>
-                    <input class="form-control" id="password" name="password" type="password" placeholder="••••••••" required autocomplete="current-password">
-                </div>
-                <button class="btn btn-dark rounded-pill py-2 mt-2 fw-medium" type="submit">
-                    Đăng nhập
-                </button>
-            </form>
-            <p class="small text-muted mt-4 mb-0 text-center">
-                Chưa có tài khoản? <a class="fw-semibold text-decoration-underline" th:href="@{/register}">Đăng ký ngay</a>
-            </p>
+                    <div class="account-field">
+                        <label for="password">Mật khẩu</label>
+                        <div class="account-password">
+                            <input id="password" name="password" type="password" placeholder="Nhập mật khẩu của bạn" required autocomplete="current-password">
+                            <button type="button" data-password-toggle="password" aria-controls="password" aria-label="Hiện mật khẩu" aria-pressed="false" hidden><i class="bi bi-eye" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                    <button class="account-submit" type="submit"><span>Đăng nhập</span><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+                </form>
+                <p class="account-switch">Lần đầu ghé OneShop? <a th:href="@{/register}">Tạo tài khoản</a></p>
+                <div class="account-security"><i class="bi bi-shield-lock" aria-hidden="true"></i><span>Mật khẩu của bạn được bảo vệ bằng mã hóa một chiều.</span></div>
+            </div>
         </div>
     </div>
 </section>

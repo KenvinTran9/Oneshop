@@ -50,7 +50,7 @@ public class SecurityConfig {
                                                                 "/decorators/**",
                                                                 "/webjars/**")
                                                 .permitAll()
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())
                                 .formLogin(login -> login
                                                 .loginPage("/login")

@@ -120,6 +120,22 @@ class AdminProductCrudTest extends com.oneshop.MongoIntegrationTestSupport {
     }
 
     @Test
+    void customerCannotCreateUpdateOrDeactivateProductsEvenWithValidCsrf() throws Exception {
+        Product existing = persistProduct("protected-product", "PROTECTED-SKU");
+        for (String path : new String[]{"/admin/products", "/admin/products/" + existing.getId(),
+                "/admin/products/" + existing.getId() + "/status",
+                "/admin/products/" + existing.getId() + "/deactivate"}) {
+            mockMvc.perform(post(path).with(user("customer@oneshop.test").roles("CUSTOMER")).with(csrf())
+                            .param("name", "Unauthorized edit").param("slug", "unauthorized")
+                            .param("sku", "UNAUTHORIZED").param("price", "1")
+                            .param("categoryId", category.getId().toString()).param("status", "ACTIVE"))
+                    .andExpect(status().isForbidden());
+        }
+        assertThat(productRepository.count()).isEqualTo(1);
+        assertThat(productRepository.findById(existing.getId()).orElseThrow().getSku()).isEqualTo("PROTECTED-SKU");
+    }
+
+    @Test
     void createsProductWithValidatedFormAndRedirects() throws Exception {
         mockMvc.perform(post("/admin/products").with(user(ADMIN).roles("ADMIN")).with(csrf())
                         .param("name", "  Serum mới  ").param("slug", "SERUM-MOI")
