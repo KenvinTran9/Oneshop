@@ -43,9 +43,6 @@ public class ProductController {
         return "pages/products";
     }
 
-    @GetMapping("/cart")
-    public String cart() { return "pages/cart"; }
-
     @GetMapping("/products/{slug}")
     public String detail(@PathVariable String slug, Model model) {
         model.addAttribute("product", productService.findActiveProductBySlug(slug));

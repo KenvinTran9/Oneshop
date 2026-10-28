@@ -173,7 +173,8 @@ class AdminProductCrudTest {
     @Test
     void updatesProductWithoutBindingSystemFields() throws Exception {
         Product product = persistProduct("old-name", "OLD-SKU");
-        LocalDateTime originalCreatedAt = product.getCreatedAt();
+        // Compare persisted timestamps; the database rounds JVM nanoseconds to microseconds.
+        LocalDateTime originalCreatedAt = productRepository.findById(product.getId()).orElseThrow().getCreatedAt();
         mockMvc.perform(get("/admin/products/{id}", product.getId()).with(user(ADMIN).roles("ADMIN")))
                 .andExpect(status().isOk()).andExpect(view().name("admin/product-detail"));
         mockMvc.perform(get("/admin/products/{id}/edit", product.getId()).with(user(ADMIN).roles("ADMIN")))

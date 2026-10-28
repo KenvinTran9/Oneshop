@@ -46,11 +46,13 @@ public class Product extends BaseEntity {
     private String imageUrl;
 
     @ElementCollection
+    @org.hibernate.annotations.BatchSize(size = 24)
     @CollectionTable(name = "product_shades", joinColumns = @JoinColumn(name = "product_id"))
     @OrderColumn(name = "shade_order")
     private List<ProductShade> shades = new ArrayList<>();
 
     @ElementCollection
+    @org.hibernate.annotations.BatchSize(size = 24)
     @CollectionTable(name = "product_sizes", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "size_label", length = 100)
     @OrderColumn(name = "size_order")

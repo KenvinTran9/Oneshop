@@ -43,6 +43,7 @@ class CatalogIntegrationTests {
     @Autowired HomeCatalogService homeCatalog;
 
     @Test
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
     void homepageBalancesActiveProductsAndUsesActualCatalogCounts() throws Exception {
         var home = homeCatalog.load();
         assertThat(home.productCount()).isEqualTo(100);
@@ -55,7 +56,7 @@ class CatalogIntegrationTests {
         String page = mvc.perform(get("/")).andExpect(status().isOk()).andReturn()
                 .getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
         assertThat(page).contains("Chăm chút làn da.", "Gợi ý OneShop", "Tìm cái tên bạn yêu thích",
-                "data-quick-add", "/products?category=", "/products?q=", "/css/home.css")
+                "action=\"/cart/items\"", "name=\"productId\"", "/products?category=", "/products?q=", "/css/home.css")
                 .doesNotContain("images.unsplash.com", "Sản phẩm mới nhất");
         assertThat(page.split("data-product-card", -1)).hasSize(9);
     }
@@ -148,6 +149,7 @@ class CatalogIntegrationTests {
 
     @Test
     @SuppressWarnings("unchecked")
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
     void paginationExposesEveryProductAndCategoryFiltersHaveTwentyProducts() throws Exception {
         var slugs = new HashSet<String>();
         for (int page = 0; page < 9; page++) {
@@ -170,17 +172,20 @@ class CatalogIntegrationTests {
     }
 
     @Test
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
     void storefrontHasFixedPricesAndPurchaseOptionsWithoutSourceLinks() throws Exception {
         Product product = products.findBySku("CATALOG-063").orElseThrow();
         String page = mvc.perform(get("/products/" + product.getSlug())).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
         assertThat(page).contains("Thành phần nổi bật", "Thương hiệu từ", "675.000 ₫",
-                "name=\"shade\"", "Hope", "name=\"quantity\"", "data-buy-now", "data-product-form",
+                "name=\"shade\"", "Hope", "name=\"quantity\"", "action=\"/cart/items\"", "data-product-form",
                 "data-shade-image=\"/images/catalog/shades/", "data-gallery-image", "data-gallery-original", "data-gallery-shade")
                 .doesNotContain("Giá tham khảo", "Xem giá tại nguồn", product.getPriceSourceUrl(), product.getSourceUrl());
         mvc.perform(get("/cart")).andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("data-cart-list")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Thông tin nhận hàng")));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler()
+                        .handlerType(com.oneshop.controller.CartController.class))
+                .andExpect(model().attributeExists("cart"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Giỏ hàng đang trống")));
     }
 
     @Test
