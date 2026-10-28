@@ -29,6 +29,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findByStatusAndCategory_Slug(ProductStatus status, String categorySlug, Pageable pageable);
+    @Override
+    @EntityGraph(attributePaths = {"category", "brand"})
+    Optional<Product> findById(Long id);
+
+    boolean existsBySkuIgnoreCase(String sku);
+
+    boolean existsBySkuIgnoreCaseAndIdNot(String sku, Long id);
+
+    boolean existsBySlugIgnoreCase(String slug);
+
+    boolean existsBySlugIgnoreCaseAndIdNot(String slug, Long id);
+
+    @Override
+    @EntityGraph(attributePaths = {"category", "brand"})
+    Page<Product> findAll(Pageable pageable);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Page<Product> findByStatus(ProductStatus status, Pageable pageable);

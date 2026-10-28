@@ -125,6 +125,20 @@ body {
     background: #f0f2f5;
 }
 
+.admin-product-preview {
+    width: 120px;
+    height: 120px;
+}
+
+.admin-product-detail-image {
+    display: block;
+    width: min(100%, 320px);
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #f0f2f5;
+}
+
 @media (max-width: 991.98px) {
     .admin-sidebar {
         position: static;

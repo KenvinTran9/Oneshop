@@ -123,6 +123,7 @@
         const items = read();
         const total = totals(items);
         document.querySelectorAll("[data-cart-count]").forEach(node => {
+            if (node.hasAttribute("data-server-cart")) return;
             const changed = node.textContent !== String(total.count);
             node.textContent = String(total.count);
             node.hidden = total.count === 0;
@@ -209,6 +210,7 @@
             if (event.target.matches(".checkout-form")) { event.preventDefault(); return; }
             const form = event.target.closest("[data-product-form]");
             if (!form) return;
+            if (form.method.toLowerCase() === "post" && new URL(form.action, window.location.href).pathname === "/cart/items") return;
             event.preventDefault();
             if (!form.reportValidity()) return;
             const fields = new FormData(form);

@@ -12,24 +12,48 @@
                 <h1 class="h3 fw-bold mt-2">Tạo tài khoản</h1>
                 <p class="text-muted small mb-0">Tham gia OneShop để nhận ưu đãi đặc quyền</p>
             </div>
-            <form action="#" class="d-grid gap-3">
+            <form th:action="@{/register}" th:object="${registrationRequest}" method="post" class="d-grid gap-3">
                 <div>
                     <label class="form-label small fw-medium" for="fullName">Họ và tên</label>
-                    <input class="form-control" id="fullName" type="text" placeholder="Nguyễn Văn A" required>
+                    <input class="form-control" id="fullName" type="text" placeholder="Nguyễn Văn A"
+                           th:field="*{fullName}" th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
+                           autocomplete="name" required>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('fullName')}"
+                         th:errors="*{fullName}">Họ tên không hợp lệ</div>
                 </div>
                 <div>
                     <label class="form-label small fw-medium" for="email">Địa chỉ Email</label>
-                    <input class="form-control" id="email" type="email" placeholder="example@email.com" required>
+                    <input class="form-control" id="email" type="email" placeholder="example@email.com"
+                           th:field="*{email}" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                           autocomplete="email" required>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('email')}"
+                         th:errors="*{email}">Email không hợp lệ</div>
                 </div>
                 <div>
                     <label class="form-label small fw-medium" for="phone">Số điện thoại</label>
-                    <input class="form-control" id="phone" type="tel" placeholder="09xxxxxxxx" required>
+                    <input class="form-control" id="phone" type="tel" placeholder="09xxxxxxxx"
+                           th:field="*{phone}" th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''"
+                           autocomplete="tel" required>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('phone')}"
+                         th:errors="*{phone}">Số điện thoại không hợp lệ</div>
                 </div>
                 <div>
                     <label class="form-label small fw-medium" for="password">Mật khẩu</label>
-                    <input class="form-control" id="password" type="password" placeholder="Tối thiểu 6 ký tự" required>
+                    <input class="form-control" id="password" name="password" type="password"
+                           placeholder="Tối thiểu 8 ký tự" autocomplete="new-password"
+                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''" required>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('password')}"
+                         th:errors="*{password}">Mật khẩu không hợp lệ</div>
                 </div>
-                <button class="btn btn-dark rounded-pill py-2 mt-2 fw-medium" type="button">
+                <div>
+                    <label class="form-label small fw-medium" for="confirmPassword">Xác nhận mật khẩu</label>
+                    <input class="form-control" id="confirmPassword" name="confirmPassword" type="password"
+                           autocomplete="new-password"
+                           th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''" required>
+                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('confirmPassword')}"
+                         th:errors="*{confirmPassword}">Mật khẩu xác nhận không khớp</div>
+                </div>
+                <button class="btn btn-dark rounded-pill py-2 mt-2 fw-medium" type="submit">
                     Tạo tài khoản
                 </button>
             </form>

@@ -1,0 +1,77 @@
+package com.oneshop.dto.request;
+
+import com.oneshop.entity.ProductStatus;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+import org.springframework.web.multipart.MultipartFile;
+
+public class AdminProductForm {
+
+    @NotBlank(message = "Vui lòng nhập tên sản phẩm.")
+    @Size(max = 180, message = "Tên sản phẩm tối đa 180 ký tự.")
+    private String name;
+
+    @NotBlank(message = "Vui lòng nhập slug.")
+    @Size(max = 200, message = "Slug tối đa 200 ký tự.")
+    @Pattern(regexp = "[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*", message = "Slug chỉ gồm chữ, số và dấu gạch nối.")
+    private String slug;
+
+    @NotBlank(message = "Vui lòng nhập SKU.")
+    @Size(max = 80, message = "SKU tối đa 80 ký tự.")
+    @Pattern(regexp = "[a-zA-Z0-9._-]+", message = "SKU chỉ gồm chữ, số, dấu chấm, gạch dưới hoặc gạch nối.")
+    private String sku;
+
+    @Size(max = 300, message = "Mô tả ngắn tối đa 300 ký tự.")
+    private String shortDescription;
+
+    @Size(max = 10000, message = "Mô tả tối đa 10.000 ký tự.")
+    private String description;
+
+    @NotNull(message = "Vui lòng nhập giá bán.")
+    @DecimalMin(value = "0.00", message = "Giá bán không được âm.")
+    @Digits(integer = 10, fraction = 2, message = "Giá bán tối đa 10 chữ số nguyên và 2 chữ số thập phân.")
+    private BigDecimal price;
+
+    @DecimalMin(value = "0.00", message = "Giá khuyến mãi không được âm.")
+    @Digits(integer = 10, fraction = 2, message = "Giá khuyến mãi tối đa 10 chữ số nguyên và 2 chữ số thập phân.")
+    private BigDecimal salePrice;
+
+    @NotNull(message = "Vui lòng chọn danh mục.")
+    private Long categoryId;
+
+    private Long brandId;
+
+    @NotNull(message = "Vui lòng chọn trạng thái.")
+    private ProductStatus status = ProductStatus.ACTIVE;
+
+    private MultipartFile image;
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
+    public String getSku() { return sku; }
+    public void setSku(String sku) { this.sku = sku; }
+    public String getShortDescription() { return shortDescription; }
+    public void setShortDescription(String shortDescription) { this.shortDescription = shortDescription; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
+    public BigDecimal getSalePrice() { return salePrice; }
+    public void setSalePrice(BigDecimal salePrice) { this.salePrice = salePrice; }
+    public Long getCategoryId() { return categoryId; }
+    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+    public Long getBrandId() { return brandId; }
+    public void setBrandId(Long brandId) { this.brandId = brandId; }
+    public ProductStatus getStatus() { return status; }
+    public void setStatus(ProductStatus status) { this.status = status; }
+    public MultipartFile getImage() { return image; }
+    public void setImage(MultipartFile image) { this.image = image; }
+
+}
