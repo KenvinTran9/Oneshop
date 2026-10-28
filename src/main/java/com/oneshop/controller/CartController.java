@@ -35,6 +35,7 @@ public class CartController {
     public String cart(Authentication authentication, HttpServletRequest request, Model model) {
         CartView cart = cartService.getCart(authenticatedEmail(authentication), request.getSession(false));
         model.addAttribute("cart", cart);
+        model.addAttribute("cartSignedIn", authenticatedEmail(authentication) != null);
         return "pages/cart";
     }
 
@@ -62,7 +63,7 @@ public class CartController {
                     authenticatedEmail(authentication),
                     request.getSession(authenticatedEmail(authentication) == null),
                     cartItemRequest.productId(),
-                    cartItemRequest.quantity()
+                    cartItemRequest.quantity(), cartItemRequest.size(), cartItemRequest.shade()
             );
             redirectAttributes.addFlashAttribute("cartSuccess", "Đã thêm sản phẩm vào giỏ hàng.");
         } catch (CartOperationException exception) {
@@ -74,6 +75,8 @@ public class CartController {
     @PostMapping("/items/{productId}")
     public String updateQuantity(@PathVariable Long productId,
                                  @RequestParam int quantity,
+                                 @RequestParam(defaultValue = "") String size,
+                                 @RequestParam(defaultValue = "") String shade,
                                  Authentication authentication,
                                  HttpServletRequest request,
                                  RedirectAttributes redirectAttributes) {
@@ -82,7 +85,7 @@ public class CartController {
                     authenticatedEmail(authentication),
                     request.getSession(false),
                     productId,
-                    quantity
+                    quantity, size, shade
             );
             redirectAttributes.addFlashAttribute("cartSuccess", "Đã cập nhật số lượng.");
         } catch (CartOperationException exception) {
@@ -93,6 +96,8 @@ public class CartController {
 
     @PostMapping("/items/{productId}/remove")
     public String removeItem(@PathVariable Long productId,
+                             @RequestParam(defaultValue = "") String size,
+                             @RequestParam(defaultValue = "") String shade,
                              Authentication authentication,
                              HttpServletRequest request,
                              RedirectAttributes redirectAttributes) {
@@ -100,7 +105,7 @@ public class CartController {
             cartService.removeItem(
                     authenticatedEmail(authentication),
                     request.getSession(false),
-                    productId
+                    productId, size, shade
             );
             redirectAttributes.addFlashAttribute("cartSuccess", "Đã xóa sản phẩm khỏi giỏ hàng.");
         } catch (CartOperationException exception) {

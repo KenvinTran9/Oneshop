@@ -1,47 +1,62 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head><title>Giỏ hàng của bạn - OneShop</title></head>
+<head><title>Giỏ hàng của bạn - OneShop</title><link rel="stylesheet" href="/css/cart.css"></head>
 <body>
-<section class="shop-cart-page">
+<section class="shop-cart-page cart-refined">
 <div class="container">
-    <nav class="shop-breadcrumb" aria-label="Điều hướng"><a href="/">Trang chủ</a><i class="bi bi-chevron-right"></i><span>Giỏ hàng</span></nav>
-    <div class="cart-page-heading"><div><span class="eyebrow">Mua sắm cùng OneShop</span><h1>Giỏ hàng <span th:if="${cart.itemCount > 0}" th:text="${'(' + cart.itemCount + ')'}"></span></h1></div><a href="/products"><i class="bi bi-arrow-left"></i> Tiếp tục mua sắm</a></div>
-    <div class="alert alert-success" role="status" th:if="${cartSuccess}" th:text="${cartSuccess}"></div>
-    <div class="alert alert-warning" role="alert" th:if="${cartError}" th:text="${cartError}"></div>
-    <div class="shop-empty-state cart-empty" th:if="${#lists.isEmpty(cart.items)}"><i class="bi bi-bag-heart"></i><h2>Giỏ hàng đang trống</h2><p>Chọn những sản phẩm phù hợp để bắt đầu chăm sóc bản thân.</p><a class="shop-button primary" href="/products">Khám phá sản phẩm</a></div>
+    <nav class="shop-breadcrumb" aria-label="Điều hướng"><a href="/">Trang chủ</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span>Giỏ hàng</span></nav>
+    <div class="cart-page-heading">
+        <div><span class="eyebrow">Những lựa chọn dành riêng cho bạn</span><h1>Giỏ hàng của bạn <span th:if="${cart.itemCount > 0}" th:text="${'(' + cart.itemCount + ')'}"></span></h1></div>
+        <a href="/products"><i class="bi bi-arrow-left" aria-hidden="true"></i> Tiếp tục mua sắm</a>
+    </div>
+    <div class="cart-feedback success" role="status" th:if="${cartSuccess}"><i class="bi bi-check-circle" aria-hidden="true"></i><span th:text="${cartSuccess}"></span></div>
+    <div class="cart-feedback warning" role="alert" th:if="${cartError}"><i class="bi bi-info-circle" aria-hidden="true"></i><span th:text="${cartError}"></span></div>
+    <div class="shop-empty-state cart-empty" th:if="${#lists.isEmpty(cart.items)}"><i class="bi bi-bag-heart" aria-hidden="true"></i><h2>Giỏ hàng đang trống</h2><p>Một làn da được nâng niu, một sắc son bạn yêu thích.<br>Thêm những lựa chọn đầu tiên của bạn nhé.</p><a class="shop-button primary" href="/products">Khám phá sản phẩm <i class="bi bi-arrow-right" aria-hidden="true"></i></a></div>
     <div class="cart-layout" th:unless="${#lists.isEmpty(cart.items)}">
         <section class="cart-items-panel" aria-label="Sản phẩm trong giỏ">
-            <div class="cart-table-heading"><span>Sản phẩm</span><span>Thành tiền</span></div>
-            <article class="cart-item" th:each="item : ${cart.items}">
-                <a class="cart-item-image" th:href="@{/products}"><img th:src="${item.imageUrl != null ? item.imageUrl : '/images/product-placeholder.svg'}" th:alt="${item.name}"></a>
-                <div class="cart-item-info">
-                    <a class="cart-item-name" th:href="@{/products}"><span th:text="${item.name}"></span></a>
-                    <p class="cart-item-options" th:text="${'SKU: ' + item.sku}"></p>
-                    <p class="cart-item-unit-price" th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</p>
-                    <p class="alert alert-warning py-2" th:if="${item.warning != null}" th:text="${item.warning}"></p>
-                    <div class="cart-item-controls">
-                        <form class="d-flex gap-2 align-items-center" th:action="@{/cart/items/{id}(id=${item.productId})}" method="post">
-                            <label class="visually-hidden" th:for="${'quantity-' + item.productId}">Số lượng</label>
-                            <input class="form-control form-control-sm" style="width:5rem" type="number" min="1" max="99" name="quantity" th:id="${'quantity-' + item.productId}" th:value="${item.quantity}">
-                            <button class="btn btn-outline-dark btn-sm" type="submit">Cập nhật</button>
+            <div class="cart-list-heading"><span th:text="${#lists.size(cart.items) + ' lựa chọn trong giỏ'}"></span><form th:action="@{/cart/clear}" method="post"><button class="cart-text-button" type="submit">Xóa tất cả</button></form></div>
+            <article class="cart-line" th:each="item, iter : ${cart.items}" data-server-cart-line>
+                <a class="cart-line-image" th:href="@{/products/{slug}(slug=${item.slug})}"><img th:src="${item.imageUrl != null ? item.imageUrl : '/images/product-placeholder.svg'}" th:alt="${item.name + (item.shade.isEmpty() ? '' : ' — ' + item.shade)}" width="96" height="108" loading="lazy"></a>
+                <div class="cart-line-info">
+                    <a class="cart-line-name" th:href="@{/products/{slug}(slug=${item.slug})}" th:text="${item.name}"></a>
+                    <div class="cart-line-options">
+                        <span th:if="${!item.shade.isEmpty()}"><span>Màu:</span> <strong th:text="${item.shade}"></strong></span>
+                        <span th:if="${!item.size.isEmpty()}"><span>Quy cách:</span> <strong th:text="${item.size}"></strong></span>
+                    </div>
+                    <p class="cart-line-unit" th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')} + ' ₫ / sản phẩm'">0 ₫</p>
+                    <p class="cart-line-warning" th:if="${item.warning != null}" th:text="${item.warning}" role="status"></p>
+                    <div class="cart-line-controls">
+                        <form class="cart-quantity-form" th:action="@{/cart/items/{id}(id=${item.productId})}" method="post" data-server-quantity-form>
+                            <input type="hidden" name="size" th:value="${item.size}"><input type="hidden" name="shade" th:value="${item.shade}">
+                            <label class="visually-hidden" th:for="${'cart-quantity-' + iter.index}" th:text="${'Số lượng ' + item.name + ' ' + item.shade + ' ' + item.size}"></label>
+                            <div class="cart-stepper">
+                                <button type="button" data-server-step="-1" th:attr="aria-label=${'Giảm số lượng ' + item.shade + ' ' + item.size}" hidden><i class="bi bi-dash" aria-hidden="true"></i></button>
+                                <input type="number" min="1" max="99" step="1" name="quantity" th:id="${'cart-quantity-' + iter.index}" th:value="${item.quantity}" required>
+                                <button type="button" data-server-step="1" th:attr="aria-label=${'Tăng số lượng ' + item.shade + ' ' + item.size}" hidden><i class="bi bi-plus" aria-hidden="true"></i></button>
+                            </div>
+                            <button class="cart-update-button" type="submit">Cập nhật</button>
+                            <span class="cart-quantity-hint" data-quantity-hint aria-live="polite" hidden>Bấm Cập nhật để áp dụng.</span>
                         </form>
-                        <form th:action="@{/cart/items/{id}/remove(id=${item.productId})}" method="post"><button class="btn btn-link text-danger btn-sm" type="submit">Xóa</button></form>
+                        <form th:action="@{/cart/items/{id}/remove(id=${item.productId})}" method="post"><input type="hidden" name="size" th:value="${item.size}"><input type="hidden" name="shade" th:value="${item.shade}"><button class="cart-text-button" type="submit" th:attr="aria-label=${'Xóa ' + item.name + ' ' + item.shade + ' ' + item.size}"><i class="bi bi-trash3" aria-hidden="true"></i> Xóa</button></form>
                     </div>
                 </div>
-                <strong class="cart-item-total" th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong>
+                <div class="cart-line-total"><span>Thành tiền</span><strong th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')} + ' ₫'">0 ₫</strong></div>
             </article>
+            <div class="cart-save-note"><i class="bi bi-bag-heart" aria-hidden="true"></i><p th:if="${cartSignedIn}">Giỏ hàng được lưu trong tài khoản của bạn.</p><p th:unless="${cartSignedIn}">Giỏ hàng được lưu trong phiên duyệt web này. <a href="/login">Đăng nhập</a> để lưu vào tài khoản.</p></div>
         </section>
         <aside class="cart-summary">
             <span class="eyebrow">OneShop</span><h2>Tóm tắt giỏ hàng</h2>
-            <div class="summary-line"><span>Tạm tính</span><strong th:text="${#numbers.formatDecimal(cart.subtotal, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong></div>
-            <div class="summary-line"><span>Phí giao hàng</span><span class="text-muted small">Xác nhận khi đặt hàng</span></div>
-            <div class="cart-total-line"><span>Tổng tiền sản phẩm</span><strong th:text="${#numbers.formatDecimal(cart.subtotal, 0, 'COMMA', 0, 'POINT')} + ' ₫'">0 ₫</strong></div>
-            <p class="cart-summary-note"><i class="bi bi-bookmark-heart"></i> Đây là giỏ hàng; bước thanh toán chưa được triển khai.</p>
-            <form th:action="@{/cart/clear}" method="post"><button class="btn btn-outline-danger w-100" type="submit">Xóa toàn bộ giỏ hàng</button></form>
-            <a class="cart-store-link" href="/stores"><i class="bi bi-chat-dots"></i> Cần tư vấn? Ghé OneShop</a>
+            <div class="summary-line"><span>Số lượng sản phẩm</span><strong th:text="${cart.itemCount}"></strong></div>
+            <div class="summary-line"><span>Tạm tính</span><strong th:text="${#numbers.formatDecimal(cart.subtotal, 0, 'POINT', 0, 'COMMA')} + ' ₫'">0 ₫</strong></div>
+            <div class="summary-line"><span>Phí giao hàng</span><span>Xác nhận khi đặt hàng</span></div>
+            <div class="cart-total-line"><span>Tổng tiền sản phẩm</span><strong th:text="${#numbers.formatDecimal(cart.subtotal, 0, 'POINT', 0, 'COMMA')} + ' ₫'">0 ₫</strong></div>
+            <a class="shop-button primary w-100" href="/stores">Liên hệ đặt hàng <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+            <p class="cart-summary-note">Cửa hàng sẽ xác nhận tình trạng sản phẩm và phí giao hàng với bạn. Đặt hàng trực tuyến sẽ được mở sau.</p>
+            <a class="cart-store-link" href="/stores"><i class="bi bi-chat-heart" aria-hidden="true"></i> Cần hỗ trợ chọn màu? Ghé OneShop</a>
         </aside>
     </div>
 </div>
 </section>
+<script src="/js/cart-page.js" defer></script>
 </body>
 </html>

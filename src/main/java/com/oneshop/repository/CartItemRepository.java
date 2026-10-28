@@ -10,13 +10,16 @@ import org.springframework.data.repository.query.Param;
 
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
-    Optional<CartItem> findByCartIdAndProductId(Long cartId, Long productId);
+    Optional<CartItem> findByCartIdAndProductIdAndSelectedSizeAndSelectedShade(
+            Long cartId, Long productId, String size, String shade);
 
     List<CartItem> findAllByCartIdOrderByIdAsc(Long cartId);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("delete from CartItem item where item.cart.id = :cartId and item.product.id = :productId")
-    int deleteByCartIdAndProductId(@Param("cartId") Long cartId, @Param("productId") Long productId);
+    @Query("delete from CartItem item where item.cart.id = :cartId and item.product.id = :productId "
+            + "and item.selectedSize = :size and item.selectedShade = :shade")
+    int deleteSelection(@Param("cartId") Long cartId, @Param("productId") Long productId,
+                        @Param("size") String size, @Param("shade") String shade);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from CartItem item where item.cart.id = :cartId")

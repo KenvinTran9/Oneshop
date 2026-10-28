@@ -1,5 +1,6 @@
 package com.oneshop.service;
 
+import com.oneshop.dto.CartSelection;
 import com.oneshop.dto.response.CartItemView;
 import com.oneshop.dto.response.CartView;
 import com.oneshop.entity.Cart;
@@ -19,27 +20,21 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CartService {
-
     public static final String GUEST_CART_SESSION_ATTRIBUTE = "oneshop.guestCart";
     public static final int MAX_QUANTITY_PER_SKU = 99;
-
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
     private final StoreStockRepository storeStockRepository;
     private final UserRepository userRepository;
 
-    public CartService(CartRepository cartRepository,
-                       CartItemRepository cartItemRepository,
-                       ProductRepository productRepository,
-                       StoreStockRepository storeStockRepository,
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository,
+                       ProductRepository productRepository, StoreStockRepository storeStockRepository,
                        UserRepository userRepository) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
@@ -49,278 +44,258 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    public CartView getCart(String authenticatedEmail, HttpSession session) {
-        if (authenticatedEmail != null) {
-            return cartRepository.findByUserEmailIgnoreCase(authenticatedEmail)
+    public CartView getCart(String email, HttpSession session) {
+        if (email != null) {
+            return cartRepository.findByUserEmailIgnoreCase(email)
                     .map(cart -> buildCart(cart.getItems().stream()
-                            .map(item -> new ProductQuantity(item.getProduct(), item.getQuantity()))
-                            .toList()))
-                    .orElseGet(this::emptyCart);
+                            .map(item -> new ProductQuantity(item.getProduct(), selection(item), item.getQuantity()))
+                            .toList())).orElseGet(this::emptyCart);
         }
-
-        Map<Long, Integer> guestItems = guestItems(session);
         List<ProductQuantity> items = new ArrayList<>();
-        for (Map.Entry<Long, Integer> entry : guestItems.entrySet()) {
-            productRepository.findById(entry.getKey())
-                    .ifPresent(product -> items.add(new ProductQuantity(product, entry.getValue())));
-        }
+        guestItems(session).forEach((key, count) -> productRepository.findById(key.productId())
+                .ifPresent(product -> items.add(new ProductQuantity(product, key, count))));
         return buildCart(items);
     }
 
     @Transactional(readOnly = true)
-    public long getItemCount(String authenticatedEmail, HttpSession session) {
-        if (authenticatedEmail != null) {
-            return cartItemRepository.sumQuantityByCartUserEmail(authenticatedEmail);
-        }
-        return guestItems(session).values().stream().mapToLong(Integer::longValue).sum();
+    public long getItemCount(String email, HttpSession session) {
+        return email != null ? cartItemRepository.sumQuantityByCartUserEmail(email)
+                : guestItems(session).values().stream().mapToLong(Integer::longValue).sum();
     }
 
     @Transactional
-    public void addItem(String authenticatedEmail, HttpSession session, Long productId, int quantity) {
+    public void addItem(String email, HttpSession session, Long productId, int quantity, String size, String shade) {
         validateRequestedQuantity(quantity);
         Product product = getProduct(productId);
         assertSellable(product);
-
-        if (authenticatedEmail == null) {
-            Map<Long, Integer> guestItems = guestItems(session);
-            int newQuantity = guestItems.getOrDefault(productId, 0) + quantity;
-            validateRequestedQuantity(newQuantity);
-            assertAvailable(product, newQuantity);
-            guestItems.put(productId, newQuantity);
-            saveGuestItems(session, guestItems);
+        CartSelection key = checkedSelection(product, size, shade);
+        if (email == null) {
+            var items = guestItems(session);
+            int next = items.getOrDefault(key, 0) + quantity;
+            validateRequestedQuantity(next);
+            assertAvailable(product, totalForProduct(items, productId) + quantity);
+            items.put(key, next);
+            saveGuestItems(session, items);
             return;
         }
-
-        Cart cart = getOrCreateCart(authenticatedEmail);
-        CartItem item = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId)
-                .orElseGet(() -> newCartItem(cart, product));
-        int newQuantity = item.getQuantity() + quantity;
-        validateRequestedQuantity(newQuantity);
-        assertAvailable(product, newQuantity);
-        item.setQuantity(newQuantity);
+        Cart cart = getOrCreateCart(email);
+        CartItem item = findItem(cart, key).orElseGet(() -> newCartItem(cart, product, key));
+        int next = item.getQuantity() + quantity;
+        validateRequestedQuantity(next);
+        assertAvailable(product, totalForProduct(cart, productId) + quantity);
+        item.setQuantity(next);
         cartItemRepository.save(item);
     }
 
     @Transactional
-    public void updateQuantity(String authenticatedEmail, HttpSession session, Long productId, int quantity) {
+    public void updateQuantity(String email, HttpSession session, Long productId, int quantity, String size, String shade) {
         validateRequestedQuantity(quantity);
+        CartSelection key = lineKey(productId, size, shade);
         Product product = getProduct(productId);
         assertSellable(product);
-        assertAvailable(product, quantity);
-
-        if (authenticatedEmail == null) {
-            Map<Long, Integer> guestItems = guestItems(session);
-            if (!guestItems.containsKey(productId)) {
-                throw new CartOperationException("Sản phẩm này không còn trong giỏ hàng.");
-            }
-            guestItems.put(productId, quantity);
-            saveGuestItems(session, guestItems);
+        checkedSelection(product, size, shade);
+        if (email == null) {
+            var items = guestItems(session);
+            Integer previous = items.get(key);
+            if (previous == null) throw missingItem();
+            assertAvailable(product, totalForProduct(items, productId) - previous + quantity);
+            items.put(key, quantity);
+            saveGuestItems(session, items);
             return;
         }
-
-        Cart cart = getCartForUser(authenticatedEmail);
-        CartItem item = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId)
-                .orElseThrow(() -> new CartOperationException("Sản phẩm này không còn trong giỏ hàng."));
+        Cart cart = getCartForUser(email);
+        CartItem item = findItem(cart, key).orElseThrow(this::missingItem);
+        assertAvailable(product, totalForProduct(cart, productId) - item.getQuantity() + quantity);
         item.setQuantity(quantity);
         cartItemRepository.save(item);
     }
 
     @Transactional
-    public void removeItem(String authenticatedEmail, HttpSession session, Long productId) {
-        if (authenticatedEmail == null) {
-            Map<Long, Integer> guestItems = guestItems(session);
-            if (guestItems.remove(productId) == null) {
-                throw new CartOperationException("Sản phẩm này không còn trong giỏ hàng.");
-            }
-            saveGuestItems(session, guestItems);
+    public void removeItem(String email, HttpSession session, Long productId, String size, String shade) {
+        // Removal must remain possible after a shade is retired or the product is discontinued.
+        CartSelection key = lineKey(productId, size, shade);
+        if (email == null) {
+            var items = guestItems(session);
+            if (items.remove(key) == null) throw missingItem();
+            saveGuestItems(session, items);
             return;
         }
+        Cart cart = getCartForUser(email);
+        if (cartItemRepository.deleteSelection(cart.getId(), productId, key.size(), key.shade()) == 0) throw missingItem();
+    }
 
-        Cart cart = getCartForUser(authenticatedEmail);
-        if (cartItemRepository.deleteByCartIdAndProductId(cart.getId(), productId) == 0) {
-            throw new CartOperationException("Sản phẩm này không còn trong giỏ hàng.");
+    @Transactional
+    public void clearCart(String email, HttpSession session) {
+        if (email == null) {
+            if (session != null) session.removeAttribute(GUEST_CART_SESSION_ATTRIBUTE);
+        } else {
+            cartRepository.findByUserEmailIgnoreCase(email)
+                    .ifPresent(cart -> cartItemRepository.deleteAllByCartId(cart.getId()));
         }
     }
 
     @Transactional
-    public void clearCart(String authenticatedEmail, HttpSession session) {
-        if (authenticatedEmail == null) {
-            if (session != null) {
-                session.removeAttribute(GUEST_CART_SESSION_ATTRIBUTE);
-            }
-            return;
-        }
-
-        cartRepository.findByUserEmailIgnoreCase(authenticatedEmail)
-                .ifPresent(cart -> cartItemRepository.deleteAllByCartId(cart.getId()));
-    }
-
-    @Transactional
-    public void mergeGuestCart(String authenticatedEmail, HttpSession session) {
-        Map<Long, Integer> guestItems = guestItems(session);
-        if (authenticatedEmail == null || guestItems.isEmpty()) {
-            return;
-        }
-
-        Cart cart = getOrCreateCart(authenticatedEmail);
-        for (Map.Entry<Long, Integer> entry : guestItems.entrySet()) {
-            Long productId = entry.getKey();
-            Integer guestQuantity = entry.getValue();
-            if (productId == null || guestQuantity == null || guestQuantity < 1) {
-                continue;
-            }
-
-            Optional<Product> productOptional = productRepository.findById(productId);
-            if (productOptional.isEmpty()) {
-                continue;
-            }
-
-            Product product = productOptional.orElseThrow();
-            CartItem item = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId)
-                    .orElseGet(() -> newCartItem(cart, product));
-            item.setQuantity(Math.min(MAX_QUANTITY_PER_SKU, item.getQuantity() + guestQuantity));
+    public void mergeGuestCart(String email, HttpSession session) {
+        var guest = guestItems(session);
+        if (email == null || guest.isEmpty()) return;
+        Cart cart = getOrCreateCart(email);
+        // Keep unavailable selections with a warning, rather than silently losing the customer's choices.
+        guest.forEach((key, count) -> productRepository.findById(key.productId()).ifPresent(product -> {
+            CartItem item = findItem(cart, key).orElseGet(() -> newCartItem(cart, product, key));
+            item.setQuantity(Math.min(MAX_QUANTITY_PER_SKU, item.getQuantity() + count));
             cartItemRepository.save(item);
-        }
+        }));
     }
 
-    private CartView buildCart(List<ProductQuantity> products) {
+    private CartView buildCart(List<ProductQuantity> items) {
+        Map<Long, Long> totals = new LinkedHashMap<>();
+        items.forEach(item -> totals.merge(item.product().getId(), (long) item.quantity(), Long::sum));
         List<CartItemView> views = new ArrayList<>();
         BigDecimal subtotal = BigDecimal.ZERO;
         long itemCount = 0;
-
-        for (ProductQuantity productQuantity : products) {
-            Product product = productQuantity.product();
-            int quantity = productQuantity.quantity();
+        for (var item : items) {
+            Product product = item.product();
+            CartSelection key = item.selection();
             BigDecimal unitPrice = currentPrice(product);
-            BigDecimal lineTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
-            long availableStock = Math.max(0, storeStockRepository.sumAvailableQuantityByProductId(product.getId()));
-            String warning = warningFor(product, quantity, availableStock);
+            BigDecimal lineTotal = unitPrice.multiply(BigDecimal.valueOf(item.quantity()));
+            long stock = Math.max(0, storeStockRepository.sumAvailableQuantityByProductId(product.getId()));
+            String warning = warningFor(product, key, totals.get(product.getId()), stock);
 
-            views.add(new CartItemView(
-                    product.getId(),
-                    product.getSku(),
-                    product.getName(),
-                    product.getImageUrl(),
-                    quantity,
-                    unitPrice,
-                    lineTotal,
-                    availableStock,
-                    warning
-            ));
+            views.add(new CartItemView(product.getId(), product.getSku(), product.getName(), product.getSlug(),
+                    key.size(), key.shade(), imageFor(product, key), item.quantity(), unitPrice, lineTotal, stock, warning));
             subtotal = subtotal.add(lineTotal);
-            itemCount += quantity;
+            itemCount += item.quantity();
         }
         return new CartView(List.copyOf(views), subtotal, itemCount);
     }
 
-    private CartView emptyCart() {
-        return new CartView(List.of(), BigDecimal.ZERO, 0);
+    private String imageFor(Product product, CartSelection key) {
+        return product.getShades().stream().filter(shade -> shade.getLabel().equals(key.shade()))
+                .filter(shade -> "photo".equals(shade.getImageType()) && shade.getImageUrl() != null
+                        && shade.getImageUrl().matches("/images/[a-zA-Z0-9/_.-]+"))
+                .map(com.oneshop.entity.ProductShade::getImageUrl).findFirst().orElse(product.getImageUrl());
     }
 
-    private BigDecimal currentPrice(Product product) {
-        BigDecimal salePrice = product.getSalePrice();
-        if (salePrice != null && salePrice.compareTo(BigDecimal.ZERO) >= 0
-                && salePrice.compareTo(product.getPrice()) < 0) {
-            return salePrice;
+    private CartSelection checkedSelection(Product product, String size, String shade) {
+        CartSelection key = lineKey(product.getId(), size, shade);
+        String chosenSize = choose(product.getSizes(), key.size(), "quy cách");
+        String chosenShade = choose(product.getShades().stream().map(com.oneshop.entity.ProductShade::getLabel).toList(), key.shade(), "màu");
+        return new CartSelection(product.getId(), chosenSize, chosenShade);
+    }
+
+    private String choose(List<String> allowed, String value, String label) {
+        if (value.isEmpty()) {
+            if (allowed.isEmpty()) return "";
+            if (allowed.size() == 1) return allowed.getFirst();
+            throw new CartOperationException("Vui lòng chọn " + label + " của sản phẩm trước khi thêm giỏ.");
         }
-        return product.getPrice();
+        if (!allowed.contains(value)) throw new CartOperationException("Lựa chọn " + label + " không còn hợp lệ. Vui lòng chọn lại.");
+        return value;
     }
 
-    private String warningFor(Product product, int quantity, long availableStock) {
-        if (!product.isActive() || product.getStatus() == ProductStatus.DISCONTINUED) {
+    private CartSelection lineKey(Long productId, String size, String shade) {
+        CartSelection key = new CartSelection(productId, size, shade);
+        if (productId == null || productId <= 0 || key.size().length() > 100 || key.shade().length() > 100)
+            throw new CartOperationException("Lựa chọn sản phẩm không hợp lệ.");
+        return key;
+    }
+
+    private String warningFor(Product product, CartSelection key, long total, long stock) {
+        if (!product.isActive() || product.getStatus() == ProductStatus.DISCONTINUED)
             return "Sản phẩm đã ngừng kinh doanh. Vui lòng xóa sản phẩm khỏi giỏ hàng.";
-        }
-        if (product.getStatus() != ProductStatus.ACTIVE) {
+        if (product.getStatus() != ProductStatus.ACTIVE)
             return "Sản phẩm hiện không được mở bán. Vui lòng xóa sản phẩm khỏi giỏ hàng.";
-        }
-        if (availableStock == 0) {
-            return "Sản phẩm hiện đã hết hàng tại các cửa hàng đang hoạt động.";
-        }
-        if (quantity > availableStock) {
-            return "Số lượng trong giỏ vượt tồn hiện tại. Hiện chỉ còn " + availableStock + " sản phẩm.";
-        }
+        try { checkedSelection(product, key.size(), key.shade()); }
+        catch (CartOperationException exception) { return "Màu hoặc quy cách đã thay đổi. Vui lòng chọn lại sản phẩm."; }
+        if (stock == 0) return "Sản phẩm hiện đã hết hàng tại các cửa hàng đang hoạt động.";
+        if (total > stock) return "Tổng số lượng các lựa chọn của sản phẩm vượt tồn hiện tại. Hiện chỉ còn " + stock + " sản phẩm.";
         return null;
     }
 
+    private BigDecimal currentPrice(Product product) {
+        BigDecimal sale = product.getSalePrice();
+        return sale != null && sale.signum() >= 0 && sale.compareTo(product.getPrice()) < 0 ? sale : product.getPrice();
+    }
+
     private void assertSellable(Product product) {
-        if (!product.isActive() || product.getStatus() != ProductStatus.ACTIVE) {
+        if (!product.isActive() || product.getStatus() != ProductStatus.ACTIVE)
             throw new CartOperationException("Sản phẩm hiện không được mở bán và chưa thể thêm vào giỏ.");
-        }
     }
 
-    private void assertAvailable(Product product, int quantity) {
+    private void assertAvailable(Product product, long quantity) {
         long available = Math.max(0, storeStockRepository.sumAvailableQuantityByProductId(product.getId()));
-        if (available == 0) {
-            throw new CartOperationException("Sản phẩm hiện đã hết hàng tại các cửa hàng đang hoạt động.");
-        }
-        if (quantity > available) {
-            throw new CartOperationException("Số lượng vượt tồn hiện tại. Hiện chỉ còn " + available + " sản phẩm.");
-        }
+        if (available == 0) throw new CartOperationException("Sản phẩm hiện đã hết hàng tại các cửa hàng đang hoạt động.");
+        if (quantity > available) throw new CartOperationException("Tổng số lượng sản phẩm vượt tồn hiện tại. Hiện chỉ còn " + available + " sản phẩm.");
     }
 
-    private Product getProduct(Long productId) {
-        if (productId == null) {
-            throw new CartOperationException("Sản phẩm không hợp lệ.");
-        }
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new CartOperationException("Sản phẩm không còn tồn tại."));
+    private Product getProduct(Long id) {
+        if (id == null) throw new CartOperationException("Sản phẩm không hợp lệ.");
+        return productRepository.findById(id).orElseThrow(() -> new CartOperationException("Sản phẩm không còn tồn tại."));
     }
 
     private Cart getOrCreateCart(String email) {
         return cartRepository.findByUserEmailIgnoreCase(email).orElseGet(() -> {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new CartOperationException("Không thể xác định tài khoản hiện tại."));
-            Cart cart = new Cart();
-            cart.setUser(user);
+            Cart cart = new Cart(); cart.setUser(user);
             return cartRepository.saveAndFlush(cart);
         });
     }
 
     private Cart getCartForUser(String email) {
-        return cartRepository.findByUserEmailIgnoreCase(email)
-                .orElseThrow(() -> new CartOperationException("Sản phẩm này không còn trong giỏ hàng."));
+        return cartRepository.findByUserEmailIgnoreCase(email).orElseThrow(this::missingItem);
     }
 
-    private CartItem newCartItem(Cart cart, Product product) {
-        CartItem item = new CartItem();
-        item.setCart(cart);
-        item.setProduct(product);
+    private java.util.Optional<CartItem> findItem(Cart cart, CartSelection key) {
+        return cartItemRepository.findByCartIdAndProductIdAndSelectedSizeAndSelectedShade(
+                cart.getId(), key.productId(), key.size(), key.shade());
+    }
+
+    private CartItem newCartItem(Cart cart, Product product, CartSelection key) {
+        CartItem item = new CartItem(); item.setCart(cart); item.setProduct(product);
+        item.setSelectedSize(key.size()); item.setSelectedShade(key.shade());
         return item;
     }
 
-    private void validateRequestedQuantity(int quantity) {
-        if (quantity < 1 || quantity > MAX_QUANTITY_PER_SKU) {
-            throw new CartOperationException("Số lượng mỗi SKU phải từ 1 đến " + MAX_QUANTITY_PER_SKU + ".");
-        }
+    private CartSelection selection(CartItem item) {
+        return new CartSelection(item.getProduct().getId(), item.getSelectedSize(), item.getSelectedShade());
     }
 
-    private Map<Long, Integer> guestItems(HttpSession session) {
-        if (session == null) {
-            return new LinkedHashMap<>();
-        }
-        Object sessionValue = session.getAttribute(GUEST_CART_SESSION_ATTRIBUTE);
-        if (!(sessionValue instanceof Map<?, ?> rawItems)) {
-            return new LinkedHashMap<>();
-        }
+    private long totalForProduct(Map<CartSelection, Integer> items, Long productId) {
+        return items.entrySet().stream().filter(entry -> productId.equals(entry.getKey().productId()))
+                .mapToLong(Map.Entry::getValue).sum();
+    }
 
-        Map<Long, Integer> items = new TreeMap<>();
-        for (Map.Entry<?, ?> entry : rawItems.entrySet()) {
-            if (entry.getKey() instanceof Long productId
-                    && entry.getValue() instanceof Integer quantity
-                    && productId > 0 && quantity > 0) {
-                items.put(productId, Math.min(quantity, MAX_QUANTITY_PER_SKU));
-            }
-        }
+    private long totalForProduct(Cart cart, Long productId) {
+        return cart.getItems().stream().filter(item -> productId.equals(item.getProduct().getId()))
+                .mapToLong(CartItem::getQuantity).sum();
+    }
+
+    private CartView emptyCart() { return new CartView(List.of(), BigDecimal.ZERO, 0); }
+    private CartOperationException missingItem() { return new CartOperationException("Lựa chọn này không còn trong giỏ hàng."); }
+    private void validateRequestedQuantity(int quantity) {
+        if (quantity < 1 || quantity > MAX_QUANTITY_PER_SKU)
+            throw new CartOperationException("Số lượng mỗi lựa chọn phải từ 1 đến " + MAX_QUANTITY_PER_SKU + ".");
+    }
+
+    private Map<CartSelection, Integer> guestItems(HttpSession session) {
+        Map<CartSelection, Integer> items = new LinkedHashMap<>();
+        if (session == null || !(session.getAttribute(GUEST_CART_SESSION_ATTRIBUTE) instanceof Map<?, ?> raw)) return items;
+        raw.forEach((rawKey, rawCount) -> {
+            // Read sessions from the previous product-only cart without dropping their contents.
+            CartSelection key = rawKey instanceof CartSelection selection ? selection
+                    : rawKey instanceof Long id ? new CartSelection(id, "", "") : null;
+            if (key != null && key.productId() != null && key.productId() > 0 && key.size().length() <= 100
+                    && key.shade().length() <= 100 && rawCount instanceof Integer count && count > 0)
+                items.put(key, Math.min(count, MAX_QUANTITY_PER_SKU));
+        });
         return items;
     }
 
-    private void saveGuestItems(HttpSession session, Map<Long, Integer> items) {
-        if (session == null) {
-            throw new CartOperationException("Phiên giỏ hàng đã hết hạn. Vui lòng tải lại trang.");
-        }
+    private void saveGuestItems(HttpSession session, Map<CartSelection, Integer> items) {
+        if (session == null) throw new CartOperationException("Phiên giỏ hàng đã hết hạn. Vui lòng tải lại trang.");
         session.setAttribute(GUEST_CART_SESSION_ATTRIBUTE, new LinkedHashMap<>(items));
     }
 
-    private record ProductQuantity(Product product, int quantity) {
-    }
+    private record ProductQuantity(Product product, CartSelection selection, int quantity) { }
 }
