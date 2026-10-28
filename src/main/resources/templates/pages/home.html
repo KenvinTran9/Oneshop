@@ -9,31 +9,39 @@
     <section class="home-hero" aria-labelledby="home-title">
         <div class="container home-hero-layout">
             <div class="home-heading">
-                <span class="eyebrow">Một chút yêu chiều, mỗi ngày</span>
+                <span class="eyebrow home-hero-eyebrow">Một chút yêu chiều, mỗi ngày</span>
                 <h1 id="home-title">Chăm chút làn da.<br><em>Tô điểm nét riêng.</em></h1>
-                <p>Từ bước chăm da quen thuộc đến sắc màu yêu thích, tìm điều phù hợp với bạn tại OneShop.</p>
+                <p>Nâng niu làn da. Chọn sắc son thật hợp.<br class="home-copy-break"> Tìm điều bạn yêu thích tại OneShop.</p>
                 <div class="home-hero-actions">
                     <a class="shop-button primary" th:href="@{/products}">Khám phá sản phẩm <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-                    <a class="home-text-link" href="#home-categories" th:if="${!#lists.isEmpty(home.categories)}">Chọn theo danh mục <i class="bi bi-arrow-down" aria-hidden="true"></i></a>
+                    <a class="home-text-link" href="#home-categories" th:if="${!#lists.isEmpty(home.categories)}">Chọn danh mục <i class="bi bi-arrow-down" aria-hidden="true"></i></a>
                 </div>
                 <dl class="home-catalog-stats" aria-label="Danh mục OneShop">
                     <div><dt th:text="${home.productCount}">0</dt><dd>sản phẩm làm đẹp</dd></div>
                     <div><dt th:text="${home.brandCount}">0</dt><dd>thương hiệu</dd></div>
                 </dl>
             </div>
-            <a class="home-hero-product" th:if="${home.heroProduct != null}" th:with="product=${home.heroProduct}"
-               th:href="@{/products/{slug}(slug=${product.slug})}">
-                <span class="home-hero-note">Khám phá cùng OneShop <i class="bi bi-stars" aria-hidden="true"></i></span>
-                <div class="home-hero-image">
-                    <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}"
-                         th:alt="${product.name}" width="420" height="420" fetchpriority="high">
+            <div class="home-hero-visual">
+                <div class="home-hero-art">
+                    <img src="/images/home/beauty-editorial-v1.webp"
+                         srcset="/images/home/beauty-editorial-v1-small.webp 640w, /images/home/beauty-editorial-v1.webp 1120w"
+                         sizes="(max-width: 767px) calc(100vw - 24px), (max-width: 1199px) 44vw, 540px"
+                         alt="" width="1120" height="1400" fetchpriority="high">
+                    <span class="home-art-note" aria-hidden="true">Chăm da. Tô điểm. Yêu mình.</span>
                 </div>
-                <div class="home-hero-caption">
-                    <div><span th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span><h2 th:text="${product.name}">Sản phẩm</h2></div>
+                <span class="home-beauty-mark" aria-hidden="true"><i class="bi bi-stars"></i><span>Đẹp theo<br>cách của bạn</span></span>
+                <a class="home-featured-product" th:if="${home.heroProduct != null}" th:with="product=${home.heroProduct}"
+                   th:href="@{/products/{slug}(slug=${product.slug})}">
+                    <div class="home-featured-image"><img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}"
+                         alt="" width="88" height="100" loading="lazy"></div>
+                    <div class="home-featured-copy">
+                        <span class="home-featured-label">Khám phá trong shop</span>
+                        <h2 th:text="${product.name}">Sản phẩm</h2>
+                        <div class="home-featured-meta"><span th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span><strong th:text="${product.displayPrice}">0 ₫</strong></div>
+                    </div>
                     <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
-                </div>
-            </a>
-            <div class="home-hero-empty" th:if="${home.heroProduct == null}" aria-hidden="true"><i class="bi bi-flower1"></i></div>
+                </a>
+            </div>
         </div>
     </section>
 

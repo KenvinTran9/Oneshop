@@ -230,6 +230,10 @@ Bảng màu storefront dùng nền kem `#FFFCF9`, chữ và nút đen than `#242
 
 Cỡ chữ storefront đã tăng nhẹ để dễ đọc: tên sản phẩm 16 px trên desktop và 14 px trên mobile, giá 19/17 px, nút trong thẻ 14/12 px; mô tả trang chủ 17/15 px. Tiêu đề, nhãn lựa chọn và thông tin giỏ được tăng tương ứng, vùng tên sản phẩm đủ chỗ cho hai dòng. Đã đóng gói bằng `mvn package -DskipTests` và kiểm tra trình duyệt ở desktop, 992, 390, 320 px, gồm nút mua trang chi tiết và giỏ có sản phẩm.
 
+Phần đầu trang chủ dùng ảnh mỹ phẩm trang trí cục bộ, chữ nghiêng hồng đất trên nền kem và thẻ sản phẩm thật có tên, giá, liên kết chi tiết. Ảnh WebP có hai kích thước qua `srcset`; khung ảnh giữ sẵn tỷ lệ để tránh nhảy bố cục, không thêm JavaScript hoặc hiệu ứng tự chạy. Chi tiết asset và prompt tạo ảnh: [docs/hero-artwork.md](docs/hero-artwork.md).
+
+Đã kiểm tra banner ở desktop, 992/390/320 px, không tràn ngang; liên kết danh mục và thẻ giới thiệu dẫn đúng nơi. `mvn verify` đạt 42 kiểm thử; bản tinh chỉnh khoảng cách/chữ sau kiểm tra trực quan được đóng gói lại bằng `mvn package -DskipTests`.
+
 ### Ảnh theo màu sản phẩm
 
 19 sản phẩm trang điểm có 62 lựa chọn màu được nối với 60 ảnh cục bộ trong `static/images/catalog/shades/`. Ảnh được đối chiếu theo mã màu, ưu tiên trang hãng; dùng ảnh sản phẩm, ảnh tán màu hoặc ảnh lên da đã công bố, không tô lại ảnh theo mã HEX. Huda Easy Bake dùng chung bảng tán màu có nhãn Banana Bread, Pound Cake và Cherry Blossom Cake; giao diện ghi rõ đây là bảng màu. Đã sửa tên CLIO `19N Light` thành `19N Porcelain` để khớp mã; `Light` thuộc `19C`.
