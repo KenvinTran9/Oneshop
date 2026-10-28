@@ -1,6 +1,6 @@
 /* Homepage discovery: reuse the storefront palette, product cards and cart. */
 .home-page { color: var(--shop-ink); }
-.home-hero { padding: 48px 0; background: linear-gradient(110deg, var(--shop-cream) 25%, var(--shop-soft) 60%, var(--shop-selected)); border-bottom: 1px solid var(--shop-line); }
+.home-hero { padding: 48px 0; background: linear-gradient(110deg, var(--shop-cream) 25%, var(--shop-soft)); border-bottom: 1px solid var(--shop-line); }
 .home-hero-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 72px; align-items: center; }
 .home-page .home-heading h1 { font-size: clamp(38px, 4.5vw, 62px); line-height: 1.22; margin: 20px 0; letter-spacing: -1.6px; }
 .home-heading h1 em { color: var(--shop-rose); font-weight: inherit; }

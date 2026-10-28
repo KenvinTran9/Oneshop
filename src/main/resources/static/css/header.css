@@ -60,7 +60,7 @@
 .header-links .navbar-nav { gap: 6px; width: 100%; padding: 7px 0; }
 .site-header .header-links .nav-link { padding: 9px 13px !important; color: var(--shop-muted); font-size: 13px; border-radius: 8px; white-space: nowrap; }
 .site-header .header-links .nav-link:hover,
-.site-header .header-links .nav-link[aria-current="page"] { color: var(--shop-primary-hover); background: var(--shop-soft); }
+.site-header .header-links .nav-link[aria-current="page"] { color: var(--shop-primary-hover); background: var(--shop-selected); }
 .site-header .header-menu-toggle { padding: 8px; width: 40px; height: 40px; border: 1px solid var(--shop-line); border-radius: 10px; }
 .header-menu-toggle .navbar-toggler-icon { width: 21px; height: 21px; }
 .shop-product-gallery, .cart-summary { top: calc(var(--site-header-height, 130px) + 20px); }

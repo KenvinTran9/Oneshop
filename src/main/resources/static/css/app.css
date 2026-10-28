@@ -1,20 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* Cream foundations, peach highlights and a clear purchase accent. */
-    --os-ink: #342b2d;
-    --os-muted: #74665f;
-    --os-blush: #f8e5e1;
-    --os-rose: #ad4f62;
-    --os-rose-hover: #933c4e;
-    --os-rose-active: #7c3040;
-    --os-outline: #cfb5aa;
-    --os-mint: #f5eee7;
+    /* Cream surfaces, charcoal typography/actions and small blush highlights. */
+    --os-ink: #242022;
+    --os-muted: #6d6567;
+    --os-primary: #242022;
+    --os-primary-hover: #40383c;
+    --os-primary-active: #151214;
+    --os-blush: #f3dedf;
+    /* Preserve existing component aliases while sharing one action palette. */
+    --os-rose: var(--os-primary);
+    --os-rose-hover: var(--os-primary-hover);
+    --os-rose-active: var(--os-primary-active);
+    --os-outline: #bdb5b5;
+    --os-mint: #f5f2ef;
     --os-cream: #fffcf9;
-    --os-line: #e9dfd8;
-    --os-warm-bg: #faf3ed;
-    --os-card-bg: #fffaf6;
-    --os-accent: var(--os-rose);
+    --os-line: #e6e0de;
+    --os-warm-bg: #f6f3f1;
+    --os-card-bg: #fffdfb;
+    --os-accent: var(--os-primary);
     --bs-secondary-color: var(--os-muted);
     --bs-body-color: var(--os-ink);
     --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
@@ -47,7 +51,7 @@ a:hover {
     --bs-btn-hover-border-color: var(--os-rose-hover);
     --bs-btn-active-bg: var(--os-rose-active);
     --bs-btn-active-border-color: var(--os-rose-active);
-    --bs-btn-focus-shadow-rgb: 173, 79, 98;
+    --bs-btn-focus-shadow-rgb: 36, 32, 34;
 }
 main .btn-outline-dark, .site-header .btn-outline-dark {
     --bs-btn-color: var(--os-rose);
@@ -56,7 +60,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
     --bs-btn-hover-border-color: var(--os-rose);
     --bs-btn-active-bg: var(--os-rose-hover);
     --bs-btn-active-border-color: var(--os-rose-hover);
-    --bs-btn-focus-shadow-rgb: 173, 79, 98;
+    --bs-btn-focus-shadow-rgb: 36, 32, 34;
 }
 
 /* ========== BRAND ========== */
@@ -73,7 +77,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #e7b6aa, var(--os-rose));
+    background: var(--os-primary);
     display: inline-block;
 }
 
@@ -183,7 +187,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
 }
 
 .collection-hero {
-    background: linear-gradient(180deg, var(--os-cream) 0%, var(--os-blush) 40%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(180deg, var(--os-cream) 0%, var(--os-warm-bg) 40%, rgba(255,255,255,0) 100%);
     text-align: center;
     padding: 4rem 0 2.5rem;
     position: relative;
@@ -198,7 +202,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
     transform: translateX(-50%);
     width: 120%;
     height: 120%;
-    background: radial-gradient(ellipse at center, rgba(248,229,225,.5) 0%, transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(36,32,34,.035) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -316,7 +320,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
     min-height: 430px;
     object-fit: cover;
     border-radius: 12px;
-    box-shadow: 0 24px 70px rgba(69, 50, 58, .14);
+    box-shadow: 0 24px 70px rgba(36, 32, 34, .14);
 }
 
 .hero-badge {
@@ -329,7 +333,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
     border: 1px solid var(--os-line);
     border-radius: 12px;
     padding: 1rem 1.2rem;
-    box-shadow: 0 16px 40px rgba(69, 50, 58, .12);
+    box-shadow: 0 16px 40px rgba(36, 32, 34, .12);
 }
 
 .hero-badge span {
@@ -398,7 +402,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
 
 .product-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 20px 50px rgba(69, 50, 58, .1);
+    box-shadow: 0 20px 50px rgba(36, 32, 34, .1);
 }
 
 .product-card img {
@@ -515,7 +519,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
 
 .store-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(69, 50, 58, .07);
+    box-shadow: 0 12px 30px rgba(36, 32, 34, .07);
 }
 
 .store-card span,
@@ -597,13 +601,13 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
 /* ========== AUTH ========== */
 .auth-section {
     min-height: 68vh;
-    background: linear-gradient(135deg, var(--os-cream), #fff, var(--os-blush));
+    background: linear-gradient(135deg, var(--os-cream), #fff, var(--os-warm-bg));
 }
 
 .auth-card {
     max-width: 440px;
     padding: 2.5rem;
-    box-shadow: 0 18px 50px rgba(69, 50, 58, .08);
+    box-shadow: 0 18px 50px rgba(36, 32, 34, .08);
     border-radius: 16px;
 }
 
@@ -620,7 +624,7 @@ main .btn-outline-dark, .site-header .btn-outline-dark {
 
 .auth-card .form-control:focus {
     border-color: var(--os-rose);
-    box-shadow: 0 0 0 3px rgba(173, 79, 98, .12);
+    box-shadow: 0 0 0 3px rgba(36, 32, 34, .12);
 }
 
 /* ========== EMPTY STATE ========== */
