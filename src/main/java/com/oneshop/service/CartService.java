@@ -9,7 +9,6 @@ import com.oneshop.entity.Product;
 import com.oneshop.entity.ProductStatus;
 import com.oneshop.entity.User;
 import com.oneshop.exception.CartOperationException;
-import com.oneshop.repository.CartItemRepository;
 import com.oneshop.repository.CartRepository;
 import com.oneshop.repository.ProductRepository;
 import com.oneshop.repository.StoreStockRepository;
@@ -21,29 +20,25 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CartService {
     public static final String GUEST_CART_SESSION_ATTRIBUTE = "oneshop.guestCart";
     public static final int MAX_QUANTITY_PER_SKU = 99;
     private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
     private final StoreStockRepository storeStockRepository;
     private final UserRepository userRepository;
 
-    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository,
+    public CartService(CartRepository cartRepository,
                        ProductRepository productRepository, StoreStockRepository storeStockRepository,
                        UserRepository userRepository) {
         this.cartRepository = cartRepository;
-        this.cartItemRepository = cartItemRepository;
         this.productRepository = productRepository;
         this.storeStockRepository = storeStockRepository;
         this.userRepository = userRepository;
     }
 
-    @Transactional(readOnly = true)
     public CartView getCart(String email, HttpSession session) {
         if (email != null) {
             return cartRepository.findByUserEmailIgnoreCase(email)
@@ -57,13 +52,11 @@ public class CartService {
         return buildCart(items);
     }
 
-    @Transactional(readOnly = true)
     public long getItemCount(String email, HttpSession session) {
-        return email != null ? cartItemRepository.sumQuantityByCartUserEmail(email)
+        return email != null ? cartRepository.findByUserEmailIgnoreCase(email).map(cart -> cart.getItems().stream().mapToLong(CartItem::getQuantity).sum()).orElse(0L)
                 : guestItems(session).values().stream().mapToLong(Integer::longValue).sum();
     }
 
-    @Transactional
     public void addItem(String email, HttpSession session, Long productId, int quantity, String size, String shade) {
         validateRequestedQuantity(quantity);
         Product product = getProduct(productId);
@@ -78,16 +71,15 @@ public class CartService {
             saveGuestItems(session, items);
             return;
         }
-        Cart cart = getOrCreateCart(email);
-        CartItem item = findItem(cart, key).orElseGet(() -> newCartItem(cart, product, key));
-        int next = item.getQuantity() + quantity;
-        validateRequestedQuantity(next);
-        assertAvailable(product, totalForProduct(cart, productId) + quantity);
-        item.setQuantity(next);
-        cartItemRepository.save(item);
+        changeCart(email, cart -> {
+            CartItem item = findItem(cart, key).orElseGet(() -> newCartItem(cart, product, key));
+            int next = item.getQuantity() + quantity;
+            validateRequestedQuantity(next);
+            assertAvailable(product, totalForProduct(cart, productId) + quantity);
+            item.setQuantity(next);
+        });
     }
 
-    @Transactional
     public void updateQuantity(String email, HttpSession session, Long productId, int quantity, String size, String shade) {
         validateRequestedQuantity(quantity);
         CartSelection key = lineKey(productId, size, shade);
@@ -103,14 +95,13 @@ public class CartService {
             saveGuestItems(session, items);
             return;
         }
-        Cart cart = getCartForUser(email);
-        CartItem item = findItem(cart, key).orElseThrow(this::missingItem);
-        assertAvailable(product, totalForProduct(cart, productId) - item.getQuantity() + quantity);
-        item.setQuantity(quantity);
-        cartItemRepository.save(item);
+        changeCart(email, cart -> {
+            CartItem item = findItem(cart, key).orElseThrow(this::missingItem);
+            assertAvailable(product, totalForProduct(cart, productId) - item.getQuantity() + quantity);
+            item.setQuantity(quantity);
+        });
     }
 
-    @Transactional
     public void removeItem(String email, HttpSession session, Long productId, String size, String shade) {
         // Removal must remain possible after a shade is retired or the product is discontinued.
         CartSelection key = lineKey(productId, size, shade);
@@ -120,31 +111,28 @@ public class CartService {
             saveGuestItems(session, items);
             return;
         }
-        Cart cart = getCartForUser(email);
-        if (cartItemRepository.deleteSelection(cart.getId(), productId, key.size(), key.shade()) == 0) throw missingItem();
+        changeCart(email, cart -> {
+            if (!cart.getItems().removeIf(item -> selection(item).equals(key))) throw missingItem();
+        });
     }
 
-    @Transactional
     public void clearCart(String email, HttpSession session) {
         if (email == null) {
             if (session != null) session.removeAttribute(GUEST_CART_SESSION_ATTRIBUTE);
         } else {
             cartRepository.findByUserEmailIgnoreCase(email)
-                    .ifPresent(cart -> cartItemRepository.deleteAllByCartId(cart.getId()));
+                    .ifPresent(cart -> changeCart(email, current -> current.getItems().clear()));
         }
     }
 
-    @Transactional
     public void mergeGuestCart(String email, HttpSession session) {
         var guest = guestItems(session);
         if (email == null || guest.isEmpty()) return;
-        Cart cart = getOrCreateCart(email);
-        // Keep unavailable selections with a warning, rather than silently losing the customer's choices.
-        guest.forEach((key, count) -> productRepository.findById(key.productId()).ifPresent(product -> {
+        // All choices are merged in one versioned cart document; no partial multi-document merge.
+        changeCart(email, cart -> guest.forEach((key, count) -> productRepository.findById(key.productId()).ifPresent(product -> {
             CartItem item = findItem(cart, key).orElseGet(() -> newCartItem(cart, product, key));
             item.setQuantity(Math.min(MAX_QUANTITY_PER_SKU, item.getQuantity() + count));
-            cartItemRepository.save(item);
-        }));
+        })));
     }
 
     private CartView buildCart(List<ProductQuantity> items) {
@@ -238,22 +226,32 @@ public class CartService {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new CartOperationException("Không thể xác định tài khoản hiện tại."));
             Cart cart = new Cart(); cart.setUser(user);
-            return cartRepository.saveAndFlush(cart);
+            return cartRepository.save(cart);
         });
     }
 
-    private Cart getCartForUser(String email) {
-        return cartRepository.findByUserEmailIgnoreCase(email).orElseThrow(this::missingItem);
+    private void changeCart(String email, java.util.function.Consumer<Cart> change) {
+        for (int attempt = 0; attempt < 4; attempt++) {
+            try {
+                Cart cart = getOrCreateCart(email);
+                change.accept(cart);
+                cartRepository.save(cart);
+                return;
+            } catch (org.springframework.dao.OptimisticLockingFailureException | org.springframework.dao.DuplicateKeyException conflict) {
+                // Reload before retrying; a failed versioned save did not apply the mutation.
+            }
+        }
+        throw new CartOperationException("Giỏ hàng vừa được thay đổi ở nơi khác. Vui lòng thử lại.");
     }
 
     private java.util.Optional<CartItem> findItem(Cart cart, CartSelection key) {
-        return cartItemRepository.findByCartIdAndProductIdAndSelectedSizeAndSelectedShade(
-                cart.getId(), key.productId(), key.size(), key.shade());
+        return cart.getItems().stream().filter(item -> selection(item).equals(key)).findFirst();
     }
 
     private CartItem newCartItem(Cart cart, Product product, CartSelection key) {
-        CartItem item = new CartItem(); item.setCart(cart); item.setProduct(product);
+        CartItem item = new CartItem(); item.setProduct(product);
         item.setSelectedSize(key.size()); item.setSelectedShade(key.shade());
+        cart.getItems().add(item);
         return item;
     }
 

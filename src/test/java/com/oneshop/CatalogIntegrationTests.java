@@ -27,13 +27,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles({"dev", "test"})
-@Transactional
-class CatalogIntegrationTests {
+
+class CatalogIntegrationTests extends com.oneshop.MongoIntegrationTestSupport {
     @Autowired ProductRepository products;
     @Autowired CategoryRepository categories;
     @Autowired BrandRepository brands;
@@ -42,8 +41,11 @@ class CatalogIntegrationTests {
     @Autowired MockMvc mvc;
     @Autowired HomeCatalogService homeCatalog;
 
+    @org.junit.jupiter.api.BeforeEach
+    void restoreCatalogFixture() throws Exception { initializer.run(); }
+
     @Test
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+
     void homepageBalancesActiveProductsAndUsesActualCatalogCounts() throws Exception {
         var home = homeCatalog.load();
         assertThat(home.productCount()).isEqualTo(100);
@@ -66,7 +68,7 @@ class CatalogIntegrationTests {
         var keep = products.findBySku("CATALOG-001").orElseThrow().getCategory().getId();
         var catalog = products.findAll();
         catalog.stream().filter(p -> !p.getCategory().getId().equals(keep)).forEach(p -> p.setStatus(ProductStatus.DRAFT));
-        products.saveAllAndFlush(catalog);
+        products.saveAll(catalog);
         var home = homeCatalog.load();
         assertThat(home.productCount()).isEqualTo(20);
         assertThat(home.categories()).hasSize(1);
@@ -81,7 +83,7 @@ class CatalogIntegrationTests {
     void homepageRendersGracefullyWithoutActiveProducts() throws Exception {
         var catalog = products.findAll();
         catalog.forEach(p -> p.setStatus(ProductStatus.DRAFT));
-        products.saveAllAndFlush(catalog);
+        products.saveAll(catalog);
         var home = homeCatalog.load();
         assertThat(home.productCount()).isZero();
         assertThat(home.brandCount()).isZero();
@@ -139,7 +141,7 @@ class CatalogIntegrationTests {
     void repeatedImportDoesNotDuplicateOrOverwriteAdministratorChanges() throws Exception {
         Product product = products.findBySku("CATALOG-001").orElseThrow();
         product.setPrice(new BigDecimal("123456"));
-        products.saveAndFlush(product);
+        products.save(product);
         initializer.run();
         assertThat(products.count()).isEqualTo(100);
         assertThat(products.findBySku("CATALOG-001").orElseThrow().getPrice()).isEqualByComparingTo("123456");
@@ -149,7 +151,7 @@ class CatalogIntegrationTests {
 
     @Test
     @SuppressWarnings("unchecked")
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+
     void paginationExposesEveryProductAndCategoryFiltersHaveTwentyProducts() throws Exception {
         var slugs = new HashSet<String>();
         for (int page = 0; page < 9; page++) {
@@ -172,7 +174,7 @@ class CatalogIntegrationTests {
     }
 
     @Test
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)
+
     void storefrontHasFixedPricesAndPurchaseOptionsWithoutSourceLinks() throws Exception {
         Product product = products.findBySku("CATALOG-063").orElseThrow();
         String page = mvc.perform(get("/products/" + product.getSlug())).andExpect(status().isOk())

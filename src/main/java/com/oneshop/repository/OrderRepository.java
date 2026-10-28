@@ -2,9 +2,9 @@ package com.oneshop.repository;
 
 import com.oneshop.entity.Order;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends MongoRepository<Order, Long> {
 
     Optional<Order> findByCode(String code);
 }

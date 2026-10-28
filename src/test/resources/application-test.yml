@@ -1,15 +1,12 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:oneshop-test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: create-drop
-
+  data:
+    mongodb:
+      # The test superclass always replaces this with a new random database.
+      uri: mongodb://127.0.0.1:27017/oneshop_test_unused
+      auto-index-creation: true
 app:
+  dev:
+    seed-stock: false
   jwt:
     secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
     issuer: oneshop-test

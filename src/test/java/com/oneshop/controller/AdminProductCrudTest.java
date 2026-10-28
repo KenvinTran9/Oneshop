@@ -25,7 +25,6 @@ import com.oneshop.entity.Product;
 import com.oneshop.entity.ProductStatus;
 import com.oneshop.repository.BrandRepository;
 import com.oneshop.repository.CategoryRepository;
-import com.oneshop.repository.CartItemRepository;
 import com.oneshop.repository.CartRepository;
 import com.oneshop.repository.OrderItemRepository;
 import com.oneshop.repository.OrderRepository;
@@ -56,7 +55,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class AdminProductCrudTest {
+class AdminProductCrudTest extends com.oneshop.MongoIntegrationTestSupport {
 
     private static final String ADMIN = "admin@oneshop.test";
 
@@ -67,7 +66,6 @@ class AdminProductCrudTest {
     @Autowired private BrandRepository brandRepository;
     @Autowired private OrderItemRepository orderItemRepository;
     @Autowired private OrderRepository orderRepository;
-    @Autowired private CartItemRepository cartItemRepository;
     @Autowired private CartRepository cartRepository;
     @Autowired private StoreStockRepository storeStockRepository;
     @Autowired private UserRepository userRepository;
@@ -86,12 +84,12 @@ class AdminProductCrudTest {
         category = new Category();
         category.setName("Chăm sóc da");
         category.setSlug("cham-soc-da-admin-test");
-        category = categoryRepository.saveAndFlush(category);
+        category = categoryRepository.save(category);
 
         brand = new Brand();
         brand.setName("One Beauty");
         brand.setSlug("one-beauty-admin-test");
-        brand = brandRepository.saveAndFlush(brand);
+        brand = brandRepository.save(brand);
     }
 
     @AfterEach
@@ -221,14 +219,14 @@ class AdminProductCrudTest {
         order.setCustomerPhone("0912345678");
         order.setShippingAddress("Test address");
         order.setTotalAmount(new BigDecimal("50000"));
-        order = orderRepository.saveAndFlush(order);
+        order = orderRepository.save(order);
         OrderItem item = new OrderItem();
         item.setOrder(order);
         item.setProduct(product);
         item.setQuantity(1);
         item.setUnitPrice(new BigDecimal("50000"));
         item.setLineTotal(new BigDecimal("50000"));
-        orderItemRepository.saveAndFlush(item);
+        orderItemRepository.save(item);
 
         mockMvc.perform(post("/admin/products/{id}/deactivate", product.getId())
                         .with(user(ADMIN).roles("ADMIN")).with(csrf()))
@@ -245,7 +243,7 @@ class AdminProductCrudTest {
     void uploadsImageThroughCloudinaryServiceAndPreservesExistingDataWhenUploadFails() throws Exception {
         Product product = persistProduct("image-old-name", "IMAGE-OLD-SKU");
         product.setImageUrl("https://images.example.test/original.jpg");
-        productRepository.saveAndFlush(product);
+        productRepository.save(product);
         MockMultipartFile image = pngImage();
 
         when(cloudinaryService.uploadProductImage(any())).thenReturn("https://images.example.test/new.png");
@@ -295,7 +293,7 @@ class AdminProductCrudTest {
         product.setStatus(ProductStatus.ACTIVE);
         product.setCategory(category);
         product.setBrand(brand);
-        return productRepository.saveAndFlush(product);
+        return productRepository.save(product);
     }
 
     private MockMultipartFile pngImage() {
@@ -306,7 +304,6 @@ class AdminProductCrudTest {
     private void clearFixtures() {
         orderItemRepository.deleteAll();
         orderRepository.deleteAll();
-        cartItemRepository.deleteAll();
         cartRepository.deleteAll();
         storeStockRepository.deleteAll();
         productRepository.deleteAll();

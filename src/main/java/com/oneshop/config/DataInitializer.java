@@ -22,6 +22,7 @@ public class DataInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataInitializer.class);
 
     @Bean
+    @org.springframework.core.annotation.Order(10)
     CommandLineRunner seedData(RoleRepository roleRepository,
                                UserRepository userRepository,
                                StoreRepository storeRepository,

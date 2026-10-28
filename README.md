@@ -4,99 +4,45 @@
 
 ---
 
-## 🚀 Công nghệ sử dụng
+## Công nghệ và lưu dữ liệu
 
-- **Backend:** Spring Boot 3.5.x, Java 21+
-- **Security:** Spring Security 6 (Form Login + JWT Authentication Filter)
-- **Database & ORM:** Spring Data JPA, Hibernate ORM
-- **Supported Databases:**
-  - H2 Database (In-Memory cho môi trường Dev)
-  - MySQL 8.x
-  - PostgreSQL
-  - Microsoft SQL Server
-- **Frontend & UI:**
-  - Thymeleaf Template Engine
-  - Bootstrap 5.3 & Bootstrap Icons
-  - SiteMesh 3 Decorator (Quản lý layout nhất quán)
-  - Google Fonts: *Playfair Display* (Serif Heading) & *Inter* (Body)
-- **Cloud Storage:** Cloudinary (Quản lý và lưu trữ hình ảnh sản phẩm)
+- Java 21, Spring Boot 3.5.16, Spring Security (form login + JWT).
+- Spring Data MongoDB; MongoDB là database duy nhất, không còn JPA/Hibernate/H2 hoặc các profile SQL.
+- Thymeleaf, Bootstrap, SiteMesh, ảnh sản phẩm cục bộ và Cloudinary tùy chọn.
+- Tài khoản, sản phẩm, danh mục, thương hiệu, cửa hàng, tồn kho và đơn hàng lưu bằng MongoDB document. Giỏ tài khoản có các dòng màu/quy cách nhúng trong cùng document.
 
----
+## Chạy local
 
-## 📦 Hướng dẫn cài đặt & Chạy dự án
-
-### Yêu cầu hệ thống
-- **JDK:** Java Development Kit 21 trở lên
-- **Maven:** 3.8+ (hoặc dùng Maven Wrapper)
-
-### Cấu hình theo môi trường
-
-Không có profile mặc định trong mã nguồn. Cấu hình chung dùng `ddl-auto=none` và `open-in-view=false`; mỗi môi trường đặt schema strategy riêng:
-
-| Profile | Cơ sở dữ liệu | `ddl-auto` | Dữ liệu demo |
-| :--- | :--- | :--- | :--- |
-| `dev` | H2 in-memory | `update` | Có, chỉ khi `dev` được bật; dữ liệu mẫu sản phẩm được thêm tự động. Tài khoản mẫu chỉ được tạo khi có mật khẩu từ biến môi trường. |
-| `test` | H2 in-memory riêng | `create-drop` | Không |
-| `prod` | JDBC qua `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | `validate` | Không |
-
-Ứng dụng từ chối khởi động nếu `dev` được bật cùng `prod` hoặc `production`. Profile database `mysql`, `postgres`, `sqlserver` cũng yêu cầu thông tin kết nối qua biến môi trường tương ứng; chúng không có mật khẩu mặc định.
-
-### 1. Khởi chạy nhanh với H2 In-Memory (profile `dev`)
-
-Profile `dev` phải được chọn rõ ràng. PowerShell:
+Cần Java 21, Maven và MongoDB đang chạy ở `127.0.0.1:27017`:
 
 ```powershell
-$env:DEMO_ADMIN_PASSWORD = "<mat-khau-local-cua-ban>"
-$env:DEMO_CUSTOMER_PASSWORD = "<mat-khau-local-cua-ban>"
+$env:JAVA_HOME = 'C:\Program Files\Java\jdk-21'
 mvn spring-boot:run "-Dspring-boot.run.profiles=dev"
 ```
 
-Trên macOS/Linux, đặt hai biến bằng `export DEMO_ADMIN_PASSWORD=...` và `export DEMO_CUSTOMER_PASSWORD=...` trước khi chạy lệnh Maven tương tự. Nếu bỏ trống biến mật khẩu, hệ thống vẫn nạp dữ liệu mẫu nhưng bỏ qua tạo tài khoản tương ứng. Không dùng mật khẩu local trong môi trường dùng chung.
+Mở [OneShop](http://localhost:8080/) hoặc kết nối MongoDB Compass với `mongodb://127.0.0.1:27017`, database `oneshop`. Dữ liệu giữ nguyên sau khi khởi động lại Java. Spring Boot không tự đọc `.env`; đặt biến trong shell/IDE hoặc cấu hình môi trường triển khai.
 
-Ứng dụng sẽ chạy tại: **`http://localhost:8080`**  
-H2 Console: **`http://localhost:8080/h2-console`** *(JDBC URL: `jdbc:h2:mem:oneshop`, User: `sa`, Password: để trống)*
+Profile `dev` tự nạp 100 SKU còn thiếu, 5 danh mục, 59 thương hiệu và cửa hàng mẫu. Nó tạo **20 đơn vị tồn kho thử** cho mỗi SKU ở cửa hàng `HCM-D1` khi chưa có bản ghi. Giá, thông tin sản phẩm, mật khẩu và số tồn đã chỉnh (kể cả 0) không bị ghi đè. Tắt tạo tồn mẫu bằng `APP_DEV_SEED_STOCK=false`. Đây là dữ liệu để thử local, không phải số tồn kinh doanh thực tế.
 
-Chạy test độc lập bằng profile `test`:
+Không có profile mặc định; chỉ định `dev`, `test` hoặc `prod`. `dev` bị từ chối khi bật cùng `prod`/`production`. Các role `ADMIN`/`CUSTOMER` là dữ liệu nền được tạo idempotent; tài khoản demo và danh mục/tồn mẫu chỉ được nạp ở dev.
 
-```powershell
-mvn test
-```
-Các bài test Spring dùng `application-test.yml` và H2 riêng; `DataInitializer` chỉ đăng ký với profile `dev`.
-
----
-
-### 2. Chạy với Cơ sở dữ liệu khác
-
-Profile database tương ứng yêu cầu biến môi trường riêng (`MYSQL_*`, `POSTGRES_*` hoặc `SQLSERVER_*`); Spring Boot không tự nạp file `.env`. Với production, dùng `prod` và đặt `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` qua môi trường triển khai hoặc secret manager:
+### Kiểm thử
 
 ```powershell
-$env:DB_URL = "<jdbc-url-cua-production>"
-$env:DB_USERNAME = "<tai-khoan-database>"
-$env:DB_PASSWORD = "<mat-khau-database>"
-$env:JWT_SECRET = "<secret-base64-ngau-nhien>"
-$env:JWT_ISSUER = "oneshop"
-$env:JWT_ACCESS_TOKEN_EXPIRATION_MILLIS = "900000"
-$env:JWT_REFRESH_TOKEN_EXPIRATION_MILLIS = "604800000"
-$env:SPRING_PROFILES_ACTIVE = "prod"
-java -jar target/oneshop-0.0.1-SNAPSHOT.jar
+mvn verify
 ```
 
-Production xác thực schema đã được tạo trước; ứng dụng không tự thay đổi schema hoặc nạp dữ liệu demo.
+Kiểm thử dùng MongoDB thật với database mới ngẫu nhiên `oneshop_test_<uuid>`; không dùng database `oneshop` và không thay MongoDB bằng mock. `ONESHOP_TEST_MONGODB_URI` chỉ định server thử khi cần, tên database luôn được thay bằng tên ngẫu nhiên riêng. Chỉ database do lượt kiểm thử đó tạo mới được xóa khi JVM kết thúc. Tài khoản kết nối test cần quyền tạo/xóa database thử.
 
-- **MySQL:**
-  ```bash
-  mvn spring-boot:run "-Dspring-boot.run.profiles=mysql"
-  ```
-- **PostgreSQL:**
-  ```bash
-  mvn spring-boot:run "-Dspring-boot.run.profiles=postgres"
-  ```
-- **SQL Server:**
-  ```bash
-  mvn spring-boot:run "-Dspring-boot.run.profiles=sqlserver"
-  ```
+Trên Windows này, nếu cần thư mục socket và tránh IDE tự ghi đè class trong `target/classes`, dùng:
 
----
+```powershell
+mvn verify "-Doneshop.build.directory=C:\OneShop\target\mongodb-build" "-DargLine=-Djdk.net.unixdomain.tmpdir=C:\OneShop\target"
+```
+
+### Triển khai
+
+Profile `prod` yêu cầu `MONGODB_URI` và đầy đủ biến JWT ở phần dưới. URI có thể trỏ tới MongoDB Atlas hoặc server riêng. Các unique index được tạo từ mapping; ứng dụng không tự xóa collection hoặc chuyển dữ liệu SQL cũ. Bộ dữ liệu local không được nạp trong prod. Xem [docs/mongodb.md](docs/mongodb.md) cho cấu trúc lưu trữ và giới hạn giao dịch.
 
 ## 🔑 Tài khoản mẫu (chỉ profile `dev`)
 
@@ -159,7 +105,7 @@ Profile `dev` có một khóa công khai chỉ dành cho local để khởi ch�
 - **Tổng quan Quản trị (`/admin`):** Thống kê số liệu sản phẩm, đơn hàng, khách hàng.
 - **Quản lý Sản phẩm (`/admin/products`):** Danh sách phân trang, xem chi tiết, tạo/cập nhật sản phẩm, quản lý SKU trên Product hiện hữu, đổi trạng thái kinh doanh và tải ảnh chính lên Cloudinary. “Ngừng kinh doanh” là soft delete (`active=false`, `DISCONTINUED`); không xóa cứng để giữ liên kết với đơn hàng. Tồn kho tiếp tục được quản lý riêng theo cửa hàng qua `StoreStock`.
 
-CRUD sản phẩm chỉ cho phép `ADMIN` ở cả lớp URL và service; các form POST dùng CSRF. Form không bind JPA entity, không nhận trường audit hoặc owner. SKU và slug được chuẩn hóa/kiểm tra trước khi lưu, đồng thời có unique constraint ở database. Nếu tải ảnh mới thất bại, dữ liệu sản phẩm và ảnh hiện tại không bị thay đổi.
+CRUD sản phẩm chỉ cho phép `ADMIN` ở cả lớp URL và service; các form POST dùng CSRF. Form không bind trực tiếp entity, không nhận trường audit hoặc owner. SKU và slug được chuẩn hóa/kiểm tra trước khi lưu, đồng thời có unique index ở MongoDB. Nếu tải ảnh mới thất bại, dữ liệu sản phẩm và ảnh hiện tại không bị thay đổi.
 
 ### 3. REST API
 - **Đăng nhập cấp access và refresh token:** `POST /api/auth/login` (Body: `{ "email": "...", "password": "..." }`)
@@ -169,48 +115,17 @@ Access token được gửi bằng header `Authorization: Bearer <access-token>`
 
 ---
 
-## 📂 Cấu trúc thư mục
-
-```text
-OneShop/
-├── src/main/java/com/oneshop/
-│   ├── config/          # Cấu hình Security, Cloudinary, DataInitializer
-│   ├── entity/          # JPA Entities (Product, Store, StoreStock, User, Order...)
-│   ├── repository/      # Spring Data JPA Repositories (@EntityGraph tối ưu lazy load)
-│   ├── security/        # JWT Service, JwtAuthenticationFilter, CustomUserDetailsService
-│   ├── service/         # Business Logic Services
-│   └── web/             # Controllers (Web MVC Controllers & REST API)
-│       └── dto/         # Request / Response DTOs
-├── src/main/resources/
-│   ├── application.yml              # Cấu hình chung an toàn
-│   ├── application-dev.yml          # Cấu hình H2 và dữ liệu local
-│   ├── application-prod.yml         # Cấu hình production, ddl-auto=validate
-│   ├── application-mysql.yml        # Cấu hình MySQL
-│   ├── application-postgres.yml     # Cấu hình PostgreSQL
-│   ├── application-sqlserver.yml    # Cấu hình SQL Server
-│   ├── static/                      # CSS, JS, Images, SiteMesh Decorators
-│   │   ├── css/app.css              # Design System phong cách Glossier
-│   │   └── decorators/main.html     # Layout chính của Storefront
-│   └── templates/                   # Giao diện Thymeleaf
-│       ├── pages/                   # Giao diện người dùng (home, products, login...)
-│       └── admin/                   # Giao diện trang quản trị
-├── .env.example                     # Tên biến môi trường và giá trị mẫu giả
-└── pom.xml                          # Quản lý thư viện Maven
-```
-
----
-
 ## 💡 Ghi chú mở rộng phát triển
 
 ### Danh mục 100 sản phẩm và giỏ hàng
 
 Profile `dev` nạp 100 sản phẩm từ `src/main/resources/catalog/products.json`: 5 danh mục, 20 sản phẩm mỗi danh mục và 59 thương hiệu. Dữ liệu được trích từ workbook `Tong_hop_100_san_pham_my_pham.xlsx`, sheet `Danh sách 100`, dòng 5–104; các sheet danh mục được đối chiếu để không nhập lặp.
 
-Mỗi sản phẩm có ảnh cục bộ, một giá bán cố định bằng VNĐ, quy cách, thành phần, công dụng, loại da phù hợp và cách dùng. 19 sản phẩm trang điểm có mã màu để chọn; màu trên màn hình chỉ dùng minh họa. Quốc gia thương hiệu không được diễn giải thành nơi sản xuất. Không tạo đánh giá hoặc tồn kho giả.
+Mỗi sản phẩm có ảnh cục bộ, một giá bán cố định bằng VNĐ, quy cách, thành phần, công dụng, loại da phù hợp và cách dùng. 19 sản phẩm trang điểm có mã màu để chọn; màu trên màn hình chỉ dùng minh họa. Quốc gia thương hiệu không được diễn giải thành nơi sản xuất. Không tạo đánh giá giả. Tồn kho mẫu 20 đơn vị chỉ được khởi tạo trong dev theo cấu hình ở trên.
 
 Trang bán hàng không hiển thị thông tin đối chiếu bên ngoài. Các trường `priceSourceUrl`, `imageSourceUrl` và ngày kiểm tra chỉ được giữ nội bộ trong dữ liệu. Các giá ngoại tệ đã được khởi tạo thành một mức VNĐ, làm tròn 1.000 đồng, theo tỷ giá bán Vietcombank được đối chiếu ngày 26/10/2026 (USD 26.020; GBP 35.132,35); các trường gốc được giữ để kiểm tra nội bộ. Có thể chỉnh giá bán trong JSON trước khi nạp hoặc qua dữ liệu quản trị. Quy cách được chuẩn hóa theo phiên bản niêm yết, gồm COSRX Vitamin C 23 (20 g), ILLIYOON (230 ml) và Eucerin UreaRepair 5% (kem dưỡng tay 75 ml).
 
-Giao diện có tìm sản phẩm/thương hiệu, lọc danh mục, sắp xếp tên/giá, chọn màu và số lượng. `/cart` lưu riêng từng sản phẩm/màu/quy cách: khách vãng lai dùng session, khách đăng nhập dùng database và gộp đúng lựa chọn khi đăng nhập. Máy chủ xác thực màu/quy cách, lấy ảnh riêng của màu và tính lại giá; thêm/cập nhật kiểm tra tổng số lượng mọi lựa chọn với tồn chung của sản phẩm. UI có đổi số lượng 1–99, cập nhật, xóa từng lựa chọn, tổng tiền và liên kết chi tiết đúng sản phẩm. Thanh toán trực tuyến chưa được triển khai; liên kết đặt hàng dẫn tới trang liên hệ cửa hàng. Xem [docs/cart-selections.md](docs/cart-selections.md) cho hành vi và migration database có sẵn.
+Giao diện có tìm sản phẩm/thương hiệu, lọc danh mục, sắp xếp tên/giá, chọn màu và số lượng. `/cart` lưu riêng từng sản phẩm/màu/quy cách: khách vãng lai dùng session, khách đăng nhập dùng database và gộp đúng lựa chọn khi đăng nhập. Máy chủ xác thực màu/quy cách, lấy ảnh riêng của màu và tính lại giá; thêm/cập nhật kiểm tra tổng số lượng mọi lựa chọn với tồn chung của sản phẩm. UI có đổi số lượng 1–99, cập nhật, xóa từng lựa chọn, tổng tiền và liên kết chi tiết đúng sản phẩm. Thanh toán trực tuyến chưa được triển khai; liên kết đặt hàng dẫn tới trang liên hệ cửa hàng. Xem [docs/cart-selections.md](docs/cart-selections.md) cho hành vi và cấu trúc document.
 
 Ảnh sản phẩm nằm trong `src/main/resources/static/images/catalog/`. CSS/JS mới tại `static/css/shop.css` và `static/js/shop.js`. Kiểm thử giỏ máy chủ: `mvn -Dtest=CartControllerTest test`; kiểm thử toàn bộ: `mvn test`. Các tiện ích giỏ localStorage cũ vẫn có kiểm thử độc lập trong `tools/test_shop_cart.cjs` nhưng không phải luồng giỏ máy chủ hiện tại.
 
@@ -244,7 +159,7 @@ Mỗi `ProductShade` có `imageUrl`, `imageAlt`, `imageType` (`photo`/`chart`). 
 
 Kiểm tra chức năng ảnh màu: `node tools/test_shade_gallery.cjs`; kiểm tra gộp màu và cập nhật ảnh giỏ: `node tools/test_shop_cart.cjs`. `mvn verify` kiểm tra các trường ảnh và tệp tài nguyên của toàn bộ danh mục cùng trang chi tiết có lựa chọn màu.
 
-Khởi động lại profile `dev` sẽ nạp lại dữ liệu khi dùng H2 in-memory. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
+MongoDB giữ dữ liệu sau khi khởi động lại. Profile `dev` chỉ bổ sung SKU hoặc bản ghi tồn kho còn thiếu. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
 
 Để cập nhật nội dung từ một workbook cùng cấu trúc (Python cần `openpyxl`):
 
@@ -259,6 +174,6 @@ $env:JAVA_HOME = 'C:\Program Files\Java\jdk-21'
 mvn spring-boot:run "-Dspring-boot.run.profiles=dev" "-Dspring-boot.run.jvmArguments=-Djdk.net.unixdomain.tmpdir=C:\OneShop\target"
 ```
 
-1. **Cloudinary:** Cập nhật thông tin `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` trong `.env` để kích hoạt tính năng upload ảnh thực tế.
+1. **Cloudinary:** Đặt `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` qua biến môi trường để kích hoạt tính năng upload ảnh thực tế.
 2. **Logic Giỏ hàng & Đơn hàng:** Các Entity `Order`, `OrderItem`, `StoreStock` đã được chuẩn bị sẵn để mở rộng quy trình đặt hàng chọn chi nhánh nhận hàng / giao hàng.
 

@@ -1,34 +1,25 @@
 package com.oneshop.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-@Entity
-@Table(name = "users")
+@Document("users")
 public class User extends BaseEntity {
 
-    @Column(nullable = false, unique = true, length = 120)
+    @Indexed(unique = true, collation = "{ 'locale': 'en', 'strength': 2 }")
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 120)
     private String fullName;
 
-    @Column(length = 20)
     private String phone;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id")
+    @DocumentReference
     private Role role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
+    @DocumentReference
     private Store store;
 
     public String getEmail() {

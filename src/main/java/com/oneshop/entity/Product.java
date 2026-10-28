@@ -1,67 +1,45 @@
 package com.oneshop.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.OrderColumn;
 
-@Entity
-@Table(name = "products")
+@Document("products")
 public class Product extends BaseEntity {
 
-    @Column(nullable = false, length = 180)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 200)
+    @Indexed(unique = true, collation = "{ 'locale': 'en', 'strength': 2 }")
     private String slug;
 
-    @Column(nullable = false, unique = true, length = 80)
+    @Indexed(unique = true, collation = "{ 'locale': 'en', 'strength': 2 }")
     private String sku;
 
-    @Column(length = 300)
     private String shortDescription;
 
-    @Lob
     private String description;
 
-    @Column(precision = 12, scale = 2)
+    @Field(targetType = org.springframework.data.mongodb.core.mapping.FieldType.DECIMAL128)
     private BigDecimal price;
 
-    @Column(precision = 12, scale = 2)
+    @Field(targetType = org.springframework.data.mongodb.core.mapping.FieldType.DECIMAL128)
     private BigDecimal salePrice;
 
     private String imageUrl;
 
-    @ElementCollection
-    @org.hibernate.annotations.BatchSize(size = 24)
-    @CollectionTable(name = "product_shades", joinColumns = @JoinColumn(name = "product_id"))
-    @OrderColumn(name = "shade_order")
     private List<ProductShade> shades = new ArrayList<>();
 
-    @ElementCollection
-    @org.hibernate.annotations.BatchSize(size = 24)
-    @CollectionTable(name = "product_sizes", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "size_label", length = 100)
-    @OrderColumn(name = "size_order")
     private List<String> sizes = new ArrayList<>();
 
-    @Column(length = 1000)
     private String priceSourceUrl;
 
-    @Column(length = 1000)
     private String imageSourceUrl;
 
     private String priceVariant;
@@ -70,41 +48,30 @@ public class Product extends BaseEntity {
 
     private boolean priceFrom;
 
-    @Column(length = 3)
     private String priceCurrency = "VND";
 
     private String brandCountry;
 
     private String packageSize;
 
-    @Lob
     private String ingredients;
 
-    @Lob
     private String suitableFor;
 
-    @Lob
     private String directions;
 
-    @Lob
     private String precautions;
 
-    @Column(length = 1000)
     private String sourceUrl;
 
-    @Column(length = 1500)
     private String imageSearchUrl;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
     private ProductStatus status = ProductStatus.ACTIVE;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @DocumentReference
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id")
+    @DocumentReference
     private Brand brand;
 
     public String getName() {

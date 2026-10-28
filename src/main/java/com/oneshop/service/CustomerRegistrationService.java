@@ -10,7 +10,6 @@ import java.util.Locale;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomerRegistrationService {
@@ -29,7 +28,6 @@ public class CustomerRegistrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
     public void register(RegisterRequest request) {
         String normalizedEmail = normalizeEmail(request.email());
         if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
@@ -48,7 +46,7 @@ public class CustomerRegistrationService {
         user.setActive(true);
 
         try {
-            userRepository.saveAndFlush(user);
+            userRepository.save(user);
         } catch (DataIntegrityViolationException exception) {
             // The database unique constraint handles simultaneous registrations for the same email.
             throw new DuplicateEmailException();

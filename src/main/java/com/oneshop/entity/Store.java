@@ -1,33 +1,30 @@
 package com.oneshop.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "stores")
+@Document("stores")
 public class Store extends BaseEntity {
 
-    @Column(nullable = false, unique = true, length = 30)
+    @Indexed(unique = true, collation = "{ 'locale': 'en', 'strength': 2 }")
     private String code;
 
-    @Column(nullable = false, length = 150)
     private String name;
 
-    @Column(nullable = false, length = 255)
     private String address;
 
-    @Column(length = 80)
     private String district;
 
-    @Column(length = 80)
     private String city;
 
-    @Column(length = 20)
     private String phone;
 
+    @Field(targetType = org.springframework.data.mongodb.core.mapping.FieldType.DECIMAL128)
     private BigDecimal latitude;
+    @Field(targetType = org.springframework.data.mongodb.core.mapping.FieldType.DECIMAL128)
     private BigDecimal longitude;
 
     public String getCode() {

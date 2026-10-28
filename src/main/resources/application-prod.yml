@@ -1,11 +1,6 @@
 spring:
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    open-in-view: false
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
   thymeleaf:
     cache: true

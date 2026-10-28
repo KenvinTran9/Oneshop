@@ -22,7 +22,6 @@ import com.oneshop.entity.Role;
 import com.oneshop.entity.Store;
 import com.oneshop.entity.StoreStock;
 import com.oneshop.entity.User;
-import com.oneshop.repository.CartItemRepository;
 import com.oneshop.repository.CartRepository;
 import com.oneshop.repository.ProductRepository;
 import com.oneshop.repository.RoleRepository;
@@ -45,14 +44,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class CartControllerTest {
+class CartControllerTest extends com.oneshop.MongoIntegrationTestSupport {
 
     private static final String USER_EMAIL = "cart-customer@example.com";
     private static final String PASSWORD = "CartPassword!42";
 
     @Autowired private MockMvc mockMvc;
     @Autowired private org.springframework.web.context.WebApplicationContext webContext;
-    @Autowired private CartItemRepository cartItemRepository;
     @Autowired private CartRepository cartRepository;
     @Autowired private ProductRepository productRepository;
     @Autowired private StoreRepository storeRepository;
@@ -66,7 +64,6 @@ class CartControllerTest {
 
     @BeforeEach
     void setUp() {
-        cartItemRepository.deleteAll();
         cartRepository.deleteAll();
         storeStockRepository.deleteAll();
         productRepository.deleteAll();
@@ -77,7 +74,7 @@ class CartControllerTest {
         Role role = new Role();
         role.setName("CUSTOMER");
         role.setDescription("Customer");
-        roleRepository.saveAndFlush(role);
+        roleRepository.save(role);
 
         User account = new User();
         account.setEmail(USER_EMAIL);
@@ -85,13 +82,13 @@ class CartControllerTest {
         account.setPhone("0912345678");
         account.setPassword(passwordEncoder.encode(PASSWORD));
         account.setRole(role);
-        userRepository.saveAndFlush(account);
+        userRepository.save(account);
 
         store = new Store();
         store.setCode("CART-TEST");
         store.setName("Cart Test Store");
         store.setAddress("1 Test Street");
-        store = storeRepository.saveAndFlush(store);
+        store = storeRepository.save(store);
 
         product = new Product();
         product.setName("Test Serum");
@@ -100,13 +97,12 @@ class CartControllerTest {
         product.setPrice(new BigDecimal("100000.00"));
         product.setSalePrice(new BigDecimal("80000.00"));
         product.setStatus(ProductStatus.ACTIVE);
-        product = productRepository.saveAndFlush(product);
+        product = productRepository.save(product);
         setStock(10);
     }
 
     @AfterEach
     void cleanCartFixtures() {
-        cartItemRepository.deleteAll();
         cartRepository.deleteAll();
     }
 
@@ -151,7 +147,7 @@ class CartControllerTest {
         mockMvc.perform(post("/cart/items/{id}/remove", product.getId())
                         .with(user(USER_EMAIL).roles("CUSTOMER")).with(csrf()))
                 .andExpect(status().is3xxRedirection());
-        assertThat(cartItemRepository.count()).isZero();
+        assertThat(cartRepository.findByUserEmailIgnoreCase(USER_EMAIL).map(c -> (long) c.getItems().size()).orElse(0L)).isZero();
     }
 
     @Test
@@ -165,19 +161,19 @@ class CartControllerTest {
         assertThat(session.getAttribute("oneshop.guestCart")).isNull();
 
         product.setStatus(ProductStatus.DISCONTINUED);
-        productRepository.saveAndFlush(product);
+        productRepository.save(product);
         mockMvc.perform(post("/cart/items").session(new MockHttpSession()).with(csrf())
                         .param("productId", product.getId().toString()).param("quantity", "1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists("cartError"));
 
         product.setStatus(ProductStatus.ACTIVE);
-        productRepository.saveAndFlush(product);
+        productRepository.save(product);
         setStock(10);
         MockHttpSession existingCart = new MockHttpSession();
         addAsGuest(existingCart, 1);
         product.setStatus(ProductStatus.DISCONTINUED);
-        productRepository.saveAndFlush(product);
+        productRepository.save(product);
         var cartPage = mockMvc.perform(get("/cart").session(existingCart)).andExpect(status().isOk()).andReturn();
         com.oneshop.dto.response.CartView cart = (com.oneshop.dto.response.CartView)
                 cartPage.getModelAndView().getModel().get("cart");
@@ -207,7 +203,7 @@ class CartControllerTest {
                 .andExpect(status().is3xxRedirection());
         mockMvc.perform(post("/cart/clear").with(user(USER_EMAIL).roles("CUSTOMER")).with(csrf()))
                 .andExpect(status().is3xxRedirection());
-        assertThat(cartItemRepository.count()).isZero();
+        assertThat(cartRepository.findByUserEmailIgnoreCase(USER_EMAIL).map(c -> (long) c.getItems().size()).orElse(0L)).isZero();
     }
 
     @Test
@@ -219,7 +215,7 @@ class CartControllerTest {
         mockMvc.perform(post("/cart/items/{id}/remove", product.getId())
                         .with(user("other@example.com").roles("CUSTOMER")).with(csrf()))
                 .andExpect(status().is3xxRedirection());
-        assertThat(cartItemRepository.count()).isEqualTo(1);
+        assertThat(cartRepository.findByUserEmailIgnoreCase(USER_EMAIL).map(c -> (long) c.getItems().size()).orElse(0L)).isEqualTo(1);
         assertThat(cartRepository.findByUserEmailIgnoreCase(USER_EMAIL).orElseThrow().getItems())
                 .singleElement().extracting("quantity").isEqualTo(2);
     }
@@ -362,7 +358,7 @@ class CartControllerTest {
         product.setSalePrice(null);
         product.setPrice(new BigDecimal("123000"));
         product.setShades(List.of(new ProductShade("03 Bare Grape", "#a06175", "/images/catalog/shades/catalog-066-shade-chart.png", "Chart", "chart")));
-        productRepository.saveAndFlush(product);
+        productRepository.save(product);
         assertThat(cartView(session, false).items()).singleElement().satisfies(item -> {
             assertThat(item.imageUrl()).isEqualTo("/images/catalog/catalog-016.png");
             assertThat(item.unitPrice()).isEqualByComparingTo("123000");
@@ -378,7 +374,7 @@ class CartControllerTest {
         setStock(3);
         assertThat(cartView(session, false).items()).allSatisfy(item -> assertThat(item.warning()).contains("vượt tồn"));
         product.setShades(List.of(new ProductShade("05 Jujube", "#be635c")));
-        productRepository.saveAndFlush(product);
+        productRepository.save(product);
         assertThat(cartView(session, false).items().getFirst().warning()).contains("chọn lại");
         mockMvc.perform(post("/cart/items/{id}/remove", product.getId()).session(session).with(csrf())
                         .param("size", "3.5 g").param("shade", "03 Bare Grape"))
@@ -405,7 +401,7 @@ class CartControllerTest {
         product.setName("The Juicy Lasting Tint");
         product.setPrice(new BigDecimal("155000"));
         product.setSalePrice(null);
-        productRepository.saveAndFlush(product);
+        productRepository.save(product);
         MockHttpSession session = new MockHttpSession();
         addSelection(session, "3.5 g", "03 Bare Grape", 1, false);
         addSelection(session, "3.5 g", "05 Jujube", 2, false);
@@ -426,7 +422,7 @@ class CartControllerTest {
         product.setShades(List.of(
                 new ProductShade("03 Bare Grape", "#a06175", "/images/catalog/shades/catalog-016-03-bare-grape.webp", "Bare Grape", "photo"),
                 new ProductShade("05 Jujube", "#be635c", "/images/catalog/shades/catalog-016-05-jujube.webp", "Jujube", "photo")));
-        product = productRepository.saveAndFlush(product);
+        product = productRepository.save(product);
     }
 
     private void addSelection(MockHttpSession session, String size, String shade, int count, boolean account) throws Exception {
@@ -454,17 +450,17 @@ class CartControllerTest {
         stock.setStore(store);
         stock.setProduct(product);
         stock.setQuantity(quantity);
-        storeStockRepository.saveAndFlush(stock);
+        storeStockRepository.save(stock);
     }
 
     private void seedAccountCart(int quantity) {
         Cart cart = new Cart();
         cart.setUser(userRepository.findByEmail(USER_EMAIL).orElseThrow());
-        cart = cartRepository.saveAndFlush(cart);
+        cart = cartRepository.save(cart);
         CartItem item = new CartItem();
-        item.setCart(cart);
         item.setProduct(product);
         item.setQuantity(quantity);
-        cartItemRepository.saveAndFlush(item);
+        cart.getItems().add(item);
+        cartRepository.save(cart);
     }
 }

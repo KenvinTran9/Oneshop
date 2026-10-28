@@ -8,10 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -21,34 +19,26 @@ public class ProductService {
     }
 
     public Page<Product> findActiveProducts(Pageable pageable) {
-        return productRepository.findByStatus(ProductStatus.ACTIVE, pageable).map(this::withOptions);
+        return productRepository.findByStatus(ProductStatus.ACTIVE, pageable);
     }
 
     public Page<Product> findActiveProducts(String categorySlug, Pageable pageable) {
         return categorySlug == null || categorySlug.isBlank()
                 ? findActiveProducts(pageable)
-                : productRepository.findByStatusAndCategory_Slug(ProductStatus.ACTIVE, categorySlug, pageable).map(this::withOptions);
+                : productRepository.findByStatusAndCategory_Slug(ProductStatus.ACTIVE, categorySlug, pageable);
     }
 
     public Page<Product> searchCatalog(String category, String search, Pageable pageable) {
         return productRepository.searchCatalog(ProductStatus.ACTIVE,
-                category == null ? "" : category.trim(), search == null ? "" : search.trim(), pageable).map(this::withOptions);
+                category == null ? "" : category.trim(), search == null ? "" : search.trim(), pageable);
     }
 
     public Product findActiveProductBySlug(String slug) {
         return productRepository.findBySlugAndStatus(slug, ProductStatus.ACTIVE)
-                .map(this::withOptions)
+
                 .orElseThrow(() -> new ProductNotFoundException(slug));
     }
 
-    private Product withOptions(Product product) {
-        // Templates render after this read transaction closes (open-in-view=false).
-        org.hibernate.Hibernate.initialize(product.getSizes());
-        org.hibernate.Hibernate.initialize(product.getShades());
-        return product;
-    }
-
-    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public Product save(Product product) {
         return productRepository.save(product);

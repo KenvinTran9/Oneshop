@@ -1,32 +1,25 @@
 package com.oneshop.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "store_stocks", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"store_id", "product_id"})
-})
+@CompoundIndex(name="uk_store_product", def="{'store':1,'product':1}", unique=true)
+@Document("store_stocks")
 public class StoreStock extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false)
+    @DocumentReference
     private Store store;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @DocumentReference
     private Product product;
 
-    @Column(nullable = false)
     private int quantity;
 
-    @Column(precision = 12, scale = 2)
+    @Field(targetType = org.springframework.data.mongodb.core.mapping.FieldType.DECIMAL128)
     private BigDecimal storePrice;
 
     public Store getStore() {

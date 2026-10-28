@@ -1,32 +1,26 @@
 package com.oneshop.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "order_items")
+@Document("order_items")
 public class OrderItem extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @DocumentReference
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @DocumentReference
     private Product product;
 
-    @Column(nullable = false)
     private int quantity;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Field(targetType = org.springframework.data.mongodb.core.mapping.FieldType.DECIMAL128)
     private BigDecimal unitPrice = BigDecimal.ZERO;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Field(targetType = org.springframework.data.mongodb.core.mapping.FieldType.DECIMAL128)
     private BigDecimal lineTotal = BigDecimal.ZERO;
 
     public Order getOrder() {

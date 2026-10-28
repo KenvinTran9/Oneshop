@@ -2,9 +2,9 @@ package com.oneshop.repository;
 
 import com.oneshop.entity.Role;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface RoleRepository extends JpaRepository<Role, Long> {
+public interface RoleRepository extends MongoRepository<Role, Long> {
 
     Optional<Role> findByName(String name);
 }

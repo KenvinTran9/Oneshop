@@ -32,8 +32,7 @@ public class SecurityConfig {
                                 .csrf(csrf -> csrf
                                                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                                                 .ignoringRequestMatchers(
-                                                                "/api/auth/refresh",
-                                                                "/h2-console/**"))
+                                                                "/api/auth/refresh"))
                                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
@@ -49,8 +48,7 @@ public class SecurityConfig {
                                                                 "/js/**",
                                                                 "/images/**",
                                                                 "/decorators/**",
-                                                                "/webjars/**",
-                                                                "/h2-console/**")
+                                                                "/webjars/**")
                                                 .permitAll()
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())

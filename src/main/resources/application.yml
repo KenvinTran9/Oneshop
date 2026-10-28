@@ -7,13 +7,10 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 20MB
-  jpa:
-    hibernate:
-      ddl-auto: none
-    open-in-view: false
-    properties:
-      hibernate:
-        format_sql: true
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      auto-index-creation: true
 
 server:
   port: 8080
@@ -34,7 +31,7 @@ sitemesh:
   decorator:
     prefix: /decorators/
     default: main.html
-    exclusions: /css/*,/js/*,/images/*,/webjars/*,/h2-console/*,/decorators/*
+    exclusions: /css/*,/js/*,/images/*,/webjars/*,/decorators/*
     mappings:
       - path: /admin/*
         decorator: admin.html

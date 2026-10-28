@@ -9,10 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 public class HomeCatalogService {
     private static final int SUGGESTION_LIMIT = 8;
     private final ProductRepository products;
@@ -51,11 +49,6 @@ public class HomeCatalogService {
         }
         var counts = products.summarizeHomeCounts(status);
         var suggestions = List.copyOf(selected.values());
-        // Load only the displayed products' options before the view loses its persistence context.
-        suggestions.forEach(product -> {
-            org.hibernate.Hibernate.initialize(product.getSizes());
-            org.hibernate.Hibernate.initialize(product.getShades());
-        });
         return new HomeCatalog(categories, suggestions,
                 products.summarizeHomeBrands(status, PageRequest.of(0, 8)),
                 counts.getProductCount(), counts.getBrandCount(), suggestions.isEmpty() ? null : suggestions.getFirst());

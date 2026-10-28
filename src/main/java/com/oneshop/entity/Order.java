@@ -1,44 +1,33 @@
 package com.oneshop.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.Field;
+
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "orders")
+@Document("orders")
 public class Order extends BaseEntity {
 
-    @Column(nullable = false, unique = true, length = 40)
+    @Indexed(unique = true, collation = "{ 'locale': 'en', 'strength': 2 }")
     private String code;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
+    @DocumentReference
     private User customer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
+    @DocumentReference
     private Store store;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
     private OrderStatus status = OrderStatus.NEW;
 
-    @Column(nullable = false, length = 120)
     private String customerName;
 
-    @Column(nullable = false, length = 20)
     private String customerPhone;
 
-    @Column(nullable = false, length = 255)
     private String shippingAddress;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Field(targetType = org.springframework.data.mongodb.core.mapping.FieldType.DECIMAL128)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     public String getCode() {

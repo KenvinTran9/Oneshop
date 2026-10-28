@@ -3,7 +3,6 @@ package com.oneshop.service;
 import com.oneshop.entity.Order;
 import com.oneshop.repository.OrderRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderService {
@@ -14,7 +13,6 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    @Transactional
     public Order createOrder(Order order) {
         return orderRepository.save(order);
     }

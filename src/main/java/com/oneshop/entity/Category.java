@@ -1,20 +1,16 @@
 package com.oneshop.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "categories")
+@Document("categories")
 public class Category extends BaseEntity {
 
-    @Column(nullable = false, length = 120)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 160)
+    @Indexed(unique = true, collation = "{ 'locale': 'en', 'strength': 2 }")
     private String slug;
 
-    @Column(length = 300)
     private String description;
 
     public String getName() {

@@ -20,10 +20,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Profile("dev")
+@org.springframework.core.annotation.Order(20)
 public class CatalogDataInitializer implements CommandLineRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogDataInitializer.class);
@@ -41,7 +41,7 @@ public class CatalogDataInitializer implements CommandLineRunner {
     }
 
     @Override
-    @Transactional
+
     public void run(String... args) throws Exception {
         List<CatalogEntry> entries;
         try (var input = new ClassPathResource("catalog/products.json").getInputStream()) {
