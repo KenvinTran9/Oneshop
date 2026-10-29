@@ -14,6 +14,39 @@ import java.math.BigDecimal;
 @Table(name = "orders")
 public class Order extends BaseEntity {
 
+    @Column(unique = true, length = 36)
+    private String checkoutToken;
+    @Column(length = 120)
+    private String customerEmail;
+    @Column(precision = 12, scale = 2)
+    private BigDecimal shippingFee = BigDecimal.ZERO;
+    @Column(length = 500)
+    private String note;
+    @Column(length = 30)
+    private String emailStatus = "PENDING";
+    private java.time.LocalDateTime emailSentAt;
+    @jakarta.persistence.OneToMany(mappedBy = "order", cascade = jakarta.persistence.CascadeType.ALL)
+    @jakarta.persistence.OrderBy("id ASC")
+    private java.util.List<OrderItem> items = new java.util.ArrayList<>();
+    @jakarta.persistence.OneToMany(mappedBy = "order", cascade = jakarta.persistence.CascadeType.ALL)
+    @jakarta.persistence.OrderBy("id ASC")
+    private java.util.List<OrderEvent> events = new java.util.ArrayList<>();
+
+    public String getCheckoutToken() { return checkoutToken; }
+    public void setCheckoutToken(String value) { checkoutToken = value; }
+    public String getCustomerEmail() { return customerEmail; }
+    public void setCustomerEmail(String value) { customerEmail = value; }
+    public BigDecimal getShippingFee() { return shippingFee == null ? BigDecimal.ZERO : shippingFee; }
+    public void setShippingFee(BigDecimal value) { shippingFee = value; }
+    public String getNote() { return note; }
+    public void setNote(String value) { note = value; }
+    public String getEmailStatus() { return emailStatus; }
+    public void setEmailStatus(String value) { emailStatus = value; }
+    public java.time.LocalDateTime getEmailSentAt() { return emailSentAt; }
+    public void setEmailSentAt(java.time.LocalDateTime value) { emailSentAt = value; }
+    public java.util.List<OrderItem> getItems() { return items; }
+    public java.util.List<OrderEvent> getEvents() { return events; }
+
     @Column(nullable = false, unique = true, length = 40)
     private String code;
 

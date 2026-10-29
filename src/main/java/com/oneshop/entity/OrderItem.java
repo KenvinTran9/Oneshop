@@ -12,6 +12,24 @@ import java.math.BigDecimal;
 @Table(name = "order_items")
 public class OrderItem extends BaseEntity {
 
+    @Column(length = 255)
+    private String productName;
+    @Column(length = 1000)
+    private String imageUrl;
+    @Column(length = 100)
+    private String selectedSize;
+    @Column(length = 100)
+    private String selectedShade;
+
+    public String getProductName() { return productName == null ? product.getName() : productName; }
+    public void setProductName(String value) { productName = value; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String value) { imageUrl = value; }
+    public String getSelectedSize() { return selectedSize == null ? "" : selectedSize; }
+    public void setSelectedSize(String value) { selectedSize = value; }
+    public String getSelectedShade() { return selectedShade == null ? "" : selectedShade; }
+    public void setSelectedShade(String value) { selectedShade = value; }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;

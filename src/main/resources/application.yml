@@ -1,6 +1,18 @@
 spring:
   application:
     name: oneshop
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
   thymeleaf:
     cache: true
   servlet:
@@ -24,6 +36,12 @@ server:
   port: 8080
 
 app:
+  orders:
+    shipping-fee: ${ORDER_SHIPPING_FEE:30000}
+  mail:
+    enabled: ${MAIL_ENABLED:false}
+    from: ${MAIL_FROM:${MAIL_USERNAME:}}
+    base-url: ${APP_BASE_URL:http://localhost:8080}
   jwt:
     secret: ${JWT_SECRET}
     issuer: ${JWT_ISSUER}
@@ -41,5 +59,7 @@ sitemesh:
     default: main.html
     exclusions: /css/*,/js/*,/images/*,/webjars/*,/decorators/*
     mappings:
+      - path: /admin
+        decorator: admin.html
       - path: /admin/*
         decorator: admin.html

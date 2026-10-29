@@ -108,6 +108,7 @@ Profile `dev` có một khóa công khai chỉ dành cho local để khởi ch�
 
 ### 2. Phân hệ Quản trị (Admin Dashboard)
 - **Tổng quan Quản trị (`/admin`):** Thống kê số liệu sản phẩm, đơn hàng, khách hàng.
+- **Đặt và theo dõi đơn (`/checkout`, `/orders`):** Checkout COD, lưu giá/màu/dung tích lúc mua, lịch sử xử lý riêng từng tài khoản, quản trị trạng thái tại `/admin/orders`, hoàn tồn khi hủy và email xác nhận Gmail SMTP sau khi lưu đơn. Xem [hướng dẫn cấu hình email và demo](docs/orders.md).
 - **Quản lý Sản phẩm (`/admin/products`):** Danh sách phân trang, xem chi tiết, tạo/cập nhật sản phẩm, quản lý SKU trên Product hiện hữu, đổi trạng thái kinh doanh và tải ảnh chính lên Cloudinary. “Ngừng kinh doanh” là soft delete (`active=false`, `DISCONTINUED`); không xóa cứng để giữ liên kết với đơn hàng. Tồn kho tiếp tục được quản lý riêng theo cửa hàng qua `StoreStock`.
 
 CRUD sản phẩm chỉ cho phép `ADMIN` ở cả lớp URL và service; các form POST dùng CSRF. Form không bind trực tiếp entity, không nhận trường audit hoặc owner. SKU và slug được chuẩn hóa/kiểm tra trước khi lưu, đồng thời có unique index ở MongoDB. Nếu tải ảnh mới thất bại, dữ liệu sản phẩm và ảnh hiện tại không bị thay đổi.

@@ -74,6 +74,15 @@ class AuthenticationFlowTest extends MySqlIntegrationTestSupport {
     }
 
     @Test
+    void loginReturnsCustomerToTheOrderPageTheyWereOpening() throws Exception {
+        account("tracking@oneshop.test", "CUSTOMER", true);
+        MockHttpSession session = new MockHttpSession();
+        mvc.perform(get("/orders").session(session)).andExpect(status().is3xxRedirection());
+        mvc.perform(post("/login").session(session).with(csrf()).param("username","tracking@oneshop.test")
+                .param("password",PASSWORD)).andExpect(redirectedUrl("/orders"));
+    }
+
+    @Test
     void logoutEndsTheAuthenticatedSession() throws Exception {
         account("customer@oneshop.test", "CUSTOMER", true);
         MockHttpSession session = login("customer@oneshop.test", "/");

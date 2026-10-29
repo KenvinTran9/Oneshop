@@ -31,6 +31,16 @@ public class CartLoginSuccessHandler implements AuthenticationSuccessHandler {
         }
         boolean admin = authentication.getAuthorities().stream()
                 .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+        var cache = new org.springframework.security.web.savedrequest.HttpSessionRequestCache();
+        var saved = cache.getRequest(request, response);
+        cache.removeRequest(request, response);
+        if (saved != null && "GET".equals(saved.getMethod())) {
+            String path = java.net.URI.create(saved.getRedirectUrl()).getPath();
+            String local = path.substring(Math.min(request.getContextPath().length(), path.length()));
+            if (local.equals("/checkout") || local.equals("/orders") || local.matches("/orders/OS-[A-F0-9]{16}")) {
+                response.sendRedirect(request.getContextPath() + local); return;
+            }
+        }
         response.sendRedirect(request.getContextPath() + (admin ? "/admin" : "/"));
     }
 }

@@ -1,0 +1,15 @@
+<!doctype html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><body>
+<div th:fragment="content(order)" class="order-layout">
+    <div>
+        <section class="order-panel"><h2>Hành trình đơn hàng</h2>
+            <ol class="order-timeline"><li th:each="event, iter : ${order.events}" th:classappend="${iter.last} ? 'current'" th:attr="data-status=${event.status}"><span class="timeline-dot" aria-hidden="true"></span><div><strong th:text="${event.status.label}"></strong><time th:text="${#temporals.format(event.time,'dd/MM/yyyy · HH:mm')}"></time><p th:text="${event.message}"></p></div></li></ol>
+            <p class="order-help" th:if="${#lists.isEmpty(order.events)}">Đơn hàng chưa có lịch sử cập nhật.</p>
+        </section>
+        <section class="order-panel"><h2>Sản phẩm đã đặt</h2><div class="order-detail-item" th:each="item : ${order.items}"><img th:src="${item.imageUrl ?: '/images/product-placeholder.svg'}" th:alt="${item.name}" width="70" height="80" loading="lazy"><div><strong th:text="${item.name}"></strong><small th:if="${!item.size.isEmpty()}" th:text="${'Quy cách: ' + item.size}"></small><small th:if="${!item.shade.isEmpty()}" th:text="${'Màu: ' + item.shade}"></small><small th:text="${'SL ' + item.quantity + ' × ' + #numbers.formatDecimal(item.unitPrice,0,'POINT',0,'COMMA') + ' ₫'}"></small></div><strong th:text="${#numbers.formatDecimal(item.lineTotal,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div></section>
+    </div>
+    <aside>
+        <section class="order-panel"><h2>Thông tin giao hàng</h2><strong th:text="${order.customerName}"></strong><p th:text="${order.customerPhone}"></p><p th:text="${order.shippingAddress}"></p><small>Email xác nhận</small><p th:text="${order.customerEmail}"></p><small>Cửa hàng xử lý</small><p th:text="${order.storeName}"></p><div th:if="${order.note != null && !order.note.isEmpty()}"><small>Ghi chú</small><p th:text="${order.note}"></p></div></section>
+        <section class="order-panel"><h2>Thanh toán</h2><div class="order-money"><span>Tiền sản phẩm</span><strong th:text="${#numbers.formatDecimal(order.subtotal,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div><div class="order-money"><span>Phí giao hàng</span><strong th:text="${#numbers.formatDecimal(order.shippingFee,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div><div class="order-money order-total"><span>Tổng cộng</span><strong th:text="${#numbers.formatDecimal(order.totalAmount,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div><p class="order-help">Thanh toán khi nhận hàng (COD).</p></section>
+    </aside>
+</div>
+</body></html>

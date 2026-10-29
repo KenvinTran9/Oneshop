@@ -23,7 +23,7 @@ Profile `dev` dùng `ddl-auto=update` cho local. Profile `prod` dùng `validate`
 
 ## Cấu trúc dữ liệu
 
-13 bảng: `roles`, `users`, `stores`, `categories`, `brands`, `products`, `product_sizes`, `product_shades`, `store_stocks`, `shopping_carts`, `shopping_cart_items`, `orders`, `order_items`.
+14 bảng: `roles`, `users`, `stores`, `categories`, `brands`, `products`, `product_sizes`, `product_shades`, `store_stocks`, `shopping_carts`, `shopping_cart_items`, `orders`, `order_items`, `order_events`.
 
 ```mermaid
 erDiagram
@@ -41,6 +41,7 @@ erDiagram
     USERS o|--o{ ORDERS : customer
     STORES o|--o{ ORDERS : fulfillment_store
     ORDERS ||--o{ ORDER_ITEMS : items
+    ORDERS ||--o{ ORDER_EVENTS : status_history
     PRODUCTS ||--o{ ORDER_ITEMS : product
 ```
 

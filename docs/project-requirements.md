@@ -16,8 +16,8 @@
 
 ## Phần nghiệp vụ còn cần hoàn thiện
 
-1. Checkout tạo đơn thật, chọn cửa hàng xử lý/nhận hàng hoặc giao hàng, kiểm tra và trừ tồn trong transaction.
-2. Quản trị đơn hàng và các trạng thái xử lý; giỏ hiện dẫn tới liên hệ cửa hàng.
+1. Đã có checkout COD giao hàng, chọn cửa hàng xử lý đủ toàn bộ giỏ, kiểm tra/trừ tồn trong transaction và hoàn tồn khi hủy. Chưa có thanh toán qua cổng, nhận tại cửa hàng hoặc phân bổ một đơn cho nhiều kho.
+2. Đã có lịch sử đơn riêng từng khách, timeline và quản trị trạng thái; email xác nhận Gmail SMTP cần cấu hình tài khoản gửi trong `.env`. Xem [orders.md](orders.md).
 3. Quản trị cửa hàng/tồn kho theo chi nhánh, bổ sung quyền nhân viên nếu rubric yêu cầu.
 4. Cấu hình Cloudinary và kiểm tra upload thật; hiện ảnh danh mục vẫn dùng file local.
 5. Chuẩn bị báo cáo ERD, sơ đồ luồng, tài khoản demo và ví dụ gọi API JWT phù hợp với chức năng đã triển khai.

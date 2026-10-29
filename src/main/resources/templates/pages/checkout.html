@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><title>Đặt hàng - OneShop</title><link href="/css/orders.css" rel="stylesheet"></head>
+<body><section class="orders-page"><div class="container">
+    <a class="order-back" href="/cart"><i class="bi bi-arrow-left" aria-hidden="true"></i> Quay lại giỏ hàng</a>
+    <div class="orders-heading"><span class="order-eyebrow">Sắp đến tay bạn</span><h1>Hoàn tất <em>đơn hàng.</em></h1><p>Kiểm tra thông tin để OneShop gửi những lựa chọn yêu thích đến bạn.</p></div>
+    <div class="order-alert error" th:if="${orderError}" th:text="${orderError}" role="alert"></div>
+    <form th:action="@{/checkout}" method="post" th:object="${checkoutForm}" class="order-layout">
+        <section class="order-panel">
+            <h2>Thông tin nhận hàng</h2>
+            <div class="order-alert error" th:if="${#fields.hasErrors('*')}" role="alert">Vui lòng kiểm tra các thông tin bên dưới.</div>
+            <input type="hidden" th:field="*{checkoutToken}">
+            <div class="order-field"><label for="customerName">Họ và tên</label><input id="customerName" th:field="*{customerName}" autocomplete="name" maxlength="120" required th:attr="aria-invalid=${#fields.hasErrors('customerName')}"><p class="field-error" th:errors="*{customerName}"></p></div>
+            <div class="order-field"><label for="customerPhone">Số điện thoại</label><input type="tel" id="customerPhone" th:field="*{customerPhone}" autocomplete="tel" maxlength="20" required th:attr="aria-invalid=${#fields.hasErrors('customerPhone')}"><p class="field-error" th:errors="*{customerPhone}"></p></div>
+            <div class="order-field"><label>Email xác nhận</label><p class="order-readonly" th:text="${customerEmail}"></p><small>Email được gửi về tài khoản đang đăng nhập.</small></div>
+            <div class="order-field"><label for="shippingAddress">Địa chỉ nhận hàng</label><textarea id="shippingAddress" th:field="*{shippingAddress}" autocomplete="street-address" rows="3" minlength="10" maxlength="255" placeholder="Số nhà, đường, phường/xã, tỉnh/thành phố" required th:attr="aria-invalid=${#fields.hasErrors('shippingAddress')}"></textarea><p class="field-error" th:errors="*{shippingAddress}"></p></div>
+            <div class="order-field"><label for="storeId">Cửa hàng xử lý đơn</label><select id="storeId" th:field="*{storeId}" required><option value="">Chọn cửa hàng</option><option th:each="store : ${stores}" th:value="${store.id}" th:text="${store.name}"></option></select><p class="field-error" th:errors="*{storeId}"></p><small>Đơn được xử lý bởi một cửa hàng có đủ sản phẩm trong giỏ.</small></div>
+            <div class="order-field"><label for="note">Ghi chú <span>(không bắt buộc)</span></label><textarea id="note" th:field="*{note}" rows="2" maxlength="500" placeholder="Lời nhắn cho OneShop..."></textarea><p class="field-error" th:errors="*{note}"></p></div>
+        </section>
+        <aside class="order-panel order-summary">
+            <h2>Đơn hàng của bạn</h2>
+            <div class="order-mini-item" th:each="item : ${cart.items}"><img th:src="${item.imageUrl ?: '/images/product-placeholder.svg'}" th:alt="${item.name}" width="60" height="70"><div><strong th:text="${item.name}"></strong><small th:text="${item.size + (item.shade.isEmpty() ? '' : ' · ' + item.shade) + ' · SL ' + item.quantity}"></small><span th:text="${#numbers.formatDecimal(item.lineTotal,0,'POINT',0,'COMMA') + ' ₫'}"></span><p class="field-error" th:if="${item.warning}" th:text="${item.warning}"></p></div></div>
+            <div class="order-money"><span>Tiền sản phẩm</span><strong th:text="${#numbers.formatDecimal(cart.subtotal,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div>
+            <div class="order-money"><span>Phí giao hàng</span><strong th:text="${#numbers.formatDecimal(shippingFee,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div>
+            <div class="order-money order-total"><span>Tổng thanh toán</span><strong th:text="${#numbers.formatDecimal(checkoutTotal,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div>
+            <div class="order-cod"><i class="bi bi-cash-coin" aria-hidden="true"></i><div><strong>Thanh toán khi nhận hàng</strong><small>COD · Thanh toán cho nhân viên giao hàng.</small></div></div>
+            <button class="order-button" type="submit" th:disabled="${#lists.isEmpty(cart.items)}">Đặt hàng COD <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+            <p class="order-help">Mã đơn và tiến trình xử lý sẽ được lưu trong “Đơn hàng của tôi”.</p>
+        </aside>
+    </form>
+</div></section></body></html>

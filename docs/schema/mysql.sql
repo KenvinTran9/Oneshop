@@ -51,6 +51,10 @@ CREATE TABLE `order_items` (
   `line_total` decimal(12,2) NOT NULL,
   `quantity` int NOT NULL,
   `unit_price` decimal(12,2) NOT NULL,
+  `product_name` varchar(255) DEFAULT NULL,
+  `image_url` varchar(1000) DEFAULT NULL,
+  `selected_size` varchar(100) DEFAULT NULL,
+  `selected_shade` varchar(100) DEFAULT NULL,
   `order_id` bigint NOT NULL,
   `product_id` bigint NOT NULL,
   PRIMARY KEY (`id`),
@@ -69,6 +73,12 @@ CREATE TABLE `orders` (
   `updated_at` datetime(6) NOT NULL,
   `version` bigint NOT NULL,
   `code` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL,
+  `checkout_token` varchar(36) DEFAULT NULL,
+  `customer_email` varchar(120) DEFAULT NULL,
+  `shipping_fee` decimal(12,2) DEFAULT NULL,
+  `note` varchar(500) DEFAULT NULL,
+  `email_status` varchar(30) DEFAULT NULL,
+  `email_sent_at` datetime(6) DEFAULT NULL,
   `customer_name` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL,
   `customer_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL,
   `shipping_address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci NOT NULL,
@@ -78,6 +88,7 @@ CREATE TABLE `orders` (
   `store_id` bigint DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UKgt3o4a5bqj59e9y6wakgk926t` (`code`),
+  UNIQUE KEY `UKorder_checkout_token` (`checkout_token`),
   KEY `FKsjfs85qf6vmcurlx43cnc16gy` (`customer_id`),
   KEY `FKnqkwhwveegs6ne9ra90y1gq0e` (`store_id`),
   CONSTRAINT `FKnqkwhwveegs6ne9ra90y1gq0e` FOREIGN KEY (`store_id`) REFERENCES `stores` (`id`),
@@ -86,6 +97,19 @@ CREATE TABLE `orders` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `order_events` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `active` bit(1) NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  `version` bigint NOT NULL,
+  `order_id` bigint NOT NULL,
+  `status` enum('CANCELLED','COMPLETED','CONFIRMED','NEW','PACKING','SHIPPING') NOT NULL,
+  `message` varchar(500) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_order_events_order` (`order_id`),
+  CONSTRAINT `fk_order_events_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_as_ci;
 CREATE TABLE `product_shades` (
   `product_id` bigint NOT NULL,
   `shade_color` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci DEFAULT NULL,

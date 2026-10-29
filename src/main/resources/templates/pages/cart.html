@@ -50,8 +50,8 @@
             <div class="summary-line"><span>Tạm tính</span><strong th:text="${#numbers.formatDecimal(cart.subtotal, 0, 'POINT', 0, 'COMMA')} + ' ₫'">0 ₫</strong></div>
             <div class="summary-line"><span>Phí giao hàng</span><span>Xác nhận khi đặt hàng</span></div>
             <div class="cart-total-line"><span>Tổng tiền sản phẩm</span><strong th:text="${#numbers.formatDecimal(cart.subtotal, 0, 'POINT', 0, 'COMMA')} + ' ₫'">0 ₫</strong></div>
-            <a class="shop-button primary w-100" href="/stores">Liên hệ đặt hàng <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-            <p class="cart-summary-note">Cửa hàng sẽ xác nhận tình trạng sản phẩm và phí giao hàng với bạn. Đặt hàng trực tuyến sẽ được mở sau.</p>
+            <a class="shop-button primary w-100" href="/checkout">Tiến hành đặt hàng <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+            <p class="cart-summary-note">Thanh toán khi nhận hàng (COD). Đăng nhập để đặt hàng và theo dõi đơn trong tài khoản.</p>
             <a class="cart-store-link" href="/stores"><i class="bi bi-chat-heart" aria-hidden="true"></i> Cần hỗ trợ chọn màu? Ghé OneShop</a>
         </aside>
     </div>
