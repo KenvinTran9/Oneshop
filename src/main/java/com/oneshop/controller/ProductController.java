@@ -36,7 +36,9 @@ public class ProductController {
         };
         Pageable pageable = PageRequest.of(Math.max(page, 0), 12, ordering);
         model.addAttribute("productPage", productService.searchCatalog(category, q, pageable));
-        model.addAttribute("categories", categoryRepository.findAll(Sort.by("id")));
+        var categories = categoryRepository.findAll(Sort.by("id"));
+        model.addAttribute("catalogTitle", categories.stream().filter(item -> item.getSlug().equals(category))
+                .map(item -> item.getName()).findFirst().orElse("Khám phá sản phẩm"));
         model.addAttribute("selectedCategory", category);
         model.addAttribute("selectedSort", selectedSort);
         model.addAttribute("searchQuery", q.trim());

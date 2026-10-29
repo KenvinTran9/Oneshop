@@ -1,24 +1,36 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head><title>Mua sắm mỹ phẩm - OneShop</title></head>
+<head>
+    <title>Mua sắm mỹ phẩm - OneShop</title>
+    <link href="/css/catalog.css" rel="stylesheet">
+</head>
 <body>
-<section class="shop-collection-heading">
+<div class="catalog-page">
+<section class="catalog-intro" aria-labelledby="catalog-title">
     <div class="container">
-        <div class="shop-collection-heading-inner">
-            <div><span class="eyebrow">OneShop Beauty Store</span><h1>Chăm chút vẻ đẹp mỗi ngày.</h1><p>Khám phá mỹ phẩm từ những thương hiệu bạn yêu thích.</p></div>
-            <div class="collection-decoration" aria-hidden="true"><span>SKINCARE</span><span>MAKEUP</span><i class="bi bi-flower1"></i></div>
+        <div class="catalog-intro-panel">
+            <div class="catalog-intro-copy">
+                <span class="catalog-eyebrow">OneShop · Thế giới làm đẹp</span>
+                <h1 id="catalog-title">Đẹp theo cách<br><em>của riêng bạn.</em></h1>
+                <p>Từ chăm sóc làn da đến một sắc son yêu thích.<br class="d-none d-md-inline"> Tìm điều khiến bạn rạng rỡ mỗi ngày.</p>
+                <span class="catalog-signature"><i class="bi bi-flower1" aria-hidden="true"></i> Một chút yêu chiều, dành riêng cho bạn.</span>
+            </div>
+            <div class="catalog-intro-visual">
+                <img src="/images/home/beauty-editorial-v1-small.webp" width="640" height="800" fetchpriority="high"
+                     alt="Ảnh minh họa serum, kem dưỡng và son môi trong ánh nắng dịu nhẹ">
+            </div>
         </div>
     </div>
 </section>
 <section class="shop-collection">
     <div class="container">
-        <nav class="shop-category-nav" aria-label="Danh mục sản phẩm">
-            <a th:classappend="${selectedCategory == ''} ? 'active'" th:href="@{/products(q=${searchQuery},sort=${selectedSort})}">Tất cả</a>
-            <a th:each="category : ${categories}" th:text="${category.name}" th:classappend="${selectedCategory == category.slug} ? 'active'"
-               th:href="@{/products(category=${category.slug},q=${searchQuery},sort=${selectedSort})}"></a>
-        </nav>
         <div class="shop-results-bar">
-            <p><strong th:text="${productPage.totalElements}">100</strong> sản phẩm <span th:if="${searchQuery != ''}">cho “<span th:text="${searchQuery}"></span>”</span></p>
+            <div class="catalog-results-copy">
+                <h2 th:text="${catalogTitle}">Khám phá sản phẩm</h2>
+                <p><strong th:text="${productPage.totalElements}">100</strong> sản phẩm <span th:if="${searchQuery != ''}">cho “<span th:text="${searchQuery}"></span>”</span>
+                    <a class="catalog-reset" th:if="${searchQuery != '' || selectedCategory != ''}" href="/products">Xóa bộ lọc <i class="bi bi-x" aria-hidden="true"></i></a>
+                </p>
+            </div>
             <form method="get" th:action="@{/products}" class="shop-sort-form">
                 <input type="hidden" name="category" th:value="${selectedCategory}">
                 <input type="hidden" name="q" th:value="${searchQuery}">
@@ -43,5 +55,6 @@
         </nav>
     </div>
 </section>
+</div>
 </body>
 </html>

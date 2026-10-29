@@ -18,6 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const sameCategory = (destination.searchParams.get("category") || "") === (currentUrl.searchParams.get("category") || "");
         const isDetail = currentUrl.pathname.startsWith("/products/") && destination.pathname === "/products" && !destination.search;
         if ((destination.pathname === currentUrl.pathname && sameCategory) || isDetail) link.setAttribute("aria-current", "page");
+        // The header is the catalog's single category menu. Keep the customer's search and ordering.
+        if (currentUrl.pathname === "/products" && destination.pathname === "/products") {
+            for (const key of ["q", "sort"]) {
+                const value = currentUrl.searchParams.get(key);
+                if (value) destination.searchParams.set(key, value);
+            }
+            link.href = destination.pathname + destination.search;
+        }
     });
     if (mainMenu && menuToggle) {
         mainMenu.addEventListener("shown.bs.collapse", () => menuToggle.setAttribute("aria-label", "Đóng menu"));
