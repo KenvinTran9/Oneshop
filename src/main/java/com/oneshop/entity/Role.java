@@ -1,14 +1,17 @@
 package com.oneshop.entity;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
-@Document("roles")
+@Entity
+@Table(name = "roles")
 public class Role extends BaseEntity {
 
-    @Indexed(unique = true, collation = "{ 'locale': 'en', 'strength': 2 }")
+    @Column(nullable = false, unique = true, length = 50)
     private String name;
 
+    @Column(length = 200)
     private String description;
 
     public String getName() {

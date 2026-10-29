@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("dev")
 @Order(30)
-@ConditionalOnProperty(name = "app.dev.seed-stock", havingValue = "true")
+@ConditionalOnProperty(name = {"app.dev.seed-stock", "app.seed.enabled"}, havingValue = "true", matchIfMissing = true)
 public class DevStockInitializer implements CommandLineRunner {
     private static final Logger LOG = LoggerFactory.getLogger(DevStockInitializer.class);
     private final ProductRepository products;

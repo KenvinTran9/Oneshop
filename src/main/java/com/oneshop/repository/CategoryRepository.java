@@ -2,9 +2,9 @@ package com.oneshop.repository;
 
 import com.oneshop.entity.Category;
 import java.util.Optional;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CategoryRepository extends MongoRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findBySlug(String slug);
 }

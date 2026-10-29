@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("dev")
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "app.seed.enabled", matchIfMissing = true)
 @org.springframework.core.annotation.Order(20)
 public class CatalogDataInitializer implements CommandLineRunner {
 

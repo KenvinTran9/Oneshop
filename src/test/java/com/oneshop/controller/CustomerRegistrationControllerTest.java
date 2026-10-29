@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class CustomerRegistrationControllerTest extends com.oneshop.MongoIntegrationTestSupport {
+class CustomerRegistrationControllerTest extends com.oneshop.MySqlIntegrationTestSupport {
 
     private static final String PASSWORD = "TestPassword!42";
 
@@ -52,7 +52,7 @@ class CustomerRegistrationControllerTest extends com.oneshop.MongoIntegrationTes
         customerRole = new Role();
         customerRole.setName("CUSTOMER");
         customerRole.setDescription("Khach hang");
-        customerRole = roleRepository.save(customerRole);
+        customerRole = roleRepository.saveAndFlush(customerRole);
     }
 
     @Test
@@ -203,6 +203,6 @@ class CustomerRegistrationControllerTest extends com.oneshop.MongoIntegrationTes
         user.setPhone("0987654321");
         user.setPassword(passwordEncoder.encode(PASSWORD));
         user.setRole(customerRole);
-        return userRepository.save(user);
+        return userRepository.saveAndFlush(user);
     }
 }

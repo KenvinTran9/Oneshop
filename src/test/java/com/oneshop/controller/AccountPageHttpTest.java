@@ -2,7 +2,7 @@ package com.oneshop.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.oneshop.MongoIntegrationTestSupport;
+import com.oneshop.MySqlIntegrationTestSupport;
 import java.net.CookieManager;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -18,7 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class AccountPageHttpTest extends MongoIntegrationTestSupport {
+class AccountPageHttpTest extends MySqlIntegrationTestSupport {
     @LocalServerPort private int port;
 
     @Test

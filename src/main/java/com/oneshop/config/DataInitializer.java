@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @Profile("dev")
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "app.seed.enabled", matchIfMissing = true)
 public class DataInitializer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataInitializer.class);

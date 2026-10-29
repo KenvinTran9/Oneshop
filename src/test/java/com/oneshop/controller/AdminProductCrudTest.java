@@ -25,6 +25,7 @@ import com.oneshop.entity.Product;
 import com.oneshop.entity.ProductStatus;
 import com.oneshop.repository.BrandRepository;
 import com.oneshop.repository.CategoryRepository;
+import com.oneshop.repository.CartItemRepository;
 import com.oneshop.repository.CartRepository;
 import com.oneshop.repository.OrderItemRepository;
 import com.oneshop.repository.OrderRepository;
@@ -55,7 +56,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class AdminProductCrudTest extends com.oneshop.MongoIntegrationTestSupport {
+class AdminProductCrudTest extends com.oneshop.MySqlIntegrationTestSupport {
 
     private static final String ADMIN = "admin@oneshop.test";
 
@@ -66,6 +67,7 @@ class AdminProductCrudTest extends com.oneshop.MongoIntegrationTestSupport {
     @Autowired private BrandRepository brandRepository;
     @Autowired private OrderItemRepository orderItemRepository;
     @Autowired private OrderRepository orderRepository;
+    @Autowired private CartItemRepository cartItemRepository;
     @Autowired private CartRepository cartRepository;
     @Autowired private StoreStockRepository storeStockRepository;
     @Autowired private UserRepository userRepository;
@@ -84,12 +86,12 @@ class AdminProductCrudTest extends com.oneshop.MongoIntegrationTestSupport {
         category = new Category();
         category.setName("Chăm sóc da");
         category.setSlug("cham-soc-da-admin-test");
-        category = categoryRepository.save(category);
+        category = categoryRepository.saveAndFlush(category);
 
         brand = new Brand();
         brand.setName("One Beauty");
         brand.setSlug("one-beauty-admin-test");
-        brand = brandRepository.save(brand);
+        brand = brandRepository.saveAndFlush(brand);
     }
 
     @AfterEach
@@ -235,14 +237,14 @@ class AdminProductCrudTest extends com.oneshop.MongoIntegrationTestSupport {
         order.setCustomerPhone("0912345678");
         order.setShippingAddress("Test address");
         order.setTotalAmount(new BigDecimal("50000"));
-        order = orderRepository.save(order);
+        order = orderRepository.saveAndFlush(order);
         OrderItem item = new OrderItem();
         item.setOrder(order);
         item.setProduct(product);
         item.setQuantity(1);
         item.setUnitPrice(new BigDecimal("50000"));
         item.setLineTotal(new BigDecimal("50000"));
-        orderItemRepository.save(item);
+        orderItemRepository.saveAndFlush(item);
 
         mockMvc.perform(post("/admin/products/{id}/deactivate", product.getId())
                         .with(user(ADMIN).roles("ADMIN")).with(csrf()))
@@ -259,7 +261,7 @@ class AdminProductCrudTest extends com.oneshop.MongoIntegrationTestSupport {
     void uploadsImageThroughCloudinaryServiceAndPreservesExistingDataWhenUploadFails() throws Exception {
         Product product = persistProduct("image-old-name", "IMAGE-OLD-SKU");
         product.setImageUrl("https://images.example.test/original.jpg");
-        productRepository.save(product);
+        productRepository.saveAndFlush(product);
         MockMultipartFile image = pngImage();
 
         when(cloudinaryService.uploadProductImage(any())).thenReturn("https://images.example.test/new.png");
@@ -309,7 +311,7 @@ class AdminProductCrudTest extends com.oneshop.MongoIntegrationTestSupport {
         product.setStatus(ProductStatus.ACTIVE);
         product.setCategory(category);
         product.setBrand(brand);
-        return productRepository.save(product);
+        return productRepository.saveAndFlush(product);
     }
 
     private MockMultipartFile pngImage() {
@@ -320,6 +322,7 @@ class AdminProductCrudTest extends com.oneshop.MongoIntegrationTestSupport {
     private void clearFixtures() {
         orderItemRepository.deleteAll();
         orderRepository.deleteAll();
+        cartItemRepository.deleteAll();
         cartRepository.deleteAll();
         storeStockRepository.deleteAll();
         productRepository.deleteAll();

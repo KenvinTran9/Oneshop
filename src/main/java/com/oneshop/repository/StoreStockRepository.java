@@ -1,11 +1,20 @@
 package com.oneshop.repository;
+
 import com.oneshop.entity.StoreStock;
 import java.util.List;
-import java.util.Optional;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-public interface StoreStockRepository extends MongoRepository<StoreStock, Long>, StockQueries {
-    @Query("{'store': ?0}") List<StoreStock> findByStoreId(Long storeId);
-    @Query("{'product': ?0}") List<StoreStock> findByProductId(Long productId);
-    @Query("{'store': ?0, 'product': ?1}") Optional<StoreStock> findByStoreIdAndProductId(Long storeId, Long productId);
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+public interface StoreStockRepository extends JpaRepository<StoreStock, Long> {
+
+    java.util.Optional<StoreStock> findByStoreIdAndProductId(Long storeId, Long productId);
+
+    List<StoreStock> findByStoreId(Long storeId);
+
+    List<StoreStock> findByProductId(Long productId);
+
+    @Query("select coalesce(sum(stock.quantity), 0) from StoreStock stock "
+            + "where stock.product.id = :productId and stock.active = true and stock.store.active = true")
+    long sumAvailableQuantityByProductId(@Param("productId") Long productId);
 }

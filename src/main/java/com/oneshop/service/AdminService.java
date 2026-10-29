@@ -27,9 +27,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Transactional(readOnly = true)
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminService {
 
@@ -109,6 +111,7 @@ public class AdminService {
                 .toList();
     }
 
+    @Transactional
     public Product saveProduct(Long id, AdminProductForm form) {
         String slug = form.getSlug().trim().toLowerCase(Locale.ROOT);
         String sku = form.getSku().trim().toUpperCase(Locale.ROOT);
@@ -147,26 +150,28 @@ public class AdminService {
         }
 
         try {
-            return productRepository.save(product);
+            return productRepository.saveAndFlush(product);
         } catch (DataIntegrityViolationException exception) {
             throw new DuplicateProductFieldException("sku", "SKU hoặc slug đã tồn tại. Vui lòng kiểm tra lại.");
         }
     }
 
+    @Transactional
     public Product toggleBusinessStatus(Long id) {
         Product product = findProduct(id);
         boolean activate = !product.isActive() || product.getStatus() != ProductStatus.ACTIVE;
         product.setActive(activate);
         product.setStatus(activate ? ProductStatus.ACTIVE : ProductStatus.DISCONTINUED);
-        return productRepository.save(product);
+        return productRepository.saveAndFlush(product);
     }
 
+    @Transactional
     public Product deactivateProduct(Long id) {
         Product product = findProduct(id);
         product.setActive(false);
         product.setStatus(ProductStatus.DISCONTINUED);
         // Never hard-delete: order_items and carts may refer to this product.
-        return productRepository.save(product);
+        return productRepository.saveAndFlush(product);
     }
 
     private String uploadImageIfProvided(MultipartFile image) {

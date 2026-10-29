@@ -22,6 +22,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class CartService {
     public static final String GUEST_CART_SESSION_ATTRIBUTE = "oneshop.guestCart";
     public static final int MAX_QUANTITY_PER_SKU = 99;
@@ -39,6 +40,7 @@ public class CartService {
         this.userRepository = userRepository;
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public CartView getCart(String email, HttpSession session) {
         if (email != null) {
             return cartRepository.findByUserEmailIgnoreCase(email)
@@ -52,6 +54,7 @@ public class CartService {
         return buildCart(items);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public long getItemCount(String email, HttpSession session) {
         return email != null ? cartRepository.findByUserEmailIgnoreCase(email).map(cart -> cart.getItems().stream().mapToLong(CartItem::getQuantity).sum()).orElse(0L)
                 : guestItems(session).values().stream().mapToLong(Integer::longValue).sum();
@@ -120,15 +123,14 @@ public class CartService {
         if (email == null) {
             if (session != null) session.removeAttribute(GUEST_CART_SESSION_ATTRIBUTE);
         } else {
-            cartRepository.findByUserEmailIgnoreCase(email)
-                    .ifPresent(cart -> changeCart(email, current -> current.getItems().clear()));
+            changeCart(email, current -> current.getItems().clear());
         }
     }
 
     public void mergeGuestCart(String email, HttpSession session) {
         var guest = guestItems(session);
         if (email == null || guest.isEmpty()) return;
-        // All choices are merged in one versioned cart document; no partial multi-document merge.
+        // Merge every selection in one SQL transaction.
         changeCart(email, cart -> guest.forEach((key, count) -> productRepository.findById(key.productId()).ifPresent(product -> {
             CartItem item = findItem(cart, key).orElseGet(() -> newCartItem(cart, product, key));
             item.setQuantity(Math.min(MAX_QUANTITY_PER_SKU, item.getQuantity() + count));
@@ -231,17 +233,12 @@ public class CartService {
     }
 
     private void changeCart(String email, java.util.function.Consumer<Cart> change) {
-        for (int attempt = 0; attempt < 4; attempt++) {
-            try {
-                Cart cart = getOrCreateCart(email);
-                change.accept(cart);
-                cartRepository.save(cart);
-                return;
-            } catch (org.springframework.dao.OptimisticLockingFailureException | org.springframework.dao.DuplicateKeyException conflict) {
-                // Reload before retrying; a failed versioned save did not apply the mutation.
-            }
-        }
-        throw new CartOperationException("Giỏ hàng vừa được thay đổi ở nơi khác. Vui lòng thử lại.");
+        // Lock the account even when it has no cart yet, serializing concurrent first adds.
+        userRepository.findForCartChange(email)
+                .orElseThrow(() -> new CartOperationException("Không thể xác định tài khoản hiện tại."));
+        Cart cart = getOrCreateCart(email);
+        change.accept(cart);
+        cartRepository.saveAndFlush(cart);
     }
 
     private java.util.Optional<CartItem> findItem(Cart cart, CartSelection key) {
@@ -249,7 +246,7 @@ public class CartService {
     }
 
     private CartItem newCartItem(Cart cart, Product product, CartSelection key) {
-        CartItem item = new CartItem(); item.setProduct(product);
+        CartItem item = new CartItem(); item.setCart(cart); item.setProduct(product);
         item.setSelectedSize(key.size()); item.setSelectedShade(key.shade());
         cart.getItems().add(item);
         return item;

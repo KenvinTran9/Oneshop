@@ -16,3 +16,10 @@ application-local.yml
 
 ### Logs ###
 *.log
+
+### Python ###
+__pycache__/
+*.pyc
+
+### Private database backups ###
+/backups/

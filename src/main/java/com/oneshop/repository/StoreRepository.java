@@ -3,9 +3,9 @@ package com.oneshop.repository;
 import com.oneshop.entity.Store;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface StoreRepository extends MongoRepository<Store, Long> {
+public interface StoreRepository extends JpaRepository<Store, Long> {
 
     List<Store> findByActiveTrueOrderByNameAsc();
 

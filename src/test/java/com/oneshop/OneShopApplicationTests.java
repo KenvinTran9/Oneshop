@@ -6,7 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class OneShopApplicationTests extends com.oneshop.MongoIntegrationTestSupport {
+class OneShopApplicationTests extends com.oneshop.MySqlIntegrationTestSupport {
     @org.springframework.beans.factory.annotation.Autowired
     org.springframework.context.ApplicationContext context;
 

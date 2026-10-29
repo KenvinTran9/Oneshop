@@ -6,43 +6,48 @@
 
 ## Công nghệ và lưu dữ liệu
 
-- Java 21, Spring Boot 3.5.16, Spring Security (form login + JWT).
-- Spring Data MongoDB; MongoDB là database duy nhất, không còn JPA/Hibernate/H2 hoặc các profile SQL.
-- Thymeleaf, Bootstrap, SiteMesh, ảnh sản phẩm cục bộ và Cloudinary tùy chọn.
-- Tài khoản, sản phẩm, danh mục, thương hiệu, cửa hàng, tồn kho và đơn hàng lưu bằng MongoDB document. Giỏ tài khoản có các dòng màu/quy cách nhúng trong cùng document.
+- Java 21, Spring Boot 3.5.16 và Spring Security (form login + JWT API).
+- Spring Data JPA/Hibernate và MySQL 8.4; tài khoản, sản phẩm, giỏ và tồn kho dùng bảng SQL có khóa ngoại.
+- Thymeleaf, Bootstrap 5, SiteMesh; tích hợp upload Cloudinary cần cấu hình tài khoản cloud để sử dụng thật.
+- Xem [đối chiếu yêu cầu đồ án](docs/project-requirements.md) và [hướng dẫn MySQL](docs/mysql.md).
 
 ## Chạy local
 
-Cần Java 21, Maven và MongoDB đang chạy ở `127.0.0.1:27017`:
+Cần Java 21, Maven và MySQL đang chạy. Database local là `oneshop_mysql` trên `127.0.0.1:3306`.
+
+Tạo database một lần nếu chưa có:
+
+```sql
+CREATE DATABASE oneshop_mysql CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci;
+```
+
+Điền thông tin MySQL vào `.env` theo [.env.example](.env.example), rồi chạy:
 
 ```powershell
 $env:JAVA_HOME = 'C:\Program Files\Java\jdk-21'
-mvn spring-boot:run "-Dspring-boot.run.profiles=dev"
+mvn spring-boot:run '-Dspring-boot.run.profiles=dev'
 ```
 
-Mở [OneShop](http://localhost:8080/) hoặc kết nối MongoDB Compass với `mongodb://127.0.0.1:27017`, database `oneshop`. Dữ liệu giữ nguyên sau khi khởi động lại Java. Spring Boot không tự đọc `.env`; đặt biến trong shell/IDE hoặc cấu hình môi trường triển khai.
+Mở [OneShop](http://localhost:8080/). Profile `dev` tự đọc `.env` dưới dạng Java properties; file này bị loại khỏi Git. Production dùng biến môi trường hoặc secret manager.
 
-Profile `dev` tự nạp 100 SKU còn thiếu, 5 danh mục, 59 thương hiệu và cửa hàng mẫu. Nó tạo **20 đơn vị tồn kho thử** cho mỗi SKU ở cửa hàng `HCM-D1` khi chưa có bản ghi. Giá, thông tin sản phẩm, mật khẩu và số tồn đã chỉnh (kể cả 0) không bị ghi đè. Tắt tạo tồn mẫu bằng `APP_DEV_SEED_STOCK=false`. Đây là dữ liệu để thử local, không phải số tồn kinh doanh thực tế.
+Profile `dev` bổ sung 100 SKU còn thiếu, 5 danh mục, 59 thương hiệu và cửa hàng mẫu. Nó tạo **20 đơn vị tồn kho thử** cho mỗi SKU tại `HCM-D1` khi chưa có bản ghi. Giá, thông tin sản phẩm, mật khẩu và số tồn đã chỉnh (kể cả 0) không bị ghi đè. `APP_DEV_SEED_STOCK=false` tắt tồn mẫu; `APP_SEED_ENABLED=false` tắt toàn bộ bộ nạp. Đây là dữ liệu thử local, không phải số tồn kinh doanh thực tế.
 
-Không có profile mặc định; chỉ định `dev`, `test` hoặc `prod`. `dev` bị từ chối khi bật cùng `prod`/`production`. Các role `ADMIN`/`CUSTOMER` là dữ liệu nền được tạo idempotent; tài khoản demo và danh mục/tồn mẫu chỉ được nạp ở dev.
+Không có profile mặc định; chỉ định `dev`, `test` hoặc `prod`. Không bật `dev` cùng `prod`/`production`. Các role `ADMIN`/`CUSTOMER` được tạo khi thiếu; tài khoản demo và danh mục/tồn mẫu chỉ được nạp ở dev.
 
 ### Kiểm thử
 
 ```powershell
-mvn verify
+mvn verify '-Doneshop.build.directory=C:\OneShop\target\mysql-build' '-DargLine=-Djdk.net.unixdomain.tmpdir=C:\OneShop\target'
+python tools/test_mysql_migration.py
 ```
 
-Kiểm thử dùng MongoDB thật với database mới ngẫu nhiên `oneshop_test_<uuid>`; không dùng database `oneshop` và không thay MongoDB bằng mock. `ONESHOP_TEST_MONGODB_URI` chỉ định server thử khi cần, tên database luôn được thay bằng tên ngẫu nhiên riêng. Chỉ database do lượt kiểm thử đó tạo mới được xóa khi JVM kết thúc. Tài khoản kết nối test cần quyền tạo/xóa database thử.
+Kiểm thử dùng MySQL thật với schema ngẫu nhiên `oneshop_test_<uuid>`, không xóa dữ liệu ứng dụng. Cấu hình kết nối đọc từ môi trường hoặc `.env`; `ONESHOP_TEST_MYSQL_URL` có thể trỏ tới server test riêng, tên database luôn được thay bằng schema thử. Tài khoản test cần quyền tạo/xóa schema thử.
 
-Trên Windows này, nếu cần thư mục socket và tránh IDE tự ghi đè class trong `target/classes`, dùng:
+### Triển khai và dữ liệu
 
-```powershell
-mvn verify "-Doneshop.build.directory=C:\OneShop\target\mongodb-build" "-DargLine=-Djdk.net.unixdomain.tmpdir=C:\OneShop\target"
-```
+Profile `prod` yêu cầu `MYSQL_URL`, `MYSQL_USERNAME`, `MYSQL_PASSWORD` và các biến JWT. Hibernate dùng `validate`; cần tạo schema trước khi chạy. Không dùng tài khoản root và cấu hình kết nối local không xác minh TLS cho production. Không nạp dữ liệu demo ở prod.
 
-### Triển khai
-
-Profile `prod` yêu cầu `MONGODB_URI` và đầy đủ biến JWT ở phần dưới. URI có thể trỏ tới MongoDB Atlas hoặc server riêng. Các unique index được tạo từ mapping; ứng dụng không tự xóa collection hoặc chuyển dữ liệu SQL cũ. Bộ dữ liệu local không được nạp trong prod. Xem [docs/mongodb.md](docs/mongodb.md) cho cấu trúc lưu trữ và giới hạn giao dịch.
+Bản MongoDB trước đó đã được chuyển sang MySQL; dữ liệu gốc và bản sao riêng được giữ. Bản sao trước khi cài lại MySQL nằm ở `backups/before-reinstall-2026-10-30/`, không đưa lên Git. Xem [docs/mysql.md](docs/mysql.md) để biết cấu trúc, quan hệ và phạm vi giao dịch.
 
 ## 🔑 Tài khoản mẫu (chỉ profile `dev`)
 
@@ -82,7 +87,7 @@ $bytes = New-Object byte[] 32
 [Convert]::ToBase64String($bytes)
 ```
 
-Không commit secret thật. File [.env.example](.env.example) chỉ liệt kê tên biến và giá trị mẫu; Spring Boot không tự động nạp `.env`, vì vậy hãy cấu hình biến trong shell, IDE, container hoặc secret manager của môi trường triển khai.
+Không commit secret thật. File [.env.example](.env.example) liệt kê tên biến và giá trị mẫu; profile `dev` nạp `.env` dưới dạng Java properties. Production dùng biến trong shell, IDE, container hoặc secret manager.
 
 Profile `dev` có một khóa công khai chỉ dành cho local để khởi chạy nhanh. Không sử dụng profile hoặc khóa này trong môi trường dùng chung/production. Không có profile mặc định; hãy chỉ định rõ `dev`, `test` hoặc `prod`.
 
@@ -125,7 +130,7 @@ Mỗi sản phẩm có ảnh cục bộ, một giá bán cố định bằng VN�
 
 Trang bán hàng không hiển thị thông tin đối chiếu bên ngoài. Các trường `priceSourceUrl`, `imageSourceUrl` và ngày kiểm tra chỉ được giữ nội bộ trong dữ liệu. Các giá ngoại tệ đã được khởi tạo thành một mức VNĐ, làm tròn 1.000 đồng, theo tỷ giá bán Vietcombank được đối chiếu ngày 26/10/2026 (USD 26.020; GBP 35.132,35); các trường gốc được giữ để kiểm tra nội bộ. Có thể chỉnh giá bán trong JSON trước khi nạp hoặc qua dữ liệu quản trị. Quy cách được chuẩn hóa theo phiên bản niêm yết, gồm COSRX Vitamin C 23 (20 g), ILLIYOON (230 ml) và Eucerin UreaRepair 5% (kem dưỡng tay 75 ml).
 
-Giao diện có tìm sản phẩm/thương hiệu, lọc danh mục, sắp xếp tên/giá, chọn màu và số lượng. `/cart` lưu riêng từng sản phẩm/màu/quy cách: khách vãng lai dùng session, khách đăng nhập dùng database và gộp đúng lựa chọn khi đăng nhập. Máy chủ xác thực màu/quy cách, lấy ảnh riêng của màu và tính lại giá; thêm/cập nhật kiểm tra tổng số lượng mọi lựa chọn với tồn chung của sản phẩm. UI có đổi số lượng 1–99, cập nhật, xóa từng lựa chọn, tổng tiền và liên kết chi tiết đúng sản phẩm. Thanh toán trực tuyến chưa được triển khai; liên kết đặt hàng dẫn tới trang liên hệ cửa hàng. Xem [docs/cart-selections.md](docs/cart-selections.md) cho hành vi và cấu trúc document.
+Giao diện có tìm sản phẩm/thương hiệu, lọc danh mục, sắp xếp tên/giá, chọn màu và số lượng. `/cart` lưu riêng từng sản phẩm/màu/quy cách: khách vãng lai dùng session, khách đăng nhập dùng database và gộp đúng lựa chọn khi đăng nhập. Máy chủ xác thực màu/quy cách, lấy ảnh riêng của màu và tính lại giá; thêm/cập nhật kiểm tra tổng số lượng mọi lựa chọn với tồn chung của sản phẩm. UI có đổi số lượng 1–99, cập nhật, xóa từng lựa chọn, tổng tiền và liên kết chi tiết đúng sản phẩm. Thanh toán trực tuyến chưa được triển khai; liên kết đặt hàng dẫn tới trang liên hệ cửa hàng. Xem [docs/cart-selections.md](docs/cart-selections.md) cho hành vi và cấu trúc bảng.
 
 Ảnh sản phẩm nằm trong `src/main/resources/static/images/catalog/`. CSS/JS mới tại `static/css/shop.css` và `static/js/shop.js`. Kiểm thử giỏ máy chủ: `mvn -Dtest=CartControllerTest test`; kiểm thử toàn bộ: `mvn test`. Các tiện ích giỏ localStorage cũ vẫn có kiểm thử độc lập trong `tools/test_shop_cart.cjs` nhưng không phải luồng giỏ máy chủ hiện tại.
 

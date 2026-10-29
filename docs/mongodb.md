@@ -1,4 +1,6 @@
-# MongoDB backend
+# Lịch sử backend MongoDB
+
+> Tài liệu lưu lại bản cũ. Dự án hiện dùng JPA + MySQL; xem [mysql.md](mysql.md). Các cấu hình và kiểm thử bên dưới mô tả thời điểm trước khi chuyển đổi.
 
 MongoDB là database duy nhất của bản hiện tại. Không tự nhập dữ liệu từ server SQL khác. Khi chuyển đổi trên máy này, chưa có database OneShop trong MongoDB; bản dev tạo database `oneshop` và nạp danh mục cục bộ. Các database khác trên server không được đọc hoặc thay đổi bởi bộ nạp.
 

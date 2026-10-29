@@ -7,10 +7,18 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 20MB
-  data:
-    mongodb:
-      uri: ${MONGODB_URI}
-      auto-index-creation: true
+  datasource:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_batch_fetch_size: 24
 
 server:
   port: 8080

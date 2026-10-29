@@ -1,19 +1,29 @@
 package com.oneshop.entity;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.ArrayList;
 import java.util.List;
 
-@Document("shopping_carts")
+@Entity
+@Table(name = "shopping_carts", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_shopping_cart_user", columnNames = "user_id")
+})
 public class Cart extends BaseEntity {
 
-    @DocumentReference
-    @Indexed(unique = true)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<CartItem> items = new ArrayList<>();
 
     public User getUser() {

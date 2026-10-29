@@ -1,10 +1,19 @@
 package com.oneshop.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class ProductShade {
+    @Column(name = "shade_label", length = 100)
     private String label;
+    @Column(name = "shade_color", length = 7)
     private String color;
+    @Column(name = "shade_image_url", length = 300)
     private String imageUrl;
+    @Column(name = "shade_image_alt", length = 300)
     private String imageAlt;
+    @Column(name = "shade_image_type", length = 20)
     private String imageType;
 
     public ProductShade() { }

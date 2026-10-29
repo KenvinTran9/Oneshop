@@ -1,13 +1,21 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   thymeleaf:
     cache: false
-  data:
-    mongodb:
-      uri: ${MONGODB_URI:mongodb://127.0.0.1:27017/oneshop}
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://127.0.0.1:3306/oneshop_mysql?connectionTimeZone=Asia/Ho_Chi_Minh&characterEncoding=UTF-8}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 app:
+  seed:
+    enabled: ${APP_SEED_ENABLED:true}
   dev:
-    seed-stock: true
+    seed-stock: ${APP_DEV_SEED_STOCK:true}
   jwt:
     # Public development-only key. Override JWT_SECRET for shared environments.
     secret: ${JWT_SECRET:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=}

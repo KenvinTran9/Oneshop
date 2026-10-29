@@ -4,7 +4,7 @@
 
 - `/register`: tạo tài khoản khách hàng; họ tên, email, điện thoại và mật khẩu được kiểm tra ở backend.
 - `/login`: đăng nhập bằng email và mật khẩu. Khách hàng về trang chủ; admin về `/admin`.
-- Tài khoản nằm trong collection `oneshop.users`. Mật khẩu được băm bằng BCrypt, không lưu nguyên văn. Không có mật khẩu mặc định được ghi trong mã nguồn.
+- Tài khoản nằm trong bảng `oneshop_mysql.users`. Mật khẩu được băm bằng BCrypt, không lưu nguyên văn. Không có mật khẩu mặc định được ghi trong mã nguồn.
 - Email được chuẩn hóa và có chỉ mục duy nhất. Đăng ký trùng email hiển thị lỗi ngay trong form.
 - Form có CSRF, nút hiện/ẩn mật khẩu và kiểm tra xác nhận mật khẩu. Backend vẫn kiểm tra khi JavaScript tắt hoặc yêu cầu được gửi trực tiếp.
 
@@ -18,15 +18,15 @@ Tài khoản admin được cấp riêng. Khi phát triển local, cơ chế có
 
 ## Kiểm thử
 
-Chạy Maven với MongoDB local đang hoạt động:
+Chạy Maven với MySQL local đang hoạt động:
 
 ```powershell
-mvn verify '-Doneshop.build.directory=C:\OneShop\target\auth-build' '-DargLine=-Djdk.net.unixdomain.tmpdir=C:\OneShop\target'
+mvn verify '-Doneshop.build.directory=C:\OneShop\target\mysql-build' '-DargLine=-Djdk.net.unixdomain.tmpdir=C:\OneShop\target'
 ```
 
-Các bài kiểm thử dùng database ngẫu nhiên riêng, không sửa dữ liệu `oneshop`.
+Các bài kiểm thử dùng schema ngẫu nhiên riêng, không sửa dữ liệu `oneshop_mysql`.
 
-- Đăng ký → đọc tài khoản từ MongoDB → đăng nhập bằng mật khẩu thực → kiểm tra quyền khách hàng.
+- Đăng ký → đọc tài khoản từ MySQL → đăng nhập bằng mật khẩu thực → kiểm tra quyền khách hàng.
 - Admin đăng nhập qua cùng form và truy cập trang đăng sản phẩm.
 - Từ chối tài khoản bị khóa, sai mật khẩu và thiếu CSRF; đăng xuất hủy phiên.
 - Khách hàng không thể thêm, sửa, đổi trạng thái hoặc ngừng kinh doanh sản phẩm ngay cả khi gửi POST với CSRF hợp lệ.

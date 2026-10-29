@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.oneshop.MongoIntegrationTestSupport;
+import com.oneshop.MySqlIntegrationTestSupport;
 import com.oneshop.entity.Role;
 import com.oneshop.entity.User;
 import com.oneshop.repository.RoleRepository;
@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class AuthenticationFlowTest extends MongoIntegrationTestSupport {
+class AuthenticationFlowTest extends MySqlIntegrationTestSupport {
     private static final String PASSWORD = "OneShopTest!2026";
     @Autowired private MockMvc mvc;
     @Autowired private UserRepository users;
@@ -33,7 +33,7 @@ class AuthenticationFlowTest extends MongoIntegrationTestSupport {
     @Autowired private PasswordEncoder encoder;
 
     @Test
-    void registeredCustomerCanLoginWithMongoCredentialsButCannotPublishProducts() throws Exception {
+    void registeredCustomerCanLoginWithMySqlCredentialsButCannotPublishProducts() throws Exception {
         role("CUSTOMER");
         mvc.perform(post("/register").with(csrf())
                         .param("fullName", "Khách OneShop").param("phone", "0912345678")
