@@ -33,7 +33,7 @@ Thiết lập profile `prod`, HTTPS, JWT secret/issuer/expiry, database, Cloudin
 Giới hạn hiện tại cần tính khi đưa lên nhiều instance:
 
 - Throttle là bộ nhớ từng instance; cần giới hạn tập trung ở WAF/API gateway hoặc kho dùng chung cho nhiều máy. Sau reverse proxy, phải cấu hình proxy tin cậy đúng theo hosting trước khi dựa vào IP khách; không bật tin mọi forwarding header.
-- Session web/giỏ khách vẫn ở bộ nhớ, cần Spring Session JDBC/Redis để sống qua restart và scale. Giỏ tài khoản và đơn lưu MySQL.
+- Profile prod lưu session web/giỏ khách và CSRF trong MySQL qua Spring Session JDBC, cookie Secure/HttpOnly/SameSite=Lax. Local dev giữ servlet session trong bộ nhớ. Giỏ tài khoản và đơn lưu MySQL.
 - JWT hiện chưa có danh sách thu hồi/refresh-token rotation lưu database. Đăng xuất web hủy session web; token API đã cấp còn hiệu lực đến hạn (hoặc khi khóa tài khoản/đổi khóa ký). Không trình bày rằng logout web thu hồi mọi token.
 - Đây là tăng cường các luồng hiện có, chưa phải chứng nhận pentest hay cam kết an toàn tuyệt đối.
 

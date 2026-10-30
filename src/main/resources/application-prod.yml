@@ -3,6 +3,15 @@ spring:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 10000
+      data-source-properties:
+        sslMode: VERIFY_IDENTITY
+        trustCertificateKeyStoreUrl: ${MYSQL_TRUSTSTORE_URL:file:/tmp/aiven-truststore.p12}
+        trustCertificateKeyStoreType: PKCS12
+        trustCertificateKeyStorePassword: changeit
   jpa:
     hibernate:
       ddl-auto: validate
@@ -10,7 +19,18 @@ spring:
     cache: true
 
 server:
+  forward-headers-strategy: native
+  # Render terminates HTTPS at its proxy. Do not trust arbitrary X-Forwarded-For for throttling.
+  tomcat:
+    remoteip:
+      remote-ip-header: ""
+      protocol-header: X-Forwarded-Proto
+      internal-proxies: '.*'
   servlet:
     session:
       cookie:
         secure: true
+
+app:
+  mail:
+    provider: ${MAIL_PROVIDER:resend}

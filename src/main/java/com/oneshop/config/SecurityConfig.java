@@ -62,7 +62,7 @@ public class SecurityConfig {
                                    AuthenticationThrottleFilter throttle) throws Exception {
         http.csrf(csrf -> csrf.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/products/**", "/stores/**", "/cart", "/cart/**",
+                        .requestMatchers("/", "/healthz", "/products/**", "/stores/**", "/cart", "/cart/**",
                                 "/login", "/register", "/account/status", "/css/**", "/js/**",
                                 "/images/**", "/decorators/**", "/webjars/**").permitAll()
                         .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")

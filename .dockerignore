@@ -1,0 +1,8 @@
+*
+!pom.xml
+!src/
+!src/main/
+!src/main/**
+!deploy/
+!deploy/start.sh
+# No .env, backups, database dumps, .git, tests, target/, or UI-only exports enter the image.

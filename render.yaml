@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: oneshop
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: MYSQL_URL
+        sync: false
+      - key: MYSQL_USERNAME
+        sync: false
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: MYSQL_CA_CERT_BASE64
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_ISSUER
+        value: oneshop
+      - key: JWT_ACCESS_TOKEN_EXPIRATION_MILLIS
+        value: "900000"
+      - key: JWT_REFRESH_TOKEN_EXPIRATION_MILLIS
+        value: "604800000"
+      - key: MAIL_ENABLED
+        value: "false"
+      - key: MAIL_PROVIDER
+        value: resend
+      - key: MAIL_FROM
+        value: onboarding@resend.dev
+      - key: RESEND_API_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

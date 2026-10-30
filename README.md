@@ -45,6 +45,9 @@ Kiểm thử dùng MySQL thật với schema ngẫu nhiên `oneshop_test_<uuid>`
 
 ### Triển khai và dữ liệu
 
+Deploy đầy đủ frontend + backend: [hướng dẫn Render + Aiven MySQL](docs/deploy-render-aiven.md).
+Dockerfile, profile prod, session JDBC và email Resend qua HTTPS đã được chuẩn bị; cần nhập secrets trên Render và triển khai service.
+
 Profile `prod` yêu cầu `MYSQL_URL`, `MYSQL_USERNAME`, `MYSQL_PASSWORD` và các biến JWT. Hibernate dùng `validate`; cần tạo schema trước khi chạy. Không dùng tài khoản root và cấu hình kết nối local không xác minh TLS cho production. Không nạp dữ liệu demo ở prod.
 
 Bản MongoDB trước đó đã được chuyển sang MySQL; dữ liệu gốc và bản sao riêng được giữ. Bản sao trước khi cài lại MySQL nằm ở `backups/before-reinstall-2026-10-30/`, không đưa lên Git. Xem [docs/mysql.md](docs/mysql.md) để biết cấu trúc, quan hệ và phạm vi giao dịch.

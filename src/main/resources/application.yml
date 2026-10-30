@@ -1,4 +1,7 @@
 spring:
+  autoconfigure:
+    # JDBC sessions are explicitly enabled only for production (and their isolated tests).
+    exclude: org.springframework.boot.autoconfigure.session.SessionAutoConfiguration
   application:
     name: oneshop
   mail:
@@ -52,8 +55,10 @@ app:
     shipping-fee: ${ORDER_SHIPPING_FEE:30000}
   mail:
     enabled: ${MAIL_ENABLED:false}
+    provider: ${MAIL_PROVIDER:smtp}
+    resend-api-key: ${RESEND_API_KEY:}
     from: ${MAIL_FROM:${MAIL_USERNAME:}}
-    base-url: ${APP_BASE_URL:http://localhost:8080}
+    base-url: ${APP_BASE_URL:${RENDER_EXTERNAL_URL:http://localhost:8080}}
   jwt:
     secret: ${JWT_SECRET}
     issuer: ${JWT_ISSUER}

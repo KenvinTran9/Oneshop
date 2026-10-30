@@ -16,7 +16,7 @@ public record OrderView(String code, OrderStatus status, LocalDateTime createdAt
     public String getEmailStatusLabel() {
         return switch (emailStatus == null ? "PENDING" : emailStatus) {
             case "SENT" -> "Đã gửi email xác nhận";
-            case "NOT_CONFIGURED" -> "Chưa cấu hình Gmail SMTP";
+            case "NOT_CONFIGURED" -> "Chưa cấu hình gửi email xác nhận";
             case "FAILED" -> "Gửi email thất bại — có thể thử lại";
             default -> "Đang chờ gửi email";
         };

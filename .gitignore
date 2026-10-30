@@ -12,6 +12,8 @@ Thumbs.db
 
 ### Environment ###
 .env
+.env.*
+!.env.example
 application-local.yml
 
 ### Logs ###
@@ -23,3 +25,8 @@ __pycache__/
 
 ### Private database backups ###
 /backups/
+
+### Static UI build / Vercel local metadata ###
+node_modules/
+dist-ui/
+.vercel/
