@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Quản lý sản phẩm - OneShop Admin</title>
+    <title>Quản lý sản phẩm - Quản trị OneShop</title>
 </head>
 <body>
 <div class="admin-page-title">
@@ -28,12 +28,12 @@
                 <td>
                     <div class="d-flex align-items-center gap-3">
                         <img class="admin-thumb" th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}" loading="lazy" th:alt="${product.name}">
-                        <span th:text="${product.name}">Ten san pham</span>
+                        <span th:text="${product.name}">Tên sản phẩm</span>
                     </div>
                 </td>
-                <td th:text="${product.category != null ? product.category.name : '-'}">Danh muc</td>
+                <td th:text="${product.category != null ? product.category.name : '-'}">Danh mục</td>
                 <td><span th:text="${product.displayPrice}">Liên hệ</span></td>
-                <td><span class="badge text-bg-success" th:text="${product.status}">ACTIVE</span></td>
+                <td><span class="badge text-bg-success" th:text="${product.status.label}">Đang bán</span></td>
                 <td>
                     <div class="d-flex flex-wrap gap-1">
                         <a class="btn btn-outline-secondary btn-sm" th:href="@{/admin/products/{id}(id=${product.id})}">Chi tiết</a>

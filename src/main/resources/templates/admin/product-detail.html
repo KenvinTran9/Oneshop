@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head><title th:text="${product.name} + ' - OneShop Admin'">Chi tiết sản phẩm</title></head>
+<head><title th:text="${product.name} + ' - Quản trị OneShop'">Chi tiết sản phẩm</title></head>
 <body>
 <div class="admin-page-title d-flex flex-wrap justify-content-between align-items-end gap-2">
     <div><span class="small text-muted">SKU <span class="font-monospace" th:text="${product.sku}">SKU</span></span><h2 th:text="${product.name}">Sản phẩm</h2></div>
@@ -16,12 +16,12 @@
         <div class="col-md-8">
             <dl class="row mb-0">
                 <dt class="col-sm-4">SKU</dt><dd class="col-sm-8 font-monospace" th:text="${product.sku}">SKU</dd>
-                <dt class="col-sm-4">Slug</dt><dd class="col-sm-8" th:text="${product.slug}">slug</dd>
+                <dt class="col-sm-4">Đường dẫn sản phẩm</dt><dd class="col-sm-8" th:text="${product.slug}">slug</dd>
                 <dt class="col-sm-4">Danh mục</dt><dd class="col-sm-8" th:text="${product.category != null ? product.category.name : '-'}">Danh mục</dd>
                 <dt class="col-sm-4">Thương hiệu</dt><dd class="col-sm-8" th:text="${product.brand != null ? product.brand.name : '-'}">Thương hiệu</dd>
                 <dt class="col-sm-4">Giá bán</dt><dd class="col-sm-8" th:text="${product.price != null ? #numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' ₫' : '-'}">0 ₫</dd>
                 <dt class="col-sm-4">Giá khuyến mãi</dt><dd class="col-sm-8" th:text="${product.salePrice != null ? #numbers.formatDecimal(product.salePrice, 0, 'COMMA', 0, 'POINT') + ' ₫' : '-'}">-</dd>
-                <dt class="col-sm-4">Trạng thái</dt><dd class="col-sm-8" th:text="${product.status}">ACTIVE</dd>
+                <dt class="col-sm-4">Trạng thái</dt><dd class="col-sm-8" th:text="${product.status.label}">Đang bán</dd>
                 <dt class="col-sm-4">Mô tả ngắn</dt><dd class="col-sm-8" th:text="${product.shortDescription ?: '-'}">-</dd>
             </dl>
             <hr>

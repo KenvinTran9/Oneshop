@@ -1,40 +1,40 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Dashboard - OneShop Admin</title>
+    <title>Bảng điều khiển - Quản trị OneShop</title>
 </head>
 <body>
 <div class="admin-page-title">
-    <span class="small text-muted">Tong quan</span>
-    <h2>Dashboard</h2>
+    <span class="small text-muted">Tổng quan</span>
+    <h2>Bảng điều khiển</h2>
 </div>
 
 <div class="row g-3">
     <div class="col-md-6 col-xl-3">
         <div class="metric-card">
             <i class="bi bi-bag"></i>
-            <span>San pham</span>
+            <span>Sản phẩm</span>
             <strong th:text="${productCount}">0</strong>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="metric-card">
             <i class="bi bi-shop"></i>
-            <span>Cua hang</span>
+            <span>Cửa hàng</span>
             <strong th:text="${storeCount}">0</strong>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="metric-card">
             <i class="bi bi-receipt"></i>
-            <span>Don hang</span>
+            <span>Đơn hàng</span>
             <strong th:text="${orderCount}">0</strong>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="metric-card">
             <i class="bi bi-people"></i>
-            <span>Tai khoan</span>
+            <span>Tài khoản</span>
             <strong th:text="${customerCount}">0</strong>
         </div>
     </div>
@@ -43,13 +43,13 @@
 <section class="admin-panel mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h3 class="h5 mb-1">Cong viec tiep theo</h3>
+            <h3 class="h5 mb-1">Công việc tiếp theo</h3>
             <p class="text-muted mb-0">Quản lý sản phẩm và cập nhật tiến trình đơn hàng cho khách.</p>
         </div>
         <div class="d-flex gap-2 flex-wrap"><a class="btn btn-outline-dark btn-sm" th:href="@{/admin/orders}">Quản lý đơn hàng</a>
         <a class="btn btn-dark btn-sm" th:href="@{/admin/products}">
             <i class="bi bi-plus-circle"></i>
-            Quan ly san pham
+            Quản lý sản phẩm
         </a></div>
     </div>
 </section>
