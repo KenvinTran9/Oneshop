@@ -29,6 +29,7 @@ body { background:#fff; }
 .site-header .header-menu-toggle { border:0;border-radius:0; }
 .site-header :is(a,button):focus-visible { outline:2px solid #9c2546;outline-offset:3px; }
 .site-footer { display:grid;grid-template-columns:1fr 1fr;gap:45px 65px;margin-top:0!important;padding:55px 24px 22px!important;background:#f3dfe5;color:#171717;overflow:hidden;border-top:1px solid #d9c2c9; }
+.footer-editorial-intro { text-align:center;align-self:center; }
 .footer-editorial-intro h2 { font:600 clamp(32px,4vw,54px)/1.15 var(--font-display);letter-spacing:-1.3px;margin:18px 0 26px; }
 .footer-editorial-intro h2 em { font-weight:500; }
 .footer-editorial-intro .store-button { background:transparent; }
@@ -38,9 +39,10 @@ body { background:#fff; }
 .footer-editorial-links a:hover { text-decoration:underline;text-underline-offset:4px; }
 .footer-editorial-note { grid-column:1/-1;max-width:430px; }
 .footer-editorial-note p { font-size:13px;line-height:1.8;margin:0; }
-.footer-wordmark { grid-column:1/-1;font-family:var(--font-body);font-size:23.7vw;font-style:italic;font-weight:800;line-height:.83;letter-spacing:-.08em;white-space:nowrap;margin:35px 0 0 -.025em; }
+.footer-smile { grid-column:1/-1;display:flex;justify-content:center;padding:8px 0 16px; }
+.footer-smile img { display:block;width:clamp(160px,18vw,250px);height:auto; }
 .site-footer .footer-bottom { grid-column:1/-1;display:flex;justify-content:space-between;gap:20px;align-items:center;padding-top:20px;margin-top:0;border-top:1px solid #bfaab1;color:#51434a;font-size:10px; }
-.site-footer .footer-bottom p { margin:0; }
+.site-footer .footer-bottom p { margin:0;color:inherit; }
 .footer-bottom a { color:inherit;text-decoration:none;font-size:11px; }
 @media(min-width:1200px) { .site-header .header-links { grid-column:2;grid-row:1; }.site-header .header-links .navbar-nav { flex-wrap:nowrap; }.site-header .header-search { grid-row:2; } }
 @media(max-width:1199.98px) and (min-width:992px) { .site-header .header-links { padding-top:5px; } }
@@ -65,7 +67,7 @@ body { background:#fff; }
     .site-header .shop-cart-link,.site-header .header-account-button,.header-search-toggle,.site-header .header-menu-toggle { width:35px;height:36px;min-height:36px; }
     .site-footer { grid-template-columns:1fr;padding:38px 18px 20px!important;gap:35px; }
     .footer-editorial-intro h2 { font-size:36px; }
-    .footer-wordmark { margin-top:10px;font-size:22vw; }
+    .footer-smile { padding:0; }
     .site-footer .footer-bottom { align-items:start;flex-direction:column;gap:10px;font-size:9px; }
     .footer-editorial-links { gap:20px; }
 }
