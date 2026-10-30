@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class OrderService {
     public record Placed(String code) { }
+    public record FulfillmentStore(Long id, String name, boolean selected) { }
     private final OrderRepository orders;
     private final UserRepository users;
     private final ProductRepository products;
@@ -53,17 +54,9 @@ public class OrderService {
         if (cart.items().isEmpty()) throw new OrderOperationException("Giỏ hàng đang trống. Hãy chọn sản phẩm trước nhé.");
         if (cart.items().stream().anyMatch(line -> line.warning() != null))
             throw new OrderOperationException("Có sản phẩm hết hàng hoặc lựa chọn đã thay đổi. Vui lòng kiểm tra lại giỏ hàng.");
-        Store store = stores.findById(form.getStoreId()).filter(Store::isActive)
-                .orElseThrow(() -> new OrderOperationException("Cửa hàng không còn hoạt động."));
         Map<Long, Integer> requested = new TreeMap<>();
         cart.items().forEach(line -> requested.merge(line.productId(), line.quantity(), Integer::sum));
-        var inventory = stocks.lockForOrder(store.getId(), requested.keySet());
-        for (var entry : requested.entrySet()) {
-            StoreStock stock = inventory.stream().filter(row -> row.getProduct().getId().equals(entry.getKey()))
-                    .filter(StoreStock::isActive).findFirst().orElseThrow(() -> insufficientStock(store));
-            if (stock.getQuantity() < entry.getValue()) throw insufficientStock(store);
-            stock.setQuantity(stock.getQuantity() - entry.getValue());
-        }
+        Store store = reserveAvailableStore(requested);
         Order order = new Order();
         order.setCode("OS-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase(Locale.ROOT));
         order.setCheckoutToken(form.getCheckoutToken()); order.setCustomer(customer);
@@ -101,6 +94,68 @@ public class OrderService {
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public OrderView forAdmin(String code) { return view(orders.findByCode(code).orElseThrow(this::notFound)); }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public List<FulfillmentStore> fulfillmentStores(String code) {
+        Order order = orders.findByCode(code).orElseThrow(this::notFound);
+        Long selected = order.getStore() == null ? null : order.getStore().getId();
+        return stores.findByActiveTrueOrderByNameAsc().stream()
+                .map(store -> new FulfillmentStore(store.getId(), store.getName(), store.getId().equals(selected))).toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public void assignStore(String code, Long storeId) {
+        Order order = orders.findForUpdate(code).orElseThrow(this::notFound);
+        if (order.getStatus() != OrderStatus.NEW)
+            throw new OrderOperationException("Chỉ đổi cửa hàng khi đơn đang chờ xác nhận.");
+        Store previous = order.getStore();
+        if (previous == null) throw new OrderOperationException("Đơn chưa có kho giữ hàng. Vui lòng kiểm tra dữ liệu đơn.");
+        Store target = stores.findById(storeId).filter(Store::isActive)
+                .orElseThrow(() -> new OrderOperationException("Cửa hàng không còn hoạt động."));
+        if (previous.getId().equals(target.getId())) return;
+        Map<Long, Integer> requested = new TreeMap<>();
+        order.getItems().forEach(item -> requested.merge(item.getProduct().getId(), item.getQuantity(), Integer::sum));
+        // Use the same store/product lock order as checkout, even for transfers in opposite directions.
+        Map<Long, List<StoreStock>> inventory = new HashMap<>();
+        java.util.stream.Stream.of(previous.getId(), target.getId()).sorted()
+                .forEach(id -> inventory.put(id, stocks.lockForOrder(id, requested.keySet())));
+        var targetInventory = inventory.get(target.getId());
+        if (!canFulfill(targetInventory, requested)) throw insufficientStock(target);
+        var previousInventory = inventory.get(previous.getId());
+        for (var entry : requested.entrySet()) {
+            StoreStock before = previousInventory.stream().filter(row -> row.getProduct().getId().equals(entry.getKey()))
+                    .findFirst().orElseThrow(() -> new OrderOperationException("Không tìm thấy kho giữ hàng của đơn."));
+            before.setQuantity(Math.addExact(before.getQuantity(), entry.getValue()));
+        }
+        deduct(targetInventory, requested);
+        order.setStore(target);
+        addEvent(order, "OneShop đã phân công " + target.getName() + " xử lý đơn hàng.");
+        orders.saveAndFlush(order);
+    }
+
+    private Store reserveAvailableStore(Map<Long, Integer> requested) {
+        for (Store store : stores.findByActiveTrueOrderByIdAsc()) {
+            var inventory = stocks.lockForOrder(store.getId(), requested.keySet());
+            if (canFulfill(inventory, requested)) {
+                deduct(inventory, requested);
+                return store;
+            }
+        }
+        throw new OrderOperationException("Chưa đủ hàng để xử lý toàn bộ giỏ. Vui lòng giảm số lượng hoặc thử lại sau.");
+    }
+
+    private boolean canFulfill(List<StoreStock> inventory, Map<Long, Integer> requested) {
+        return requested.entrySet().stream().allMatch(entry -> inventory.stream().anyMatch(row -> row.isActive()
+                && row.getProduct().getId().equals(entry.getKey()) && row.getQuantity() >= entry.getValue()));
+    }
+
+    private void deduct(List<StoreStock> inventory, Map<Long, Integer> requested) {
+        for (var row : inventory) {
+            row.setQuantity(row.getQuantity() - requested.get(row.getProduct().getId()));
+        }
+    }
 
     @Transactional
     public void cancel(String email, String code) {

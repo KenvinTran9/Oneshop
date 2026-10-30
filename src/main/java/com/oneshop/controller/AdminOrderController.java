@@ -22,7 +22,16 @@ public class AdminOrderController {
     }
     @GetMapping("/{code}")
     public String detail(@PathVariable String code, Model model) {
-        model.addAttribute("order", orders.forAdmin(code)); return "admin/order-detail";
+        var order = orders.forAdmin(code);
+        model.addAttribute("order", order);
+        if (order.status() == OrderStatus.NEW) model.addAttribute("fulfillmentStores", orders.fulfillmentStores(code));
+        return "admin/order-detail";
+    }
+    @PostMapping("/{code}/store")
+    public String assign(@PathVariable String code, @RequestParam Long storeId, RedirectAttributes redirect) {
+        try { orders.assignStore(code, storeId); redirect.addFlashAttribute("orderSuccess", "Đã cập nhật cửa hàng xử lý đơn."); }
+        catch (OrderOperationException failure) { redirect.addFlashAttribute("orderError", failure.getMessage()); }
+        return "redirect:/admin/orders/" + code;
     }
     @PostMapping("/{code}/status")
     public String update(@PathVariable String code, @RequestParam OrderStatus status, RedirectAttributes redirect) {

@@ -2,7 +2,6 @@ package com.oneshop.controller;
 
 import com.oneshop.dto.request.CheckoutForm;
 import com.oneshop.exception.OrderOperationException;
-import com.oneshop.repository.StoreRepository;
 import com.oneshop.repository.UserRepository;
 import com.oneshop.service.CartService;
 import com.oneshop.service.OrderService;
@@ -19,10 +18,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class OrderController {
     private final OrderService orders;
     private final CartService carts;
-    private final StoreRepository stores;
     private final UserRepository users;
-    public OrderController(OrderService orders, CartService carts, StoreRepository stores, UserRepository users) {
-        this.orders = orders; this.carts = carts; this.stores = stores; this.users = users;
+    public OrderController(OrderService orders, CartService carts, UserRepository users) {
+        this.orders = orders; this.carts = carts; this.users = users;
     }
     @GetMapping("/checkout")
     public String checkout(Principal principal, Model model) {
@@ -31,9 +29,6 @@ public class OrderController {
         users.findByEmail(principal.getName()).ifPresent(user -> {
             form.setCustomerName(user.getFullName()); form.setCustomerPhone(user.getPhone());
         });
-        var choices = stores.findByActiveTrueOrderByNameAsc();
-        choices.stream().filter(store -> "HCM-D1".equals(store.getCode())).findFirst()
-                .or(() -> choices.stream().findFirst()).ifPresent(store -> form.setStoreId(store.getId()));
         model.addAttribute("checkoutForm", form); checkoutModel(principal, model);
         return "pages/checkout";
     }
@@ -65,7 +60,7 @@ public class OrderController {
     }
     private void checkoutModel(Principal principal, Model model) {
         var cart = carts.getCart(principal.getName(), null);
-        model.addAttribute("cart", cart); model.addAttribute("stores", stores.findByActiveTrueOrderByNameAsc());
+        model.addAttribute("cart", cart);
         model.addAttribute("shippingFee", orders.getShippingFee());
         model.addAttribute("checkoutTotal", cart.subtotal().add(orders.getShippingFee()));
         model.addAttribute("customerEmail", principal.getName());

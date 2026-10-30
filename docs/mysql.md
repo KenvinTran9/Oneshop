@@ -56,6 +56,8 @@ erDiagram
 
 Các role nền được tạo khi thiếu. Profile `dev` bổ sung SKU/cửa hàng thiếu và tạo 20 tồn mẫu mỗi SKU ở `HCM-D1` khi chưa có cặp tồn. Không ghi đè dữ liệu đã chỉnh hoặc số tồn bằng 0. `APP_DEV_SEED_STOCK=false` tắt tồn mẫu; `APP_SEED_ENABLED=false` tắt tất cả bộ nạp, dùng khi chuẩn bị schema để nhập dữ liệu.
 
+Khách đặt hàng không chọn cửa hàng. Backend khóa tồn theo thứ tự ID cửa hàng/sản phẩm và tự giữ hàng ở một cửa hàng hoạt động có đủ toàn bộ giỏ. Admin có thể phân công lại khi đơn còn `NEW`: hoàn giữ hàng ở kho cũ và giữ tại kho mới trong cùng giao dịch; thiếu hàng thì không chuyển. Hủy đơn hoàn tồn về cửa hàng đang phụ trách. Phân công yêu cầu quyền ADMIN và CSRF, được ghi vào lịch sử đơn, không tự gửi thêm email.
+
 ## Chuyển đổi và sao lưu
 
 Ngày 29/10/2026, dữ liệu OneShop được xuất từ MongoDB và nhập vào schema MySQL riêng, giữ ID và quan hệ. `tools/mongo_snapshot_to_mysql.py` chuyển canonical EJSON thành SQL transaction, giữ giá decimal, ngày giờ local, màu/quy cách và các dòng giỏ. Công cụ từ chối ghi đè file đầu ra. Chỉ nhập vào schema đã được xác minh trống.

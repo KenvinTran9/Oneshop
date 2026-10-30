@@ -32,7 +32,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest(properties = {"app.mail.enabled=true", "app.mail.from=shop@example.com",
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"app.mail.enabled=true", "app.mail.from=shop@example.com",
         "spring.mail.username=shop@example.com", "spring.mail.password=test-only-no-network",
         "app.mail.base-url=http://localhost:8080", "app.orders.shipping-fee=30000"})
 @AutoConfigureMockMvc
@@ -47,6 +48,9 @@ class OrderFlowTest extends MySqlIntegrationTestSupport {
     @Autowired StoreRepository stores;
     @Autowired StoreStockRepository stocks;
     @Autowired UserRepository users;
+    @Autowired RoleRepository roles;
+    @Autowired org.springframework.security.crypto.password.PasswordEncoder encoder;
+    @org.springframework.boot.test.web.server.LocalServerPort int port;
     @Autowired org.springframework.jdbc.core.JdbcTemplate jdbc;
     @MockitoBean JavaMailSender mail;
     Product product;
@@ -71,7 +75,7 @@ class OrderFlowTest extends MySqlIntegrationTestSupport {
     }
     CheckoutForm form() {
         CheckoutForm f = new CheckoutForm(); f.setCustomerName("Khách thử nghiệm"); f.setCustomerPhone("0912345678");
-        f.setShippingAddress("12 Đường thử nghiệm, TP. Hồ Chí Minh"); f.setStoreId(store.getId());
+        f.setShippingAddress("12 Đường thử nghiệm, TP. Hồ Chí Minh");
         f.setCheckoutToken(UUID.randomUUID().toString()); return f;
     }
     String place() { return orders.place(EMAIL, form()); }
@@ -155,16 +159,19 @@ class OrderFlowTest extends MySqlIntegrationTestSupport {
         update(code,"PACKING"); update(code,"CANCELLED"); assertThat(stock()).isEqualTo(10);
     }
     @Test void checkoutRejectsInvalidInputsAndUsesServerPriceInsteadOfPostedTotal() throws Exception {
-        mvc.perform(get("/checkout").with(user(EMAIL))).andExpect(status().isOk());
+        mvc.perform(get("/checkout").with(user(EMAIL))).andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("name=\"storeId\""))))
+                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("Cửa hàng xử lý đơn"))));
         mvc.perform(post("/checkout").with(user(EMAIL)).with(csrf()).param("customerName","").param("customerPhone","abc"))
-                .andExpect(status().isOk()).andExpect(model().attributeHasFieldErrors("checkoutForm","customerName","customerPhone","shippingAddress","storeId","checkoutToken"));
+                .andExpect(status().isOk()).andExpect(model().attributeHasFieldErrors("checkoutForm","customerName","customerPhone","shippingAddress","checkoutToken"));
         assertThat(repository.count()).isZero(); verify(mail,never()).send(any(MimeMessage.class));
         String token=UUID.randomUUID().toString();
         mvc.perform(post("/checkout").with(user(EMAIL)).with(csrf()).param("customerName","Khách thử")
                 .param("customerPhone","0912345678").param("shippingAddress","12 Đường thử nghiệm, TP HCM")
-                .param("storeId",store.getId().toString()).param("checkoutToken",token).param("totalAmount","1"))
+                .param("storeId","-999").param("checkoutToken",token).param("totalAmount","1"))
                 .andExpect(status().is3xxRedirection());
         assertThat(repository.findByCheckoutToken(token).orElseThrow().getTotalAmount()).isEqualByComparingTo("230000");
+        assertThat(repository.findByCheckoutToken(token).orElseThrow().getStore().getId()).isEqualTo(store.getId());
         mvc.perform(get("/orders").with(user(EMAIL))).andExpect(status().isOk());
     }
     @Test void insufficientStoreStockRollsBackEverythingAndDoesNotSendMail() {
@@ -172,6 +179,91 @@ class OrderFlowTest extends MySqlIntegrationTestSupport {
         assertThatThrownBy(this::place).isInstanceOf(OrderOperationException.class);
         assertThat(repository.count()).isZero(); assertThat(stock()).isEqualTo(1);
         assertThat(carts.getCart(EMAIL,null).itemCount()).isEqualTo(2); verify(mail,never()).send(any(MimeMessage.class));
+    }
+
+    Store otherStore(int quantity) {
+        Store branch = new Store(); branch.setCode("HCM-D2"); branch.setName("OneShop chi nhánh khác");
+        branch.setAddress("Địa chỉ chi nhánh thử"); branch = stores.saveAndFlush(branch);
+        StoreStock inventory = new StoreStock(); inventory.setStore(branch); inventory.setProduct(product);
+        inventory.setQuantity(quantity); stocks.saveAndFlush(inventory);
+        return branch;
+    }
+    int stock(Store branch) {
+        return stocks.findByStoreIdAndProductId(branch.getId(), product.getId()).orElseThrow().getQuantity();
+    }
+    @Test void checkoutAutomaticallyFindsAnotherStoreWithoutDeductingInsufficientCandidate() throws Exception {
+        var inventory = stocks.findByStoreIdAndProductId(store.getId(), product.getId()).orElseThrow();
+        inventory.setQuantity(1); stocks.saveAndFlush(inventory);
+        Store branch = otherStore(10);
+        String token = UUID.randomUUID().toString();
+        mvc.perform(post("/checkout").with(user(EMAIL)).with(csrf()).param("customerName","Khách thử")
+                .param("customerPhone","0912345678").param("shippingAddress","12 Đường thử nghiệm, TP HCM")
+                .param("checkoutToken",token)).andExpect(status().is3xxRedirection());
+        assertThat(repository.findByCheckoutToken(token).orElseThrow().getStore().getId()).isEqualTo(branch.getId());
+        assertThat(stock()).isEqualTo(1); assertThat(stock(branch)).isEqualTo(8);
+    }
+    @Test void adminTransfersReservationOnceAndCancellationReturnsStockToNewStore() throws Exception {
+        Store branch = otherStore(10); String code = place();
+        mvc.perform(get("/admin/orders/{code}",code).with(user("admin@example.com").roles("ADMIN")))
+                .andExpect(status().isOk()).andExpect(model().attributeExists("fulfillmentStores"));
+        for (int i=0;i<2;i++) mvc.perform(post("/admin/orders/{code}/store",code).with(user("admin@example.com").roles("ADMIN"))
+                .with(csrf()).param("storeId",branch.getId().toString())).andExpect(status().is3xxRedirection());
+        assertThat(stock()).isEqualTo(10); assertThat(stock(branch)).isEqualTo(8);
+        assertThat(repository.findByCode(code).orElseThrow().getStore().getId()).isEqualTo(branch.getId());
+        assertThat(orders.forCustomer(EMAIL,code).events()).hasSize(2);
+        orders.cancel(EMAIL,code);
+        assertThat(stock()).isEqualTo(10); assertThat(stock(branch)).isEqualTo(10);
+        verify(mail,times(1)).send(any(MimeMessage.class));
+    }
+    @Test void failedAdminAssignmentLeavesBothReservationsAndHistoryUnchanged() throws Exception {
+        Store branch = otherStore(1); String code = place();
+        mvc.perform(post("/admin/orders/{code}/store",code).with(user("admin@example.com").roles("ADMIN"))
+                .with(csrf()).param("storeId",branch.getId().toString())).andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("orderError"));
+        assertThat(stock()).isEqualTo(8); assertThat(stock(branch)).isEqualTo(1);
+        assertThat(repository.findByCode(code).orElseThrow().getStore().getId()).isEqualTo(store.getId());
+        assertThat(orders.forCustomer(EMAIL,code).events()).hasSize(1);
+    }
+    @Test void storeAssignmentRequiresAdminAndCsrfAndOnlyAcceptsUnconfirmedOrders() throws Exception {
+        Store branch = otherStore(10); String code = place();
+        mvc.perform(post("/admin/orders/{code}/store",code).with(user(EMAIL)).with(csrf())
+                .param("storeId",branch.getId().toString())).andExpect(status().isForbidden());
+        mvc.perform(post("/admin/orders/{code}/store",code).with(user("admin@example.com").roles("ADMIN"))
+                .param("storeId",branch.getId().toString())).andExpect(status().isForbidden());
+        update(code,"CONFIRMED");
+        mvc.perform(post("/admin/orders/{code}/store",code).with(user("admin@example.com").roles("ADMIN")).with(csrf())
+                .param("storeId",branch.getId().toString())).andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("orderError"));
+        assertThat(stock()).isEqualTo(8); assertThat(stock(branch)).isEqualTo(10);
+        assertThat(repository.findByCode(code).orElseThrow().getStore().getId()).isEqualTo(store.getId());
+    }
+
+    @Test void realCheckoutHidesStoreChoiceAndOnlyAdminDetailRendersAssignmentForm() throws Exception {
+        var role = new Role(); role.setName("ADMIN"); role = roles.saveAndFlush(role);
+        var buyer = users.findByEmail(EMAIL).orElseThrow(); buyer.setRole(role);
+        buyer.setPassword(encoder.encode("HttpCheckout!2026")); users.saveAndFlush(buyer);
+        var client = java.net.http.HttpClient.newBuilder().cookieHandler(new java.net.CookieManager()).build();
+        String base = "http://localhost:" + port;
+        var page = client.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create(base + "/login")).GET().build(),
+                java.net.http.HttpResponse.BodyHandlers.ofString());
+        var csrf = java.util.regex.Pattern.compile("name=\"_csrf\"[^>]*value=\"([^\"]+)\"").matcher(page.body());
+        assertThat(csrf.find()).isTrue();
+        var login = client.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create(base + "/login"))
+                .header("Content-Type", "application/x-www-form-urlencoded").POST(java.net.http.HttpRequest.BodyPublishers.ofString(
+                        "username=buyer%40example.com&password=HttpCheckout%212026&_csrf="
+                                + java.net.URLEncoder.encode(csrf.group(1), java.nio.charset.StandardCharsets.UTF_8))).build(),
+                java.net.http.HttpResponse.BodyHandlers.ofString());
+        assertThat(login.statusCode()).isEqualTo(302);
+        var checkout = client.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create(base + "/checkout")).GET().build(),
+                java.net.http.HttpResponse.BodyHandlers.ofString());
+        assertThat(checkout.statusCode()).isEqualTo(200);
+        assertThat(checkout.body()).contains("Thông tin nhận hàng", "checkoutToken")
+                .doesNotContain("name=\"storeId\"", "Cửa hàng xử lý đơn", "Chọn cửa hàng");
+        String code = place();
+        var adminPage = client.send(java.net.http.HttpRequest.newBuilder(java.net.URI.create(base + "/admin/orders/" + code)).GET().build(),
+                java.net.http.HttpResponse.BodyHandlers.ofString());
+        assertThat(adminPage.statusCode()).isEqualTo(200);
+        assertThat(adminPage.body()).contains("Phân công cửa hàng", "name=\"storeId\"", "/admin/orders/" + code + "/store");
     }
     @Test void concurrentCheckoutsCannotOversellTheLastUnits() throws Exception {
         carts.addItem("other@example.com",null,product.getId(),2,"3 g","Hồng đất");
