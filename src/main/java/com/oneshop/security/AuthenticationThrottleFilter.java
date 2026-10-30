@@ -35,7 +35,8 @@ public class AuthenticationThrottleFilter extends OncePerRequestFilter {
         int limit = limit(request);
         if (!enabled || limit == 0) { chain.doFilter(request, response); return; }
         String path = request.getRequestURI().substring(request.getContextPath().length());
-        String group = path.contains("refresh") ? "refresh" : path.equals("/register") ? "register" : "login";
+        String group = path.contains("refresh") ? "refresh" : path.equals("/register") ? "register"
+                : path.equals("/forgot-password") ? "forgot-password" : path.equals("/reset-password") ? "reset-password" : "login";
         long retry = reserve(request.getRemoteAddr() + ":" + group, limit);
         if (retry == 0) { chain.doFilter(request, response); return; }
         response.setStatus(429);
@@ -53,6 +54,8 @@ public class AuthenticationThrottleFilter extends OncePerRequestFilter {
             case "/login", "/api/auth/login" -> 15;
             case "/register" -> 5;
             case "/api/auth/refresh" -> 30;
+            case "/forgot-password" -> 5;
+            case "/reset-password" -> 10;
             default -> 0;
         };
     }

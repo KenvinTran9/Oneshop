@@ -50,6 +50,7 @@
 .account-submit:disabled { opacity: .65; cursor: wait; }
 .account-switch { text-align: center; color: #5f5659; font-size: 15px; margin: 23px 0; }
 .account-switch a { color: var(--account-accent); font-weight: 500; text-decoration: underline; text-underline-offset: 4px; }
+.account-forgot { justify-self:end;color:var(--account-accent);font-size:14px;font-weight:500;text-decoration:underline;text-underline-offset:4px; }
 .account-security { display: flex; justify-content: center; align-items: flex-start; gap: 8px; padding-top: 20px; border-top: 1px solid var(--account-line); color: #66575d; font-size: 13px; line-height: 1.7; }
 .account-security i { font-size: 14px; color: var(--account-accent); }
 @media (max-width: 991px) {

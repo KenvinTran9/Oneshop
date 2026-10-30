@@ -24,7 +24,7 @@ python tools/prepare_render.py
 ```
 
 Lệnh đầu chỉ đọc và xác minh TLS/hostname. Lệnh thứ hai chỉ import khi Aiven **chưa có bảng**.
-Nó xuất snapshot 14 bảng ứng dụng, lưu backup riêng trong `backups/aiven-migration/`, đối chiếu số bản ghi và giữ nguyên local.
+Nó xuất snapshot 15 bảng ứng dụng (gồm trạng thái khôi phục mật khẩu), lưu backup riêng trong `backups/aiven-migration/`, đối chiếu số bản ghi và giữ nguyên local. Chạy bản mới ở local một lần để Hibernate bổ sung bảng khôi phục trước khi xuất.
 Không migrate session cũ, không chạy DROP, không tự xóa khi có lỗi import một phần.
 Nếu import thất bại, kiểm tra database trước khi thử lại; không xóa database đang có dữ liệu.
 Muốn bản chụp chính xác, tránh thay đổi sản phẩm/đặt hàng local trong lúc xuất dữ liệu.

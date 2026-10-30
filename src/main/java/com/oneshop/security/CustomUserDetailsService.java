@@ -16,9 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final com.oneshop.repository.PasswordResetAccountRepository resetAccounts;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public CustomUserDetailsService(UserRepository userRepository, com.oneshop.repository.PasswordResetAccountRepository resetAccounts) {
         this.userRepository = userRepository;
+        this.resetAccounts = resetAccounts;
     }
 
     @Override
@@ -28,12 +30,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .authorities(List.of(new SimpleGrantedAuthority(toAuthority(user.getRole()))))
-                .disabled(!user.isActive())
-                .build();
+        return new AccountUserDetails(user.getEmail(), user.getPassword(), user.isActive(),
+                List.of(new SimpleGrantedAuthority(toAuthority(user.getRole()))),
+                resetAccounts.findCredentialVersion(user.getEmail()).orElse(0L));
     }
 
     private String toAuthority(Role role) {

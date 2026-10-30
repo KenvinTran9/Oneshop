@@ -18,7 +18,7 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 TABLES = ("roles", "stores", "categories", "brands", "users", "products",
           "product_sizes", "product_shades", "store_stocks", "shopping_carts",
-          "shopping_cart_items", "orders", "order_items", "order_events")
+          "shopping_cart_items", "orders", "order_items", "order_events", "password_reset_accounts")
 SESSIONS = {"SPRING_SESSION", "SPRING_SESSION_ATTRIBUTES"}
 
 
@@ -166,7 +166,7 @@ def main():
             raise ValueError("Import failed and may be partial. No automatic cleanup/retry. Keep private backup and inspect Aiven.")
         if counts(dst, target["database"]) != baseline:
             raise ValueError("Imported row counts differ; inspect before deploying. No automatic cleanup performed.")
-        print("Migration complete: all 14 application tables and row counts verified. Local data unchanged.")
+        print("Migration complete: all " + str(len(TABLES)) + " application tables and row counts verified. Local data unchanged.")
         print("Private backup:", dump.relative_to(ROOT))
 
 

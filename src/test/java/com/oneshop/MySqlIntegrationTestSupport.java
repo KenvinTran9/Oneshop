@@ -85,7 +85,7 @@ public abstract class MySqlIntegrationTestSupport {
             try (var statement = connection.createStatement()) {
                 statement.execute("SET FOREIGN_KEY_CHECKS=0");
                 try {
-                    for (String table : java.util.List.of("shopping_cart_items", "shopping_carts", "order_events", "order_items",
+                    for (String table : java.util.List.of("password_reset_accounts", "shopping_cart_items", "shopping_carts", "order_events", "order_items",
                             "orders", "store_stocks", "product_shades", "product_sizes", "users", "products",
                             "brands", "categories", "stores", "roles")) {
                         statement.executeUpdate("DELETE FROM `" + table + "`");

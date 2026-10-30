@@ -6,6 +6,8 @@
 
 ## Công nghệ và lưu dữ liệu
 
+Khôi phục tài khoản qua email: [luồng quên mật khẩu và cấu hình gửi xác thực](docs/password-reset.md).
+
 - Java 21, Spring Boot 3.5.16 và Spring Security (form login + JWT API).
 - Spring Data JPA/Hibernate và MySQL 8.4; tài khoản, sản phẩm, giỏ và tồn kho dùng bảng SQL có khóa ngoại.
 - Thymeleaf, Bootstrap 5, SiteMesh; tích hợp upload Cloudinary cần cấu hình tài khoản cloud để sử dụng thật.

@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     const form = document.querySelector('[data-account-form]');
+    const submitLabel = form?.querySelector('[type="submit"] span')?.textContent;
     const password = form?.querySelector('#password');
     const confirmation = form?.querySelector('#confirmPassword');
     const checkConfirmation = () => {
@@ -31,6 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const submit = form?.querySelector('[type="submit"]');
         if (!submit) return;
         submit.disabled = false;
-        submit.querySelector('span').textContent = confirmation ? 'Tạo tài khoản' : 'Đăng nhập';
+        submit.querySelector('span').textContent = submitLabel;
     });
 });

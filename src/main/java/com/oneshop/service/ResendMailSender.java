@@ -31,12 +31,18 @@ public class ResendMailSender {
     public boolean isConfigured() { return apiKey != null && !apiKey.isBlank(); }
 
     public void send(String from, String to, String subject, String text, String html, String orderCode) throws Exception {
+        sendMessage(from, to, subject, text, html, "oneshop-confirmation-" + orderCode);
+    }
+    public void sendPasswordReset(String from, String to, String subject, String text, String html, String deliveryId) throws Exception {
+        sendMessage(from, to, subject, text, html, "oneshop-password-reset-" + deliveryId);
+    }
+    private void sendMessage(String from, String to, String subject, String text, String html, String idempotencyKey) throws Exception {
         var payload = Map.of("from", "OneShop <" + from + ">", "to", List.of(to),
                 "subject", subject, "text", text, "html", html);
         var request = HttpRequest.newBuilder(ENDPOINT).timeout(Duration.ofSeconds(12))
                 .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")
-                .header("Idempotency-Key", "oneshop-confirmation-" + orderCode)
+                .header("Idempotency-Key", idempotencyKey)
                 .POST(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(payload))).build();
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() < 200 || response.statusCode() >= 300)

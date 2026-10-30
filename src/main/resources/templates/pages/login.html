@@ -27,6 +27,7 @@
                 <div class="account-notice account-notice-success" role="status" th:if="${param.logout}">
                     <i class="bi bi-check-circle" aria-hidden="true"></i><span>Bạn đã đăng xuất thành công.</span>
                 </div>
+                <div class="account-notice account-notice-success" role="status" th:if="${passwordResetSuccess}"><i class="bi bi-check-circle" aria-hidden="true"></i><span>Đã đặt lại mật khẩu. Bạn đăng nhập bằng mật khẩu mới nhé.</span></div>
                 <div class="account-notice account-notice-success" role="status" th:if="${registrationSuccessMessage}">
                     <i class="bi bi-check-circle" aria-hidden="true"></i><span th:text="${registrationSuccessMessage}"></span>
                 </div>
@@ -42,6 +43,7 @@
                             <button type="button" data-password-toggle="password" aria-controls="password" aria-label="Hiện mật khẩu" aria-pressed="false" hidden><i class="bi bi-eye" aria-hidden="true"></i></button>
                         </div>
                     </div>
+                    <a class="account-forgot" href="/forgot-password">Quên mật khẩu?</a>
                     <button class="account-submit" type="submit"><span>Đăng nhập</span><i class="bi bi-arrow-right" aria-hidden="true"></i></button>
                 </form>
                 <p class="account-switch">Lần đầu ghé OneShop? <a th:href="@{/register}">Tạo tài khoản</a></p>

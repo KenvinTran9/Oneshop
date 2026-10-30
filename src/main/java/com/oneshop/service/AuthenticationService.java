@@ -37,10 +37,10 @@ public class AuthenticationService {
 
     public TokenResponse login(LoginRequest request) {
         String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
-        authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(normalizedEmail, request.password())
         );
-        return issueTokens(normalizedEmail);
+        return issueTokens(normalizedEmail, com.oneshop.security.AccountUserDetails.versionOf(authentication.getPrincipal()));
     }
 
     public TokenResponse refresh(RefreshTokenRequest request) {
@@ -49,7 +49,7 @@ public class AuthenticationService {
         if (!jwtService.isRefreshTokenValid(request.refreshToken(), userDetails)) {
             throw new BadCredentialsException("Invalid refresh token");
         }
-        return issueTokens(username);
+        return issueTokens(username, com.oneshop.security.AccountUserDetails.versionOf(userDetails));
     }
 
     public Optional<CurrentUserResponse> getCurrentUser(Authentication authentication) {
@@ -67,12 +67,12 @@ public class AuthenticationService {
         return Optional.of(new CurrentUserResponse(true, authentication.getName(), isAdmin, authorities));
     }
 
-    private TokenResponse issueTokens(String username) {
+    private TokenResponse issueTokens(String username, long credentialVersion) {
         return new TokenResponse(
                 "Bearer",
-                jwtService.generateAccessToken(username),
+                jwtService.generateAccessToken(username, credentialVersion),
                 jwtService.getAccessTokenExpirationMillis(),
-                jwtService.generateRefreshToken(username),
+                jwtService.generateRefreshToken(username, credentialVersion),
                 jwtService.getRefreshTokenExpirationMillis()
         );
     }

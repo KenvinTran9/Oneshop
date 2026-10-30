@@ -45,11 +45,17 @@ public class JwtService {
     }
 
     public String generateAccessToken(String username) {
-        return generateToken(username, ACCESS_TOKEN_TYPE, accessTokenExpirationMillis);
+        return generateAccessToken(username, 0);
+    }
+    public String generateAccessToken(String username, long credentialVersion) {
+        return generateToken(username, ACCESS_TOKEN_TYPE, accessTokenExpirationMillis, credentialVersion);
     }
 
     public String generateRefreshToken(String username) {
-        return generateToken(username, REFRESH_TOKEN_TYPE, refreshTokenExpirationMillis);
+        return generateRefreshToken(username, 0);
+    }
+    public String generateRefreshToken(String username, long credentialVersion) {
+        return generateToken(username, REFRESH_TOKEN_TYPE, refreshTokenExpirationMillis, credentialVersion);
     }
 
     public String extractAccessTokenUsername(String token) {
@@ -76,7 +82,7 @@ public class JwtService {
         return refreshTokenExpirationMillis;
     }
 
-    private String generateToken(String username, String tokenType, long expirationMillis) {
+    private String generateToken(String username, String tokenType, long expirationMillis, long credentialVersion) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("JWT subject must not be blank");
         }
@@ -88,6 +94,7 @@ public class JwtService {
                 .subject(username)
                 .issuer(issuer)
                 .claim(TOKEN_TYPE_CLAIM, tokenType)
+                .claim("cv", credentialVersion)
                 .issuedAt(issuedAt)
                 .expiration(expiresAt)
                 .signWith(signingKey)
@@ -96,7 +103,11 @@ public class JwtService {
 
     private boolean isTokenValid(String token, UserDetails userDetails, String expectedTokenType) {
         Claims claims = extractClaims(token, expectedTokenType);
+        Object generation = claims.get("cv");
+        if (generation != null && !(generation instanceof Integer || generation instanceof Long)) return false;
+        long version = generation == null ? 0L : ((Number) generation).longValue();
         return userDetails.isEnabled()
+                && version == AccountUserDetails.versionOf(userDetails)
                 && userDetails.isAccountNonExpired()
                 && userDetails.isAccountNonLocked()
                 && userDetails.isCredentialsNonExpired()

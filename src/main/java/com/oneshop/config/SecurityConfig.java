@@ -59,11 +59,12 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     SecurityFilterChain webSecurity(HttpSecurity http, CartLoginSuccessHandler success,
-                                   AuthenticationThrottleFilter throttle) throws Exception {
+                                   AuthenticationThrottleFilter throttle, com.oneshop.security.CredentialVersionFilter credentials) throws Exception {
         http.csrf(csrf -> csrf.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
                         .requestMatchers("/", "/healthz", "/products/**", "/stores/**", "/cart", "/cart/**",
-                                "/login", "/register", "/account/status", "/css/**", "/js/**",
+                                "/login", "/register", "/forgot-password", "/reset-password", "/account/status", "/css/**", "/js/**",
                                 "/images/**", "/decorators/**", "/webjars/**").permitAll()
                         .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
@@ -74,7 +75,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .sessionFixation(fixation -> fixation.changeSessionId()))
-                .addFilterBefore(throttle, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(throttle, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(credentials, UsernamePasswordAuthenticationFilter.class);
         securityHeaders(http);
         return http.build();
     }
@@ -90,7 +92,11 @@ public class SecurityConfig {
                         + "img-src 'self' https: data:; connect-src 'self'; "
                         + "frame-src https://www.google.com https://maps.google.com; "
                         + "object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"))
-                .permissionsPolicyHeader(policy -> policy.policy("camera=(), microphone=(), geolocation=()")));
+                .permissionsPolicyHeader(policy -> policy.policy("camera=(), microphone=(), geolocation=()"))
+                .addHeaderWriter((request, response) -> {
+                    if ((request.getContextPath() + "/reset-password").equals(request.getRequestURI()))
+                        response.setHeader("Referrer-Policy", "no-referrer");
+                }));
     }
 
     private static void jsonError(HttpServletResponse response, int status, String message) throws java.io.IOException {
@@ -112,6 +118,10 @@ public class SecurityConfig {
         var registration = new FilterRegistrationBean<>(filter);
         registration.setEnabled(false);
         return registration;
+    }
+    @Bean
+    FilterRegistrationBean<com.oneshop.security.CredentialVersionFilter> credentialsRegistration(com.oneshop.security.CredentialVersionFilter filter) {
+        var registration = new FilterRegistrationBean<>(filter); registration.setEnabled(false); return registration;
     }
 
     @Bean
