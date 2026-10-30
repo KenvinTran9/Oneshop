@@ -7,7 +7,7 @@ File trong dự án:
 - `src/main/resources/static/images/home/banner-makeup-v1.webp`
 - `src/main/resources/static/images/home/banner-serum-v1.webp`
 
-Banner tự đổi sau 5000 ms. Nút trước/sau, chấm chọn ảnh và tạm dừng hỗ trợ bàn phím. Tự chuyển tạm dừng khi trỏ chuột vào, focus trong banner, cuộn khỏi banner hoặc tab nền; tắt theo prefers-reduced-motion. Khi không có JavaScript, banner đầu và các liên kết vẫn dùng được. Chữ/CTA là HTML, không nằm trong ảnh; liên kết mở đúng danh mục. Không thêm khuyến mãi hay đánh giá chưa có dữ liệu. Bố cục desktop là một ô lớn và hai ô nhỏ bên phải, mobile xếp các ô phụ bên dưới. Khối tổng số sản phẩm/thương hiệu đã được bỏ khỏi hero.
+Banner tự đổi sau 5000 ms. Nút trước/sau và chấm chọn ảnh hỗ trợ bàn phím. Nút tạm dừng đã được bỏ theo yêu cầu giao diện. Tự chuyển tạm dừng khi trỏ chuột vào, focus trong banner, cuộn khỏi banner hoặc tab nền; tắt theo prefers-reduced-motion. Khi không có JavaScript, banner đầu và các liên kết vẫn dùng được. Chữ/CTA là HTML, không nằm trong ảnh; liên kết mở đúng danh mục. Không thêm khuyến mãi hay đánh giá chưa có dữ liệu. Bố cục desktop là một ô lớn và hai ô nhỏ bên phải, mobile xếp các ô phụ bên dưới. Khối tổng số sản phẩm/thương hiệu đã được bỏ khỏi hero.
 
 ## Bộ prompt cuối cùng
 
