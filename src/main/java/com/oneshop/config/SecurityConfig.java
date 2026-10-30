@@ -30,6 +30,24 @@ import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWrite
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
     @Bean
+    @Order(0)
+    SecurityFilterChain publicAssets(HttpSecurity http) throws Exception {
+        // Public files never need a login session, JWT lookup, or JDBC session writes.
+        http.securityMatcher("/css/**", "/js/**", "/images/**", "/webjars/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .anonymous(AbstractHttpConfigurer::disable)
+                .sessionManagement(AbstractHttpConfigurer::disable)
+                .securityContext(context -> context.securityContextRepository(
+                        new org.springframework.security.web.context.NullSecurityContextRepository()))
+                .requestCache(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable).httpBasic(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET, "/**").permitAll()
+                        .requestMatchers(HttpMethod.HEAD, "/**").permitAll().anyRequest().denyAll());
+        securityHeaders(http);
+        return http.build();
+    }
+    @Bean
     @Order(1)
     SecurityFilterChain apiSecurity(HttpSecurity http, JwtAuthenticationFilter jwt,
                                    AuthenticationThrottleFilter throttle) throws Exception {
@@ -64,7 +82,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
                         .requestMatchers("/", "/healthz", "/products/**", "/stores/**", "/cart", "/cart/**",
-                                "/login", "/register", "/forgot-password", "/reset-password", "/account/status", "/css/**", "/js/**",
+                                "/login", "/register", "/forgot-password", "/reset-password", "/account/status", "/account/header", "/css/**", "/js/**",
                                 "/images/**", "/decorators/**", "/webjars/**").permitAll()
                         .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())

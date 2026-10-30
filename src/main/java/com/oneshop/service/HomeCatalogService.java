@@ -25,15 +25,22 @@ public class HomeCatalogService {
         var status = ProductStatus.ACTIVE;
         var categorySummaries = products.summarizeHomeCategories(status);
         var categories = categorySummaries.stream()
-                .map(c -> new Category(c.getName(), c.getSlug(), c.getProductCount(), icon(c.getSlug()), teaser(c.getSlug())))
+                .map(c -> new Category(c.getName(), c.getSlug(), c.getProductCount()))
                 .toList();
-        // Take one from each category before taking a second; never load the full catalog.
-        var pools = new ArrayList<List<Product>>();
-        for (var category : categorySummaries) {
-            if (pools.size() == SUGGESTION_LIMIT) break;
-            pools.add(products.findByStatusAndCategory_IdOrderByCreatedAtDescIdDesc(
-                    status, category.getId(), PageRequest.of(0, 2)));
+        // Rank in MySQL once, then fetch bounded candidates with their brand/category in one query.
+        // This avoids one database round trip per category on a remote Aiven connection.
+        var grouped = new LinkedHashMap<Long, List<Product>>();
+        var ids = categorySummaries.isEmpty() ? List.<Long>of()
+                : products.findHomeCategoryCandidateIds(status.name(), PageRequest.of(0, SUGGESTION_LIMIT * 2));
+        if (!ids.isEmpty()) {
+            var candidates = products.findHomeCandidates(ids, status).stream()
+                    .collect(java.util.stream.Collectors.toMap(Product::getId, product -> product));
+            for (Long id : ids) {
+                Product product = candidates.get(id);
+                if (product != null) grouped.computeIfAbsent(product.getCategory().getId(), ignored -> new ArrayList<>()).add(product);
+            }
         }
+        var pools = grouped.values();
         var selected = new LinkedHashMap<Long, Product>();
         for (int round = 0; round < 2; round++) {
             for (var pool : pools) {
@@ -49,41 +56,16 @@ public class HomeCatalogService {
                 selected.putIfAbsent(product.getId(), product);
             }
         }
-        var counts = products.summarizeHomeCounts(status);
         var suggestions = List.copyOf(selected.values());
         // Load only the displayed products' options before the view loses its persistence context.
         suggestions.forEach(product -> {
             org.hibernate.Hibernate.initialize(product.getSizes());
             org.hibernate.Hibernate.initialize(product.getShades());
         });
-        return new HomeCatalog(categories, suggestions,
-                products.summarizeHomeBrands(status, PageRequest.of(0, 8)),
-                counts.getProductCount(), counts.getBrandCount(), suggestions.isEmpty() ? null : suggestions.getFirst());
+        return new HomeCatalog(categories, suggestions, products.summarizeHomeBrands(status, PageRequest.of(0, 8)));
     }
 
-    private static String icon(String slug) {
-        return switch (slug) {
-            case "cham-soc-da" -> "bi-droplet";
-            case "trang-diem" -> "bi-brush";
-            case "serum" -> "bi-eyedropper";
-            case "kem-duong" -> "bi-flower1";
-            case "sua-rua-mat" -> "bi-water";
-            default -> "bi-bag-heart";
-        };
-    }
-
-    private static String teaser(String slug) {
-        return switch (slug) {
-            case "cham-soc-da" -> "Chăm chút mỗi ngày";
-            case "trang-diem" -> "Sắc màu của riêng bạn";
-            case "serum" -> "Thêm một bước nâng niu";
-            case "kem-duong" -> "Dưỡng ẩm dịu dàng";
-            case "sua-rua-mat" -> "Khởi đầu tươi mới";
-            default -> "Khám phá điều yêu thích";
-        };
-    }
-
-    public record Category(String name, String slug, long productCount, String icon, String teaser) {
+    public record Category(String name, String slug, long productCount) {
         public String getImageUrl() {
             return "/images/home/" + switch (slug) {
                 case "cham-soc-da" -> "editorial-skin-v1.webp";
@@ -95,6 +77,5 @@ public class HomeCatalogService {
         }
     }
 
-    public record HomeCatalog(List<Category> categories, List<Product> suggestions, List<HomeBrand> brands,
-                              long productCount, long brandCount, Product heroProduct) { }
+    public record HomeCatalog(List<Category> categories, List<Product> suggestions, List<HomeBrand> brands) { }
 }

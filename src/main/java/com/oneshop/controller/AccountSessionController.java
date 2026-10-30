@@ -13,7 +13,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/account")
 public class AccountSessionController {
     private final AuthenticationService authentication;
-    public AccountSessionController(AuthenticationService authentication) { this.authentication = authentication; }
+    private final com.oneshop.service.CartService carts;
+    public AccountSessionController(AuthenticationService authentication, com.oneshop.service.CartService carts) {
+        this.authentication = authentication; this.carts = carts;
+    }
+
+    @GetMapping("/header")
+    public com.oneshop.dto.response.HeaderStatusResponse header(Authentication current, jakarta.servlet.http.HttpServletRequest request) {
+        var account = authentication.getCurrentUser(current);
+        String email = account.map(user -> user.email()).orElse(null);
+        return new com.oneshop.dto.response.HeaderStatusResponse(account.isPresent(), email,
+                account.map(user -> user.isAdmin()).orElse(false), carts.getItemCount(email, request.getSession(false)));
+    }
 
     @GetMapping("/status")
     public ResponseEntity<?> status(Authentication current) {

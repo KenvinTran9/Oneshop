@@ -54,17 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     const cartCountBadge = document.querySelector("[data-cart-count]");
-    fetch("/cart/count", { headers: { "Accept": "application/json" } })
-        .then(response => response.ok ? response.json() : null)
-        .then(data => {
-            if (cartCountBadge && data) {
-                cartCountBadge.textContent = data.itemCount > 99 ? "99+" : String(data.itemCount);
-                cartCountBadge.hidden = data.itemCount < 1;
-            }
-        })
-        .catch(() => {});
-    // The website checks its session; /api/auth/me is reserved for explicit Bearer tokens.
-    fetch("/account/status", {
+    // One session-backed request supplies both account navigation and the cart badge.
+    fetch("/account/header", {
         headers: { "Accept": "application/json" }
     })
     .then(response => {
@@ -74,6 +65,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return null;
     })
     .then(data => {
+        if (cartCountBadge && data) {
+            cartCountBadge.textContent = data.itemCount > 99 ? "99+" : String(data.itemCount);
+            cartCountBadge.hidden = data.itemCount < 1;
+        }
         const guestNav = document.getElementById("navGuest");
         const userDropdown = document.getElementById("navUserDropdown");
         const userEmailLabel = document.getElementById("userEmailLabel");

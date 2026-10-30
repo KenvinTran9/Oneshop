@@ -1,6 +1,6 @@
 # Backend JPA + MySQL
 
-OneShop dùng Java 21, Spring Boot 3.5.16, Spring Data JPA/Hibernate và MySQL. Bản local hiện kết nối MySQL 8.4.13, database `oneshop_mysql`. MongoDB không còn là dependency của ứng dụng.
+OneShop dùng Java 21, Spring Boot 3.5.16, Spring Data JPA/Hibernate và MySQL. Bản local hiện kết nối MySQL 8.4.13, database `oneshop_mysql`.
 
 ## Cấu hình và chạy local
 
@@ -60,7 +60,7 @@ Khách đặt hàng không chọn cửa hàng. Backend khóa tồn theo thứ t�
 
 ## Chuyển đổi và sao lưu
 
-Ngày 29/10/2026, dữ liệu OneShop được xuất từ MongoDB và nhập vào schema MySQL riêng, giữ ID và quan hệ. `tools/mongo_snapshot_to_mysql.py` chuyển canonical EJSON thành SQL transaction, giữ giá decimal, ngày giờ local, màu/quy cách và các dòng giỏ. Công cụ từ chối ghi đè file đầu ra. Chỉ nhập vào schema đã được xác minh trống.
+Ngày 29/10/2026, dữ liệu OneShop được chuyển sang schema MySQL riêng, giữ ID, quan hệ, giá decimal, ngày giờ, màu/quy cách và các dòng giỏ. Công cụ chuyển đổi một lần đã được gỡ sau khi hoàn tất; lịch sử Git vẫn giữ phiên bản cũ. Chuyển local lên Aiven dùng `tools/migrate_aiven.py` với database đích trống.
 
 Ngày 30/10/2026, trước khi cài lại MySQL, đã xuất riêng 4 database người dùng vào `backups/before-reinstall-2026-10-30/`. Các file này bị loại khỏi Git và có quyền truy cập giới hạn. Bản sao `oneshop_mysql.sql` đã được khôi phục thử trong schema ngẫu nhiên, xác nhận đủ 100 sản phẩm, 100 tồn kho, 100 quy cách và 62 màu. Schema thử sau đó được xóa.
 
@@ -72,7 +72,7 @@ Dữ liệu xác nhận: 100 sản phẩm, 59 thương hiệu, 5 danh mục, 2 c
 
 ```powershell
 mvn verify '-Doneshop.build.directory=C:\OneShop\target\mysql-build' '-DargLine=-Djdk.net.unixdomain.tmpdir=C:\OneShop\target'
-python tools/test_mysql_migration.py
+python tools/test_aiven_deploy.py
 ```
 
 `MySqlIntegrationTestSupport` tạo schema ngẫu nhiên `oneshop_test_<uuid>`, thay database trong JDBC URL và xác minh chính xác tên schema trước khi xóa fixture hoặc dọn schema. Tài khoản test cần quyền tạo/xóa schema thử; không dùng cơ chế dọn fixture với database ứng dụng.

@@ -56,9 +56,19 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @EntityGraph(attributePaths = {"category", "brand"})
     List<Product> findByStatusOrderByCreatedAtDescIdDesc(ProductStatus status, Pageable pageable);
 
+    @Query(value = """
+            select ranked.id from (
+                select p.id, p.category_id,
+                    row_number() over (partition by p.category_id order by p.created_at desc, p.id desc) as category_rank
+                from products p where p.status = :status and p.category_id is not null
+            ) ranked where ranked.category_rank <= 2
+            order by ranked.category_id, ranked.category_rank
+            """, nativeQuery = true)
+    List<Long> findHomeCategoryCandidateIds(@Param("status") String status, Pageable pageable);
+
     @EntityGraph(attributePaths = {"category", "brand"})
-    List<Product> findByStatusAndCategory_IdOrderByCreatedAtDescIdDesc(
-            ProductStatus status, Long categoryId, Pageable pageable);
+    @Query("select p from Product p where p.id in :ids and p.status = :status")
+    List<Product> findHomeCandidates(@Param("ids") java.util.Collection<Long> ids, @Param("status") ProductStatus status);
 
     interface HomeCategory {
         Long getId();
@@ -72,10 +82,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         long getProductCount();
     }
 
-    interface HomeCounts {
-        long getProductCount();
-        long getBrandCount();
-    }
 
     @Query("""
             select c.id as id, c.name as name, c.slug as slug, count(p) as productCount
@@ -91,11 +97,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             """)
     List<HomeBrand> summarizeHomeBrands(@Param("status") ProductStatus status, Pageable pageable);
 
-    @Query("""
-            select count(p) as productCount, count(distinct b.id) as brandCount
-            from Product p left join p.brand b where p.status = :status
-            """)
-    HomeCounts summarizeHomeCounts(@Param("status") ProductStatus status);
 
     @EntityGraph(attributePaths = {"category", "brand"})
     Optional<Product> findBySlugAndStatus(String slug, ProductStatus status);

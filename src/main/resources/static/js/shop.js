@@ -1,280 +1,52 @@
+// Storefront controls; cart contents, pricing and checkout are handled by the backend.
 (() => {
-    "use strict";
-    const STORAGE_KEY = "oneshop.cart.v1";
-    let memoryCart = [];
-    let storageWritable = true;
-    let lastRemoved = null;
-    let toastTimer;
-    const money = value => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(value);
+    'use strict';
     const quantity = value => Math.min(99, Math.max(1, Math.trunc(Number(value)) || 1));
-    const itemKey = item => JSON.stringify([item.sku, item.size, item.shade]);
-    function normalizeItem(value) {
-        if (!value || !/^CATALOG-\d{3}$/.test(value.sku) || typeof value.name !== "string") return null;
-        const price = Number(value.price);
-        if (!Number.isFinite(price) || price <= 0 || price > 1e9) return null;
-        return {
-            sku: value.sku, name: value.name.slice(0, 180), price: Math.round(price),
-            quantity: quantity(value.quantity), size: String(value.size || "").slice(0, 100),
-            shade: String(value.shade || "").slice(0, 100),
-            image: /^\/images\/[a-z0-9/_.-]+$/i.test(value.image || "") ? value.image : "/images/product-placeholder.svg",
-            url: /^\/products\/[a-z0-9-]+$/.test(value.url || "") ? value.url : "/products"
-        };
-    }
-    function normalizeCart(value) {
-        const merged = new Map();
-        if (!Array.isArray(value)) return [];
-        value.slice(0, 200).forEach(raw => {
-            const item = normalizeItem(raw);
-            if (!item) return;
-            const key = itemKey(item);
-            const existing = merged.get(key);
-            if (existing) existing.quantity = quantity(existing.quantity + item.quantity);
-            else merged.set(key, item);
+    function updateQuantity(form) {
+        const input = form?.querySelector('[data-quantity]');
+        if (!input) return;
+        const value = quantity(input.value);
+        input.value = String(value);
+        form.querySelectorAll('[data-quantity-step]').forEach(button => {
+            button.disabled = Number(button.dataset.quantityStep) < 0 ? value <= 1 : value >= 99;
         });
-        return Array.from(merged.values());
     }
-    function read() {
-        try {
-            if (storageWritable) {
-                const raw = window.localStorage.getItem(STORAGE_KEY);
-                memoryCart = normalizeCart(raw ? JSON.parse(raw) : []);
-            }
-        } catch (_) { /* Private browsing or damaged storage: keep a usable in-memory cart. */ }
-        return memoryCart.map(item => ({ ...item }));
-    }
-    function totals(items) {
-        return items.reduce((total, item) => ({ count: total.count + item.quantity, subtotal: total.subtotal + item.price * item.quantity }), { count: 0, subtotal: 0 });
-    }
-    function write(items) {
-        memoryCart = normalizeCart(items);
-        try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(memoryCart)); } catch (_) { storageWritable = false; }
-        window.dispatchEvent(new CustomEvent("oneshop:cart-updated"));
-        return read();
-    }
-    function add(raw) {
-        const item = normalizeItem(raw);
-        if (!item) return false;
-        const items = read();
-        const existing = items.find(value => itemKey(value) === itemKey(item));
-        if (existing) {
-            existing.quantity = quantity(existing.quantity + item.quantity);
-            existing.image = item.image;
-        }
-        else items.push(item);
-        write(items);
-        return true;
-    }
-    function setQuantity(key, value) {
-        const items = read();
-        const item = items.find(row => itemKey(row) === key);
-        if (item) item.quantity = quantity(value);
-        write(items);
-    }
-    function remove(key) {
-        const items = read();
-        lastRemoved = items.find(item => itemKey(item) === key) || null;
-        write(items.filter(item => itemKey(item) !== key));
-    }
-    window.OneShopCart = { read, add, setQuantity, remove, totals, itemKey, normalizeCart, quantity };
-
-    function element(tag, className, text) {
-        const node = document.createElement(tag);
-        if (className) node.className = className;
-        if (text !== undefined) node.textContent = text;
-        return node;
-    }
-    function notify(message, allowUndo = false) {
-        const toast = document.querySelector("[data-cart-toast]");
-        if (!toast) return;
-        toast.querySelector("[data-toast-message]").textContent = message;
-        toast.querySelector("[data-undo-removal]").hidden = !allowUndo;
-        if (window.OneShopMotion) window.OneShopMotion.showToast(toast);
-        else toast.hidden = false;
-        scheduleToastDismiss(toast);
-    }
-    function dismissToast() {
-        clearTimeout(toastTimer);
-        const toast = document.querySelector("[data-cart-toast]");
-        if (window.OneShopMotion) window.OneShopMotion.hideToast(toast);
-        else if (toast) toast.hidden = true;
-    }
-    function scheduleToastDismiss(toast) {
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => {
-            if (!toast.matches(":hover") && !toast.contains(document.activeElement)) dismissToast();
-        }, 7000);
-    }
-    function openDialog(selector) {
-        const dialog = document.querySelector(selector);
+    function openDialog(dialog) {
+        if (!dialog) return;
         if (window.OneShopMotion) window.OneShopMotion.openDialog(dialog);
-        else dialog?.showModal();
+        else dialog.showModal();
     }
     function closeDialog(dialog) {
+        if (!dialog) return;
         if (window.OneShopMotion) window.OneShopMotion.closeDialog(dialog);
-        else dialog?.close();
+        else dialog.close();
     }
-    function updateText(node, value, animate = false) {
-        if (node.textContent === value) return;
-        const hadValue = node.textContent !== "";
-        node.textContent = value;
-        if (animate && hadValue) window.OneShopMotion?.valueChanged(node);
-    }
-    function render() {
-        const items = read();
-        const total = totals(items);
-        document.querySelectorAll("[data-cart-count]").forEach(node => {
-            if (node.hasAttribute("data-server-cart")) return;
-            const changed = node.textContent !== String(total.count);
-            node.textContent = String(total.count);
-            node.hidden = total.count === 0;
-            if (changed && total.count) window.OneShopMotion?.pulse(node);
-        });
-        const list = document.querySelector("[data-cart-list]");
-        if (!list) return;
-        const rows = new Map(Array.from(list.children, row => [row.dataset.cartKey, row]));
-        const keys = new Set(items.map(itemKey));
-        const structureChanged = rows.size !== keys.size || items.some(item => !rows.has(itemKey(item)));
-        const positions = structureChanged ? window.OneShopMotion?.captureRows(list) : null;
-        const focusedRow = document.activeElement?.closest("[data-cart-key]");
-        const focusedIndex = focusedRow ? Array.from(list.children).indexOf(focusedRow) : -1;
-        document.querySelector("[data-cart-empty]").hidden = items.length !== 0;
-        document.querySelector("[data-cart-content]").hidden = items.length === 0;
-        document.querySelector("[data-cart-count-label]").textContent = total.count ? ` (${total.count})` : "";
-        updateText(document.querySelector("[data-cart-subtotal]"), money(total.subtotal), true);
-        updateText(document.querySelector("[data-cart-total]"), money(total.subtotal), true);
-        rows.forEach((row, key) => { if (!keys.has(key)) row.remove(); });
-        let cursor = list.firstElementChild;
-        items.forEach(item => {
-            const key = itemKey(item);
-            const row = rows.get(key) || createCartRow(item);
-            if (row !== cursor) list.insertBefore(row, cursor);
-            cursor = row.nextElementSibling;
-            updateText(row.querySelector(".cart-item-name"), item.name);
-            updateText(row.querySelector(".cart-item-options"), [item.size, item.shade].filter(Boolean).join(" · "));
-            updateText(row.querySelector(".cart-item-unit-price"), money(item.price));
-            updateText(row.querySelector(".cart-item-total"), money(item.price * item.quantity), true);
-            const thumbnail = row.querySelector(".cart-item-image img");
-            if (thumbnail.getAttribute("src") !== item.image) thumbnail.src = item.image;
-            const input = row.querySelector("[data-cart-quantity]");
-            if (input.value !== String(item.quantity)) input.value = String(item.quantity);
-            row.querySelector('[data-cart-step="-1"]').disabled = item.quantity <= 1;
-            row.querySelector('[data-cart-step="1"]').disabled = item.quantity >= 99;
-        });
-        if (positions) window.OneShopMotion.settleRows(list, positions);
-        if (focusedRow && !keys.has(focusedRow.dataset.cartKey)) {
-            const next = list.children[Math.min(focusedIndex, list.children.length - 1)];
-            (next?.querySelector("[data-cart-remove]") || document.querySelector("[data-cart-empty] a"))?.focus({ preventScroll: true });
-        }
-    }
-    function createCartRow(item) {
-        const row = element("article", "cart-item");
-        const key = itemKey(item);
-        row.dataset.cartKey = key;
-        const imageLink = element("a", "cart-item-image");
-        imageLink.href = item.url;
-        const image = element("img"); image.src = item.image; image.alt = item.name;
-        imageLink.append(image);
-        const info = element("div", "cart-item-info");
-        const name = element("a", "cart-item-name", item.name); name.href = item.url;
-        info.append(name, element("p", "cart-item-options", [item.size, item.shade].filter(Boolean).join(" · ")),
-            element("p", "cart-item-unit-price", money(item.price)));
-        const controls = element("div", "cart-item-controls");
-        const stepper = element("div", "quantity-stepper compact");
-        const minus = element("button", "", "−"); minus.type = "button"; minus.dataset.cartStep = "-1";
-        minus.disabled = item.quantity <= 1; minus.setAttribute("aria-label", `Giảm số lượng ${item.name}`);
-        const input = element("input"); input.type = "number"; input.min = "1"; input.max = "99";
-        input.value = String(item.quantity); input.dataset.cartQuantity = ""; input.setAttribute("aria-label", `Số lượng ${item.name}`);
-        const plus = element("button", "", "+"); plus.type = "button"; plus.dataset.cartStep = "1";
-        plus.disabled = item.quantity >= 99; plus.setAttribute("aria-label", `Tăng số lượng ${item.name}`);
-        stepper.append(minus, input, plus);
-        const removeButton = element("button", "cart-remove", "Xóa"); removeButton.type = "button";
-        removeButton.dataset.cartRemove = ""; removeButton.setAttribute("aria-label", `Xóa ${item.name} khỏi giỏ hàng`);
-        controls.append(stepper, removeButton); info.append(controls);
-        row.append(imageLink, info, element("strong", "cart-item-total", money(item.price * item.quantity)));
-        return row;
-    }
-    function updateQuantityControl(form) {
-        const input = form.querySelector("[data-quantity]");
-        if (!input) return;
-        const number = quantity(input.value); input.value = String(number);
-        form.querySelector('[data-quantity-step="-1"]').disabled = number <= 1;
-        form.querySelector('[data-quantity-step="1"]').disabled = number >= 99;
-    }
-    document.addEventListener("DOMContentLoaded", () => {
-        render();
-        document.querySelectorAll("[data-product-form]").forEach(updateQuantityControl);
-        if (new URLSearchParams(window.location.search).get("checkout") === "1" && read().length) {
-            openDialog("[data-checkout-dialog]");
-        }
-        document.addEventListener("submit", event => {
-            if (event.target.matches(".checkout-form")) { event.preventDefault(); return; }
-            const form = event.target.closest("[data-product-form]");
-            if (!form) return;
-            if (form.method.toLowerCase() === "post" && new URL(form.action, window.location.href).pathname === "/cart/items") return;
-            event.preventDefault();
-            if (!form.reportValidity()) return;
-            const fields = new FormData(form);
-            const item = { ...form.dataset, quantity: fields.get("quantity"), size: fields.get("size"), shade: fields.get("shade") };
-            if (!add(item)) { notify("Chưa thể thêm sản phẩm. Vui lòng thử lại."); return; }
-            window.OneShopMotion?.pulse(event.submitter?.querySelector("i"));
-            if (event.submitter?.hasAttribute("data-buy-now")) window.location.assign("/cart?checkout=1");
-            else notify("Đã thêm sản phẩm vào giỏ hàng của bạn.");
-        });
-        document.addEventListener("click", event => {
-            const quick = event.target.closest("[data-quick-add]");
-            if (quick) {
-                const card = quick.closest("[data-product-card]");
-                if (card && add({ ...card.dataset, quantity: 1, shade: "" })) {
-                    window.OneShopMotion?.pulse(quick.querySelector("i"));
-                    notify("Đã thêm sản phẩm vào giỏ hàng của bạn.");
-                }
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-product-form]').forEach(updateQuantity);
+        document.addEventListener('click', event => {
+            const step = event.target.closest('[data-quantity-step]');
+            if (step) {
+                const form = step.closest('[data-product-form]');
+                const input = form?.querySelector('[data-quantity]');
+                if (input) { input.value = String(quantity(Number(input.value) + Number(step.dataset.quantityStep))); updateQuantity(form); }
                 return;
             }
-            const step = event.target.closest("[data-quantity-step]");
-            if (step) {
-                const form = step.closest("[data-product-form]");
-                const input = form.querySelector("[data-quantity]");
-                input.value = String(quantity(Number(input.value) + Number(step.dataset.quantityStep)));
-                updateQuantityControl(form); return;
-            }
-            const cartStep = event.target.closest("[data-cart-step]");
-            if (cartStep) {
-                const row = cartStep.closest("[data-cart-key]");
-                setQuantity(row.dataset.cartKey, Number(row.querySelector("[data-cart-quantity]").value) + Number(cartStep.dataset.cartStep)); return;
-            }
-            const removeButton = event.target.closest("[data-cart-remove]");
-            if (removeButton) { remove(removeButton.closest("[data-cart-key]").dataset.cartKey); notify("Đã bỏ sản phẩm khỏi giỏ hàng.", true); return; }
-            if (event.target.closest("[data-undo-removal]") && lastRemoved) { add(lastRemoved); lastRemoved = null; notify("Đã khôi phục sản phẩm trong giỏ hàng."); }
-            if (event.target.closest("[data-dismiss-toast]")) dismissToast();
-            if (event.target.closest("[data-open-checkout]") && read().length) openDialog("[data-checkout-dialog]");
-            if (event.target.closest("[data-close-checkout]")) closeDialog(document.querySelector("[data-checkout-dialog]"));
-            if (event.target.closest("[data-image-zoom]")) openDialog("[data-product-zoom]");
-            if (event.target.closest("[data-close-zoom]")) closeDialog(document.querySelector("[data-product-zoom]"));
+            if (event.target.closest('[data-image-zoom]')) openDialog(document.querySelector('[data-product-zoom]'));
+            if (event.target.closest('[data-close-zoom]')) closeDialog(document.querySelector('[data-product-zoom]'));
         });
-        document.addEventListener("change", event => {
-            if (event.target.matches("[data-auto-submit]")) event.target.form.requestSubmit();
-            if (event.target.matches("[data-quantity]")) updateQuantityControl(event.target.closest("[data-product-form]"));
-            if (event.target.matches("[data-cart-quantity]")) setQuantity(event.target.closest("[data-cart-key]").dataset.cartKey, event.target.value);
+        document.addEventListener('change', event => {
+            if (event.target.matches('[data-auto-submit]')) event.target.form.requestSubmit();
+            if (event.target.matches('[data-quantity]')) updateQuantity(event.target.closest('[data-product-form]'));
             if (event.target.matches('input[name="shade"]')) {
-                event.target.closest("[data-product-form]").querySelector("[data-selected-shade]").textContent = event.target.value;
+                const label = event.target.closest('[data-product-form]')?.querySelector('[data-selected-shade]');
+                if (label) label.textContent = event.target.value;
             }
         });
-        document.querySelectorAll("dialog").forEach(dialog => dialog.addEventListener("click", event => {
-            if (event.target === dialog) {
-                const bounds = dialog.getBoundingClientRect();
-                if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) closeDialog(dialog);
-            }
+        document.querySelectorAll('[data-product-zoom]').forEach(dialog => dialog.addEventListener('click', event => {
+            if (event.target !== dialog) return;
+            const bounds = dialog.getBoundingClientRect();
+            if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)
+                closeDialog(dialog);
         }));
-        const toast = document.querySelector("[data-cart-toast]");
-        if (toast) {
-            toast.addEventListener("pointerenter", () => clearTimeout(toastTimer));
-            toast.addEventListener("focusin", () => clearTimeout(toastTimer));
-            toast.addEventListener("pointerleave", () => scheduleToastDismiss(toast));
-            toast.addEventListener("focusout", event => {
-                if (!toast.contains(event.relatedTarget)) scheduleToastDismiss(toast);
-            });
-        }
     });
-    window.addEventListener("oneshop:cart-updated", render);
-    window.addEventListener("storage", event => { if (event.key === STORAGE_KEY || event.key === null) render(); });
 })();

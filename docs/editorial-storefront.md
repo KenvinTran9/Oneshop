@@ -4,7 +4,7 @@ Cập nhật 30/10/2026. Tham khảo nhịp bố cục ảnh lớn, header gọn
 
 ## Bố cục và hành vi
 
-Hero tràn chiều ngang với ba ảnh tự đổi sau 5 giây; giữ điều hướng trước/sau, chấm chọn, hỗ trợ bàn phím và prefers-reduced-motion. Tiếp theo là hai hàng tổng cộng tám sản phẩm lấy từ database, cặp ảnh chăm da/trang điểm, khu vực skincare, năm danh mục bằng ảnh, câu chuyện thương hiệu, thương hiệu và cửa hàng. Header có tìm kiếm thu gọn; footer hồng với wordmark lớn. Trang danh mục dùng cùng màu sắc, ảnh chiến dịch và đường nét vuông.
+Hero tràn chiều ngang với ba ảnh tự đổi sau 5 giây; giữ điều hướng trước/sau, chấm chọn, hỗ trợ bàn phím và prefers-reduced-motion. Tiếp theo là hai hàng tổng cộng tám sản phẩm lấy từ database, cặp ảnh chăm da/trang điểm, khu vực skincare, năm danh mục bằng ảnh, câu chuyện thương hiệu, thương hiệu và cửa hàng. Header có tìm kiếm thu gọn; footer hồng với mặt cười. Trang danh mục dùng cùng màu sắc, ảnh chiến dịch và đường nét vuông.
 
 Giữ nguyên giỏ hàng, đăng nhập, đăng ký, thanh toán và theo dõi đơn. Không thêm khuyến mãi hay đánh giá giả. Ảnh campaign là ảnh trang trí; ảnh sản phẩm trong danh mục vẫn gắn đúng sản phẩm.
 
@@ -14,19 +14,14 @@ Build Maven thành công; 15 kiểm tra hiện có (CatalogIntegrationTests, Aut
 
 ## Nguồn tài sản
 
-Năm ảnh tạo bằng công cụ image_gen tích hợp (built-in), nhân vật người lớn hư cấu, sản phẩm không thương hiệu. Không sử dụng ảnh hay logo của Glossier. File WebP chất lượng 87, giữ nguyên kích thước ảnh gốc, chỉ chuyển định dạng bằng Pillow; không crop hay sửa ảnh sau khi tạo.
+Bộ ảnh tạo bằng công cụ image_gen tích hợp (built-in), nhân vật người lớn hư cấu, sản phẩm không thương hiệu. Không sử dụng ảnh hay logo của Glossier. File WebP chất lượng 87, giữ nguyên kích thước ảnh gốc, chỉ chuyển định dạng bằng Pillow; không crop hay sửa ảnh sau khi tạo.
 
-- `src/main/resources/static/images/home/editorial-glow-v1.webp`
 - `src/main/resources/static/images/home/editorial-color-v1.webp`
 - `src/main/resources/static/images/home/editorial-skin-v1.webp`
 - `src/main/resources/static/images/home/editorial-lips-v1.webp`
 - `src/main/resources/static/images/home/editorial-ritual-v1.webp`
 
 ## Bộ prompt cuối cùng
-
-### editorial-glow-v1
-
-Use case: ads-marketing. Asset type: landscape 1536x1024 full-bleed beauty campaign hero for OneShop cosmetics store. Photorealistic fashion beauty photograph, adult Vietnamese/East Asian woman around 28, natural luminous warm skin with visible subtle pores, glossy rose lips, dark hair slicked behind ear, small silver earring, a joyful relaxed confident expression, white camisole neckline. CLOSE-UP portrait on RIGHT two thirds with face large, not a distant fashion model. She gently touches her cheek with one hand. Left third soft sunlit cream and pale pink studio wall as quiet negative space for HTML copy. Modern art-directed beauty campaign, direct warm daylight with a little editorial flash, rich rosy color, believable human skin, striking face and beautiful composition. Preserve full face and chin inside central right 60% for responsive cropping. No printed text, brand logos, labels, watermark, UI, collage, or typography. Fictional adult model, not a celebrity. No overly airbrushed skin or plastic CG texture.
 
 ### editorial-color-v1
 

@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.oneshop.entity.Cart;
@@ -108,6 +110,19 @@ class CartControllerTest extends com.oneshop.MySqlIntegrationTestSupport {
     void cleanCartFixtures() {
         cartItemRepository.deleteAll();
         cartRepository.deleteAll();
+    }
+
+    @Test
+    void headerCombinesAccountStatusAndTheCorrectCartCounter() throws Exception {
+        MockHttpSession session = new MockHttpSession(); addAsGuest(session, 2);
+        mockMvc.perform(get("/account/header").session(session)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.authenticated").value(false)).andExpect(jsonPath("$.isAdmin").value(false))
+                .andExpect(jsonPath("$.itemCount").value(2));
+        seedAccountCart(3);
+        mockMvc.perform(get("/account/header").session(session).with(user(USER_EMAIL).roles("CUSTOMER")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.authenticated").value(true))
+                .andExpect(jsonPath("$.email").value(USER_EMAIL)).andExpect(jsonPath("$.itemCount").value(3))
+                .andExpect(header().string("Cache-Control", org.hamcrest.Matchers.containsString("no-store")));
     }
 
     @Test

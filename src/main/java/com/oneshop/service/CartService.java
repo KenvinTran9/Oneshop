@@ -56,7 +56,7 @@ public class CartService {
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public long getItemCount(String email, HttpSession session) {
-        return email != null ? cartRepository.findByUserEmailIgnoreCase(email).map(cart -> cart.getItems().stream().mapToLong(CartItem::getQuantity).sum()).orElse(0L)
+        return email != null ? cartRepository.countItemsByUserEmail(email)
                 : guestItems(session).values().stream().mapToLong(Integer::longValue).sum();
     }
 

@@ -4,6 +4,9 @@ spring:
     exclude: org.springframework.boot.autoconfigure.session.SessionAutoConfiguration
   application:
     name: oneshop
+  mvc:
+    # These unused request-completion events force a JDBC session lookup even for static files.
+    publish-request-handled-events: false
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}

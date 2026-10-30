@@ -24,16 +24,6 @@ function node() {
     };
 }
 (async () => {
-    const toast = node();
-    motion.showToast(toast);
-    assert.equal(toast.hidden, false);
-    const dismissing = motion.hideToast(toast);
-    const outgoing = toast.animations.at(-1);
-    motion.showToast(toast);
-    assert.equal(outgoing.canceled, true);
-    await dismissing;
-    assert.equal(toast.hidden, false, 'A new notification must survive an interrupted dismissal');
-
     const dialog = node();
     motion.openDialog(dialog);
     assert.equal(dialog.open, true);
@@ -65,10 +55,10 @@ function node() {
     motion.pulse(badge);
     assert.equal(badge.animations.length, 2, 'Background tabs do not start effects');
     document.hidden = false;
-    const unsupported = { hidden: true };
-    motion.showToast(unsupported);
-    assert.equal(unsupported.hidden, false);
-    await motion.hideToast(unsupported);
-    assert.equal(unsupported.hidden, true);
+    const unsupported = { open: false, dataset: {}, showModal() { this.open = true; }, close() { this.open = false; } };
+    motion.openDialog(unsupported);
+    assert.equal(unsupported.open, true);
+    await motion.closeDialog(unsupported);
+    assert.equal(unsupported.open, false);
     console.log('Motion tests passed: interruption, rapid updates, modal focus timing, live reduced-motion changes, background tabs and fallback.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

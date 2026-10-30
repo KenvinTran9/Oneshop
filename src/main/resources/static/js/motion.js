@@ -39,32 +39,6 @@
         play(node, [{ opacity: .45 }, { opacity: 1 }], { duration: 180 });
     }
 
-    function showToast(toast) {
-        const wasHidden = toast.hidden;
-        cancel(toast);
-        toast.hidden = false;
-        if (!wasHidden) {
-            play(toast, [{ opacity: .75 }, { opacity: 1 }], { duration: 150 });
-            return;
-        }
-        play(toast, [
-            { opacity: 0, transform: "translate(-50%, 10px)" },
-            { opacity: 1, transform: "translate(-50%, 0)" }
-        ]);
-    }
-
-    async function hideToast(toast) {
-        if (!toast || toast.hidden) return;
-        const animation = play(toast, [
-            { opacity: 1, transform: "translate(-50%, 0)" },
-            { opacity: 0, transform: "translate(-50%, 8px)" }
-        ], { duration: 140 });
-        if (animation) {
-            try { await animation.finished; } catch (_) { return; }
-        }
-        toast.hidden = true;
-    }
-
     function openDialog(dialog) {
         if (!dialog) return;
         cancel(dialog);
@@ -140,5 +114,5 @@
         });
     });
 
-    window.OneShopMotion = { pulse, valueChanged, enter, showToast, hideToast, openDialog, closeDialog, captureRows, settleRows };
+    window.OneShopMotion = { pulse, valueChanged, enter, openDialog, closeDialog, captureRows, settleRows };
 })();

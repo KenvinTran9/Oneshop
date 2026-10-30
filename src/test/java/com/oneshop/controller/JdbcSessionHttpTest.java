@@ -26,12 +26,27 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ActiveProfiles({"test", "jdbc-session-test"})
 class JdbcSessionHttpTest extends MySqlIntegrationTestSupport {
     @LocalServerPort int port;
-    @Autowired JdbcIndexedSessionRepository repository;
+    @org.springframework.test.context.bean.override.mockito.MockitoSpyBean JdbcIndexedSessionRepository repository;
     @Autowired JdbcTemplate jdbc;
     @Autowired PlatformTransactionManager transactions;
     @Autowired com.oneshop.repository.UserRepository users;
     @Autowired com.oneshop.repository.RoleRepository roles;
     @Autowired org.springframework.security.crypto.password.PasswordEncoder encoder;
+
+    @Test void publicAssetsDoNotLoadJdbcSessionsEvenWhenTheBrowserHasASessionCookie() throws Exception {
+        var client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+        String base = "http://localhost:" + port;
+        client.send(HttpRequest.newBuilder(URI.create(base + "/login")).GET().build(), HttpResponse.BodyHandlers.ofString());
+        org.mockito.Mockito.clearInvocations(repository);
+        for (String path : java.util.List.of("/css/home.css", "/js/shop.js", "/images/oneshop-smile.svg")) {
+            var response = client.send(HttpRequest.newBuilder(URI.create(base + path)).GET().build(), HttpResponse.BodyHandlers.ofString());
+            assertThat(response.statusCode()).isEqualTo(200);
+            assertThat(response.headers().allValues("Set-Cookie")).isEmpty();
+        }
+        org.mockito.Mockito.verify(repository, org.mockito.Mockito.never()).findById(org.mockito.ArgumentMatchers.anyString());
+        client.send(HttpRequest.newBuilder(URI.create(base + "/account/header")).GET().build(), HttpResponse.BodyHandlers.ofString());
+        org.mockito.Mockito.verify(repository, org.mockito.Mockito.atLeastOnce()).findById(org.mockito.ArgumentMatchers.anyString());
+    }
 
     @Test void authenticatedSessionSurvivesRepositoryReplacementAndLogoutRemovesIt() throws Exception {
         var role = new com.oneshop.entity.Role(); role.setName("CUSTOMER"); role = roles.saveAndFlush(role);

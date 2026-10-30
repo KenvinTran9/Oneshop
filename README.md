@@ -40,7 +40,7 @@ Không có profile mặc định; chỉ định `dev`, `test` hoặc `prod`. Kh�
 
 ```powershell
 mvn verify '-Doneshop.build.directory=C:\OneShop\target\mysql-build' '-DargLine=-Djdk.net.unixdomain.tmpdir=C:\OneShop\target'
-python tools/test_mysql_migration.py
+python tools/test_aiven_deploy.py
 ```
 
 Kiểm thử dùng MySQL thật với schema ngẫu nhiên `oneshop_test_<uuid>`, không xóa dữ liệu ứng dụng. Cấu hình kết nối đọc từ môi trường hoặc `.env`; `ONESHOP_TEST_MYSQL_URL` có thể trỏ tới server test riêng, tên database luôn được thay bằng schema thử. Tài khoản test cần quyền tạo/xóa schema thử.
@@ -48,11 +48,12 @@ Kiểm thử dùng MySQL thật với schema ngẫu nhiên `oneshop_test_<uuid>`
 ### Triển khai và dữ liệu
 
 Deploy đầy đủ frontend + backend: [hướng dẫn Render + Aiven MySQL](docs/deploy-render-aiven.md).
+Ghi nhận hiệu năng và phần mã cũ đã dọn: [performance.md](docs/performance.md).
 Dockerfile, profile prod, session JDBC và email Resend qua HTTPS đã được chuẩn bị; cần nhập secrets trên Render và triển khai service.
 
 Profile `prod` yêu cầu `MYSQL_URL`, `MYSQL_USERNAME`, `MYSQL_PASSWORD` và các biến JWT. Hibernate dùng `validate`; cần tạo schema trước khi chạy. Không dùng tài khoản root và cấu hình kết nối local không xác minh TLS cho production. Không nạp dữ liệu demo ở prod.
 
-Bản MongoDB trước đó đã được chuyển sang MySQL; dữ liệu gốc và bản sao riêng được giữ. Bản sao trước khi cài lại MySQL nằm ở `backups/before-reinstall-2026-10-30/`, không đưa lên Git. Xem [docs/mysql.md](docs/mysql.md) để biết cấu trúc, quan hệ và phạm vi giao dịch.
+Dữ liệu hiện được lưu bằng MySQL. Bản sao trước khi cài lại MySQL nằm ở `backups/before-reinstall-2026-10-30/`, không đưa lên Git. Xem [docs/mysql.md](docs/mysql.md) để biết cấu trúc, quan hệ và phạm vi giao dịch.
 
 ## 🔑 Tài khoản mẫu (chỉ profile `dev`)
 
@@ -116,7 +117,7 @@ Profile `dev` có một khóa công khai chỉ dành cho local để khởi ch�
 - **Đặt và theo dõi đơn (`/checkout`, `/orders`):** Checkout COD, lưu giá/màu/dung tích lúc mua, lịch sử xử lý riêng từng tài khoản, quản trị trạng thái tại `/admin/orders`, hoàn tồn khi hủy và email xác nhận Gmail SMTP sau khi lưu đơn. Xem [hướng dẫn cấu hình email và demo](docs/orders.md).
 - **Quản lý Sản phẩm (`/admin/products`):** Danh sách phân trang, xem chi tiết, tạo/cập nhật sản phẩm, quản lý SKU trên Product hiện hữu, đổi trạng thái kinh doanh và tải ảnh chính lên Cloudinary. “Ngừng kinh doanh” là soft delete (`active=false`, `DISCONTINUED`); không xóa cứng để giữ liên kết với đơn hàng. Tồn kho tiếp tục được quản lý riêng theo cửa hàng qua `StoreStock`.
 
-CRUD sản phẩm chỉ cho phép `ADMIN` ở cả lớp URL và service; các form POST dùng CSRF. Form không bind trực tiếp entity, không nhận trường audit hoặc owner. SKU và slug được chuẩn hóa/kiểm tra trước khi lưu, đồng thời có unique index ở MongoDB. Nếu tải ảnh mới thất bại, dữ liệu sản phẩm và ảnh hiện tại không bị thay đổi.
+CRUD sản phẩm chỉ cho phép `ADMIN` ở cả lớp URL và service; các form POST dùng CSRF. Form không bind trực tiếp entity, không nhận trường audit hoặc owner. SKU và slug được chuẩn hóa/kiểm tra trước khi lưu, đồng thời có unique constraint ở MySQL. Nếu tải ảnh mới thất bại, dữ liệu sản phẩm và ảnh hiện tại không bị thay đổi.
 
 ### 3. REST API
 - **Đăng nhập cấp access và refresh token:** `POST /api/auth/login` (Body: `{ "email": "...", "password": "..." }`)
@@ -138,7 +139,7 @@ Trang bán hàng không hiển thị thông tin đối chiếu bên ngoài. Các
 
 Giao diện có tìm sản phẩm/thương hiệu, lọc danh mục, sắp xếp tên/giá, chọn màu và số lượng. `/cart` lưu riêng từng sản phẩm/màu/quy cách: khách vãng lai dùng session, khách đăng nhập dùng database và gộp đúng lựa chọn khi đăng nhập. Máy chủ xác thực màu/quy cách, lấy ảnh riêng của màu và tính lại giá; thêm/cập nhật kiểm tra tổng số lượng mọi lựa chọn với tồn chung của sản phẩm. UI có đổi số lượng 1–99, cập nhật, xóa từng lựa chọn, tổng tiền và liên kết chi tiết đúng sản phẩm. Thanh toán trực tuyến chưa được triển khai; liên kết đặt hàng dẫn tới trang liên hệ cửa hàng. Xem [docs/cart-selections.md](docs/cart-selections.md) cho hành vi và cấu trúc bảng.
 
-Ảnh sản phẩm nằm trong `src/main/resources/static/images/catalog/`. CSS/JS mới tại `static/css/shop.css` và `static/js/shop.js`. Kiểm thử giỏ máy chủ: `mvn -Dtest=CartControllerTest test`; kiểm thử toàn bộ: `mvn test`. Các tiện ích giỏ localStorage cũ vẫn có kiểm thử độc lập trong `tools/test_shop_cart.cjs` nhưng không phải luồng giỏ máy chủ hiện tại.
+Ảnh sản phẩm nằm trong `src/main/resources/static/images/catalog/`. CSS/JS tại `static/css/shop.css` và `static/js/shop.js`; JavaScript chỉ hỗ trợ điều khiển giao diện, giỏ và giá được xử lý ở backend. Kiểm thử giỏ máy chủ: `mvn -Dtest=CartControllerTest test`; kiểm thử toàn bộ: `mvn test`.
 
 Hiệu ứng dùng chung nằm ở `static/css/motion.css` và `static/js/motion.js`: thẻ xuất hiện một lần khi vào vùng nhìn, phản hồi nút/giỏ hàng và mở/đóng hộp thoại. Hiệu ứng chuyển động dùng transform/opacity, không thêm thư viện. Nội dung luôn hiện được khi JavaScript hoặc IntersectionObserver không có; hiệu ứng dừng khi tab ở nền hoặc người dùng bật giảm chuyển động. Giỏ máy chủ lưu qua form POST và tải lại tổng tiền sau khi cập nhật; tiện ích giỏ UI cũ dùng nhận diện dòng theo sản phẩm/quy cách/màu. Kiểm tra các tình huống ngắt hiệu ứng, thao tác nhanh và giảm chuyển động: `node tools/test_shop_motion.cjs`.
 
@@ -168,9 +169,9 @@ Mỗi `ProductShade` có `imageUrl`, `imageAlt`, `imageType` (`photo`/`chart`). 
 
 `catalog/shade-images.json` lưu nội bộ URL trang đối chiếu, URL ảnh, kích thước, ngày kiểm tra và SHA-256 của từng tệp. Storefront không hiển thị các đường dẫn đối chiếu này. Script nhập workbook giữ nguyên phần `shades`, gồm các trường ảnh đã bổ sung. Bộ nạp `dev` chỉ nạp các trường này khi tạo SKU mới, tiếp tục giữ nguyên sản phẩm có sẵn và chỉnh sửa quản trị.
 
-Kiểm tra chức năng ảnh màu: `node tools/test_shade_gallery.cjs`; kiểm tra gộp màu và cập nhật ảnh giỏ: `node tools/test_shop_cart.cjs`. `mvn verify` kiểm tra các trường ảnh và tệp tài nguyên của toàn bộ danh mục cùng trang chi tiết có lựa chọn màu.
+Kiểm tra chức năng ảnh màu: `node tools/test_shade_gallery.cjs`; kiểm tra giỏ backend và gộp màu: `mvn -Dtest=CartControllerTest test`. `mvn verify` kiểm tra các trường ảnh và tệp tài nguyên của toàn bộ danh mục cùng trang chi tiết có lựa chọn màu.
 
-MongoDB giữ dữ liệu sau khi khởi động lại. Profile `dev` chỉ bổ sung SKU hoặc bản ghi tồn kho còn thiếu. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
+MySQL giữ dữ liệu sau khi khởi động lại. Profile `dev` chỉ bổ sung SKU hoặc bản ghi tồn kho còn thiếu. Bộ nạp nhận diện sản phẩm bằng SKU nội bộ `CATALOG-001` đến `CATALOG-100`, không nhập trùng và không ghi đè các sản phẩm đã có hoặc các chỉnh sửa quản trị. Các profile cơ sở dữ liệu khác không tự nhập danh mục này.
 
 Để cập nhật nội dung từ một workbook cùng cấu trúc (Python cần `openpyxl`):
 
