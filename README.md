@@ -474,7 +474,6 @@ Xem thêm [phân tích hiệu năng](docs/performance.md). Dự án đã giảm 
 
 | Tài liệu | Nội dung |
 | --- | --- |
-| [Ôn vấn đáp và luồng code](docs/van-dap-one-shop.md) | Kiến trúc, luồng nghiệp vụ, câu hỏi thường gặp và kịch bản demo |
 | [MySQL](docs/mysql.md) | Chạy và sử dụng database |
 | [Tài khoản](docs/accounts.md) | Đăng ký, đăng nhập, phân quyền |
 | [Bảo mật backend](docs/backend-security.md) | Các lớp bảo vệ và giới hạn |
