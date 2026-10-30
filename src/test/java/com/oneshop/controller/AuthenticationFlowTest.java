@@ -45,7 +45,7 @@ class AuthenticationFlowTest extends MySqlIntegrationTestSupport {
         assertThat(stored.getRole().getName()).isEqualTo("CUSTOMER");
         assertThat(stored.isActive()).isTrue();
         MockHttpSession session = login("  NEW-CUSTOMER@ONESHOP.TEST  ", "/");
-        mvc.perform(get("/api/auth/me").session(session))
+        mvc.perform(get("/account/status").session(session))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.isAdmin").value(false));
         mvc.perform(get("/admin/products/new").session(session)).andExpect(status().isForbidden());
         mvc.perform(post("/admin/products").session(session).with(csrf())
@@ -57,7 +57,7 @@ class AuthenticationFlowTest extends MySqlIntegrationTestSupport {
     void adminLogsInThroughSameFormAndCanOpenProductCreation() throws Exception {
         account("admin@oneshop.test", "ADMIN", true);
         MockHttpSession session = login("admin@oneshop.test", "/admin");
-        mvc.perform(get("/api/auth/me").session(session))
+        mvc.perform(get("/account/status").session(session))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.isAdmin").value(true));
         mvc.perform(get("/admin/products/new").session(session)).andExpect(status().isOk());
     }

@@ -10,6 +10,8 @@
 
 ## Phân quyền
 
+Chi tiết cấu hình JWT/session, CSRF, cookie và giới hạn đăng nhập: [backend-security.md](backend-security.md). Website đọc phiên qua `/account/status`; API `/api/auth/me` chỉ nhận access token Bearer.
+
 Đăng ký công khai luôn cấp vai trò `CUSTOMER`; các trường gửi thêm như `role`, `role.name`, `active` không cấp được quyền quản trị.
 
 Chỉ `ADMIN` được truy cập `/admin`, mở form thêm sản phẩm và gửi yêu cầu tạo, sửa, ngừng kinh doanh sản phẩm. Quyền được kiểm tra cả ở Spring Security và `AdminService`; ẩn menu chỉ là phần giao diện.

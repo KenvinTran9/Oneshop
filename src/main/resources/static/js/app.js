@@ -63,8 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(() => {});
-    // 1. Kiem tra trang thai dang nhap qua API /api/auth/me
-    fetch("/api/auth/me", {
+    // The website checks its session; /api/auth/me is reserved for explicit Bearer tokens.
+    fetch("/account/status", {
         headers: { "Accept": "application/json" }
     })
     .then(response => {

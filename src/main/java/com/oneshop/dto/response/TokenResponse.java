@@ -7,4 +7,5 @@ public record TokenResponse(
         String refreshToken,
         long refreshTokenExpiresInMillis
 ) {
+    @Override public String toString() { return "TokenResponse[redacted]"; }
 }

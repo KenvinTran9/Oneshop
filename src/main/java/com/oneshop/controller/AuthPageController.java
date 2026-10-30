@@ -40,6 +40,11 @@ public class AuthPageController {
         return "pages/register";
     }
 
+    @GetMapping("/logout")
+    public String confirmLogout() {
+        return "pages/logout";
+    }
+
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("registrationRequest") RegisterRequest request,
                            BindingResult bindingResult,

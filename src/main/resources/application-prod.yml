@@ -8,3 +8,9 @@ spring:
       ddl-auto: validate
   thymeleaf:
     cache: true
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
