@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>OneShop</title>
+  <rect width="64" height="64" rx="14" fill="#f3dfe5"/>
+  <ellipse cx="28" cy="35" rx="17" ry="22" fill="#171717"/>
+  <ellipse cx="29" cy="35" rx="8" ry="13" fill="#f3dfe5"/>
+  <path d="M48 4 51 12 60 16 51 20 48 28 45 20 37 16 45 12Z" fill="#9c2546" stroke="#f3dfe5" stroke-width="3" stroke-linejoin="round"/>
+</svg>
