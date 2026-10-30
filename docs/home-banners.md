@@ -1,5 +1,7 @@
 # Banner trang chủ OneShop
 
+> Đây là bố cục banner phiên bản trước. Bố cục hiện tại và bộ ảnh mới được mô tả tại [editorial-storefront.md](editorial-storefront.md); một số ảnh cũ vẫn dùng cho danh mục.
+
 Tạo ngày 30/10/2026 bằng công cụ image_gen tích hợp (built-in), ba ảnh ngang 1536 × 1024. Đây là ảnh trang trí không thương hiệu, không đại diện một sản phẩm cụ thể trong danh mục. Bản WebP chất lượng 87 giữ nguyên kích thước, không crop hay sửa bố cục ảnh gốc. Ảnh cũ beauty-editorial-v1 vẫn được giữ cho trang danh mục/đăng nhập.
 
 File trong dự án:

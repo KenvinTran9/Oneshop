@@ -13,6 +13,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (headerSearch && currentUrl.pathname === "/products") {
         headerSearch.value = currentUrl.searchParams.get("q") || "";
     }
+    const searchToggle = document.querySelector("[data-header-search-toggle]");
+    const searchPanel = document.getElementById("site-search-panel");
+    if (searchToggle && searchPanel && headerSearch) {
+        function setSearchOpen(open, focus = false) {
+            searchPanel.hidden = !open;
+            searchToggle.setAttribute("aria-expanded", String(open));
+            searchToggle.setAttribute("aria-label", open ? "Đóng tìm kiếm" : "Mở tìm kiếm");
+            if (focus) (open ? headerSearch : searchToggle).focus();
+        }
+        searchToggle.hidden = false;
+        setSearchOpen(Boolean(headerSearch.value));
+        searchToggle.addEventListener("click", () => setSearchOpen(searchPanel.hidden, true));
+        searchPanel.addEventListener("keydown", event => {
+            if (event.key === "Escape") { event.preventDefault(); setSearchOpen(false, true); }
+        });
+    }
     mainMenu?.querySelectorAll("a.nav-link").forEach(link => {
         const destination = new URL(link.href);
         const sameCategory = (destination.searchParams.get("category") || "") === (currentUrl.searchParams.get("category") || "");

@@ -1,0 +1,71 @@
+/* OneShop editorial storefront: clear typography, thin lines and image-led layouts. */
+:root { --store-ink:#171717; --store-pink:#f3dfe5; --store-berry:#9c2546; --store-line:#dedbda; }
+body { background:#fff; }
+.store-eyebrow { display:block;font:600 10px/1.6 var(--font-body);text-transform:uppercase;letter-spacing:1.5px; }
+.store-button { display:inline-flex;align-items:center;justify-content:center;gap:20px;min-height:44px;padding:11px 18px;border:1px solid #171717;border-radius:0;background:#fff;color:#171717;font:500 12px/1.5 var(--font-body);text-decoration:none; }
+.store-button:hover { background:#171717;color:#fff; }
+.store-button.dark { background:#171717;color:#fff; }
+.store-button.dark:hover { background:#393034; }
+.shop-announcement { display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:28px;padding:5px 24px;background:#171717;color:#fff;font-size:10px;letter-spacing:.3px; }
+.shop-announcement a { color:inherit;text-decoration:none;white-space:nowrap; }
+.site-header { color:#171717; }
+.site-header .header-shell { max-width:none;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 18px;padding:12px 24px; }
+.site-header .brand-mark { display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:126px;margin:0;padding:0; }
+.brand-wordmark { font-family:var(--font-body);font-size:29px;line-height:1;font-weight:800;font-style:italic;letter-spacing:-1.8px; }
+.brand-tagline { font-family:var(--font-body);font-size:7px;font-weight:500;font-style:normal;letter-spacing:2.8px;line-height:1.2; }
+.site-header .navbar-icons { grid-column:3;grid-row:1;gap:7px; }
+.header-search-toggle { display:grid;place-items:center;width:38px;height:38px;border:0;background:transparent;color:#171717;font-size:17px; }
+.header-search[hidden],.header-search-toggle[hidden] { display:none!important; }
+.site-header .header-search { grid-column:1/-1;grid-row:2;border-radius:0;background:#faf7f7;border-color:#dcd5d7;margin-top:8px; }
+.header-search-submit { border-radius:0;background:#171717; }
+.site-header .header-links { grid-column:1/-1;grid-row:3;margin:0;border:0; }
+.site-header .header-links .navbar-nav { gap:0;justify-content:center;padding:0; }
+.site-header .header-links .nav-link { font-size:11px;font-weight:500;letter-spacing:.2px;text-transform:uppercase;padding:10px 11px!important;border-radius:0;color:#242024; }
+.site-header .header-links .nav-link:hover,.site-header .header-links .nav-link[aria-current='page'] { background:transparent;color:#9c2546;text-decoration:underline;text-underline-offset:7px; }
+.site-header .shop-cart-link { width:38px;height:38px;border:0;background:transparent;border-radius:0; }
+.site-header .header-account-button { background:transparent!important;border:0;color:#171717!important;font-size:12px;min-height:38px;padding:6px 8px!important; }
+.site-header .header-account-label { max-width:98px; }
+.site-header .user-avatar-circle { background:transparent; }
+.site-header .header-menu-toggle { border:0;border-radius:0; }
+.site-header :is(a,button):focus-visible { outline:2px solid #9c2546;outline-offset:3px; }
+.site-footer { display:grid;grid-template-columns:1fr 1fr;gap:45px 65px;margin-top:0!important;padding:55px 24px 22px!important;background:#f3dfe5;color:#171717;overflow:hidden;border-top:1px solid #d9c2c9; }
+.footer-editorial-intro h2 { font:600 clamp(32px,4vw,54px)/1.15 var(--font-display);letter-spacing:-1.3px;margin:18px 0 26px; }
+.footer-editorial-intro h2 em { font-weight:500; }
+.footer-editorial-intro .store-button { background:transparent; }
+.footer-editorial-links { display:grid;grid-template-columns:1fr 1fr;gap:24px; }
+.footer-editorial-links h3 { font:600 11px/1.6 var(--font-body);text-transform:uppercase;letter-spacing:.8px;margin:0 0 15px; }
+.footer-editorial-links a { display:block;width:fit-content;color:inherit;font-size:12px;line-height:1.7;margin:9px 0;text-decoration:none; }
+.footer-editorial-links a:hover { text-decoration:underline;text-underline-offset:4px; }
+.footer-editorial-note { grid-column:1/-1;max-width:430px; }
+.footer-editorial-note p { font-size:13px;line-height:1.8;margin:0; }
+.footer-wordmark { grid-column:1/-1;font-family:var(--font-body);font-size:23.7vw;font-style:italic;font-weight:800;line-height:.83;letter-spacing:-.08em;white-space:nowrap;margin:35px 0 0 -.025em; }
+.site-footer .footer-bottom { grid-column:1/-1;display:flex;justify-content:space-between;gap:20px;align-items:center;padding-top:20px;margin-top:0;border-top:1px solid #bfaab1;color:#51434a;font-size:10px; }
+.site-footer .footer-bottom p { margin:0; }
+.footer-bottom a { color:inherit;text-decoration:none;font-size:11px; }
+@media(min-width:1200px) { .site-header .header-links { grid-column:2;grid-row:1; }.site-header .header-links .navbar-nav { flex-wrap:nowrap; }.site-header .header-search { grid-row:2; } }
+@media(max-width:1199.98px) and (min-width:992px) { .site-header .header-links { padding-top:5px; } }
+@media(max-width:991.98px) {
+    .site-header .header-shell { grid-template-columns:minmax(0,1fr) auto;padding:12px 18px;row-gap:0; }
+    .site-header .navbar-icons { grid-column:2; }
+    .site-header .header-links { grid-row:3; }
+    .site-header .header-links .navbar-nav { padding-top:12px;gap:0; }
+    .site-header .header-links .nav-link { padding:13px 8px!important;font-size:13px; }
+    .site-header .header-account-button { width:38px;height:38px;padding:0!important; }
+    .site-header .header-search { margin-top:12px; }
+    .site-footer { grid-template-columns:1fr 1fr;gap:35px; }
+}
+@media(max-width:575.98px) {
+    .shop-announcement { padding:6px 14px;min-height:28px;font-size:8px;justify-content:center; }
+    .shop-announcement a { display:none; }
+    .site-header .header-shell { padding:11px 12px;column-gap:4px; }
+    .site-header .brand-mark { min-width:112px; }
+    .brand-wordmark { font-size:27px; }
+    .brand-tagline { font-size:6px;letter-spacing:2.4px; }
+    .site-header .navbar-icons { gap:2px; }
+    .site-header .shop-cart-link,.site-header .header-account-button,.header-search-toggle,.site-header .header-menu-toggle { width:35px;height:36px;min-height:36px; }
+    .site-footer { grid-template-columns:1fr;padding:38px 18px 20px!important;gap:35px; }
+    .footer-editorial-intro h2 { font-size:36px; }
+    .footer-wordmark { margin-top:10px;font-size:22vw; }
+    .site-footer .footer-bottom { align-items:start;flex-direction:column;gap:10px;font-size:9px; }
+    .footer-editorial-links { gap:20px; }
+}

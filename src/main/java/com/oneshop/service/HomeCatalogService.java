@@ -83,7 +83,17 @@ public class HomeCatalogService {
         };
     }
 
-    public record Category(String name, String slug, long productCount, String icon, String teaser) { }
+    public record Category(String name, String slug, long productCount, String icon, String teaser) {
+        public String getImageUrl() {
+            return "/images/home/" + switch (slug) {
+                case "cham-soc-da" -> "editorial-skin-v1.webp";
+                case "trang-diem" -> "editorial-lips-v1.webp";
+                case "serum" -> "banner-serum-v1.webp";
+                case "kem-duong" -> "banner-skincare-v1.webp";
+                default -> "editorial-ritual-v1.webp";
+            };
+        }
+    }
 
     public record HomeCatalog(List<Category> categories, List<Product> suggestions, List<HomeBrand> brands,
                               long productCount, long brandCount, Product heroProduct) { }

@@ -1,13 +1,13 @@
 /* Catalog accents stay local to this page; one category menu lives in the header. */
-.catalog-page { --catalog-rose: #805260; --catalog-line: #e9dbe0; }
+.catalog-page { --catalog-rose: #171717; --catalog-line: #ded8db; }
 .catalog-intro { padding: 28px 0 0; }
 .catalog-intro-panel {
     display: grid;
     grid-template-columns: 1.3fr 1fr;
     overflow: hidden;
-    border: 1px solid var(--catalog-line);
-    border-radius: 24px;
-    background: #f7eeec;
+    border: 0;
+    border-radius: 0;
+    background: #f5e3e9;
 }
 .catalog-intro-copy { padding: 32px 40px; align-self: center; }
 .catalog-eyebrow { display: block; color: var(--catalog-rose); font-size: 12px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; }
@@ -24,20 +24,20 @@
 .catalog-signature { display: flex; align-items: center; gap: 9px; margin-top: 23px; color: var(--catalog-rose); font-size: 12px; font-weight: 500; }
 .catalog-signature i { font-size: 19px; }
 .catalog-intro-visual { position: relative; min-width: 0; min-height: 320px; }
-.catalog-intro-visual img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: center 57%; }
+.catalog-intro-visual img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: center 28%; }
 .catalog-page .shop-collection { padding-top: 30px; }
 .catalog-page .shop-results-bar { margin: 0 0 24px; padding-bottom: 20px; border-bottom: 1px solid var(--catalog-line); }
 .catalog-results-copy { min-width: 0; }
 .catalog-results-copy h2 { font-size: 23px; font-weight: 600; letter-spacing: -.5px; margin: 0 0 7px; }
 .catalog-page .shop-results-bar p { font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
 .catalog-reset { display: inline-flex; align-items: center; gap: 3px; margin-left: 12px; color: var(--catalog-rose); text-underline-offset: 3px; font-size: 13px; }
-.catalog-page .shop-sort-form select { min-height: 44px; border-radius: 12px; background-color: #fffdfb; }
-.catalog-page .shop-card { border-color: #eae2e1; border-radius: 18px; }
+.catalog-page .shop-sort-form select { min-height: 44px; border-radius: 0; background-color: white; }
+.catalog-page .shop-card { border: 0; border-radius: 0; }
 .catalog-page .shop-card-image { background: #faf7f5; border-bottom-color: #eee6e3; }
-.catalog-page .shop-category-tag { border: 0; border-radius: 20px; padding: 6px 10px; background: #fffffff0; }
+.catalog-page .shop-category-tag { border: 0; border-radius: 0; padding: 6px 10px; background: #fffffff0; }
 .catalog-page .shop-card-brand { color: var(--catalog-rose); font-size: 11px; letter-spacing: 1.3px; }
 .catalog-page .shop-card h2 { font-weight: 500; }
-.catalog-page .shop-card-add { width: 100%; min-height: 44px; border-color: #d7bcc6; border-radius: 11px; color: var(--catalog-rose); background: #fffaf9; font-weight: 500; }
+.catalog-page .shop-card-add { width: 100%; min-height: 44px; border-color: #171717; border-radius: 0; color: var(--catalog-rose); background: white; font-weight: 500; }
 .catalog-page .shop-card-add:hover { background: var(--catalog-rose); border-color: var(--catalog-rose); color: white; }
 .catalog-page .shop-card:focus-within { border-color: var(--catalog-rose); }
 .catalog-page a:focus-visible, .catalog-page button:focus-visible, .catalog-page select:focus-visible { outline: 2px solid var(--catalog-rose); outline-offset: 4px; }
@@ -48,7 +48,7 @@
 }
 @media (max-width: 575px) {
     .catalog-intro { padding-top: 18px; }
-    .catalog-intro-panel { grid-template-columns: minmax(0, 1fr) 100px; border-radius: 18px; }
+    .catalog-intro-panel { grid-template-columns: minmax(0, 1fr) 100px; border-radius: 0; }
     .catalog-intro-copy { padding: 23px 18px; }
     .catalog-eyebrow { font-size: 9px; line-height: 1.6; letter-spacing: .8px; }
     .catalog-page .catalog-intro h1 { font-size: 30px; margin: 14px 0; letter-spacing: -.7px; }
@@ -62,6 +62,6 @@
     .catalog-page .shop-results-bar p { font-size: 12px; }
     .catalog-reset { display: flex; width: fit-content; margin: 5px 0 0; font-size: 12px; }
     .catalog-page .shop-sort-form select { max-width: 143px; font-size: 12px; }
-    .catalog-page .shop-card { border-radius: 14px; }
+    .catalog-page .shop-card { border-radius: 0; }
     .catalog-page .shop-card-add { font-size: 12px; }
 }
