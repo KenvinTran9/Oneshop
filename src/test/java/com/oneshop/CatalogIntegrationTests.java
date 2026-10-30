@@ -60,7 +60,7 @@ class CatalogIntegrationTests extends com.oneshop.MySqlIntegrationTestSupport {
                 .getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
         assertThat(page).contains("Chăm chút làn da.", "Gợi ý OneShop", "Tìm cái tên bạn yêu thích",
                 "action=\"/cart/items\"", "name=\"productId\"", "/products?category=", "/products?q=", "/css/home.css")
-                .doesNotContain("images.unsplash.com", "Sản phẩm mới nhất");
+                .doesNotContain("images.unsplash.com", "Sản phẩm mới nhất", "home-catalog-stats");
         assertThat(page.split("data-product-card", -1)).hasSize(9);
     }
 

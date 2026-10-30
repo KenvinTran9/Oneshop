@@ -7,39 +7,48 @@
 <body>
 <div class="home-page">
     <section class="home-hero" aria-labelledby="home-title">
+        <h1 class="visually-hidden" id="home-title">OneShop — Mỹ phẩm chăm sóc da và trang điểm</h1>
         <div class="container home-hero-layout">
-            <div class="home-heading">
-                <span class="eyebrow home-hero-eyebrow">Một chút yêu chiều, mỗi ngày</span>
-                <h1 id="home-title">Chăm chút làn da.<br><em>Tô điểm nét riêng.</em></h1>
-                <p>Nâng niu làn da. Chọn sắc son thật hợp.<br class="home-copy-break"> Tìm điều bạn yêu thích tại OneShop.</p>
-                <div class="home-hero-actions">
-                    <a class="shop-button primary" th:href="@{/products}">Khám phá sản phẩm <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-                    <a class="home-text-link" href="#home-categories" th:if="${!#lists.isEmpty(home.categories)}">Chọn danh mục <i class="bi bi-arrow-down" aria-hidden="true"></i></a>
-                </div>
-                <dl class="home-catalog-stats" aria-label="Danh mục OneShop">
-                    <div><dt th:text="${home.productCount}">0</dt><dd>sản phẩm làm đẹp</dd></div>
-                    <div><dt th:text="${home.brandCount}">0</dt><dd>thương hiệu</dd></div>
-                </dl>
-            </div>
-            <div class="home-hero-visual">
-                <div class="home-hero-art">
-                    <img src="/images/home/beauty-editorial-v1.webp"
-                         srcset="/images/home/beauty-editorial-v1-small.webp 640w, /images/home/beauty-editorial-v1.webp 1120w"
-                         sizes="(max-width: 767px) calc(100vw - 24px), (max-width: 1199px) 44vw, 540px"
-                         alt="" width="1120" height="1400" fetchpriority="high">
-                    <span class="home-art-note" aria-hidden="true">Chăm da. Tô điểm. Yêu mình.</span>
-                </div>
-                <span class="home-beauty-mark" aria-hidden="true"><i class="bi bi-stars"></i><span>Đẹp theo<br>cách của bạn</span></span>
-                <a class="home-featured-product" th:if="${home.heroProduct != null}" th:with="product=${home.heroProduct}"
-                   th:href="@{/products/{slug}(slug=${product.slug})}">
-                    <div class="home-featured-image"><img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}"
-                         alt="" width="88" height="100" loading="lazy"></div>
-                    <div class="home-featured-copy">
-                        <span class="home-featured-label">Khám phá trong shop</span>
-                        <h2 th:text="${product.name}">Sản phẩm</h2>
-                        <div class="home-featured-meta"><span th:text="${product.brand != null ? product.brand.name : 'OneShop'}">OneShop</span><strong th:text="${product.displayPrice}">0 ₫</strong></div>
+            <div class="home-carousel" role="region" aria-roledescription="băng chuyền" aria-label="Bộ sưu tập OneShop" data-home-carousel>
+                <article class="home-banner" role="group" aria-roledescription="banner" aria-label="1 trên 3: Chăm sóc da" data-banner-slide>
+                    <img class="home-banner-image" src="/images/home/banner-skincare-v1.webp" width="1536" height="1024" alt="" fetchpriority="high">
+                    <div class="home-banner-copy"><span class="home-banner-eyebrow">Một chút yêu chiều, mỗi ngày</span>
+                        <h2>Chăm chút làn da.<br><em>Tô điểm nét riêng.</em></h2>
+                        <p>Những lựa chọn làm đẹp<br>dành riêng cho bạn.</p>
+                        <a class="home-banner-link" href="/products">Khám phá sản phẩm <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
                     </div>
-                    <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                </article>
+                <article class="home-banner makeup" role="group" aria-roledescription="banner" aria-label="2 trên 3: Trang điểm" data-banner-slide hidden>
+                    <img class="home-banner-image" src="/images/home/banner-makeup-v1.webp" width="1536" height="1024" alt="" decoding="async">
+                    <div class="home-banner-copy"><span class="home-banner-eyebrow">Sắc màu của riêng bạn</span>
+                        <h2>Một sắc son mới.<br><em>Một nét rạng rỡ.</em></h2>
+                        <p>Tìm tông màu yêu thích,<br>tự tin theo cách của bạn.</p>
+                        <a class="home-banner-link" href="/products?category=trang-diem">Khám phá trang điểm <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+                    </div>
+                </article>
+                <article class="home-banner serum" role="group" aria-roledescription="banner" aria-label="3 trên 3: Serum" data-banner-slide hidden>
+                    <img class="home-banner-image" src="/images/home/banner-serum-v1.webp" width="1536" height="1024" alt="" decoding="async">
+                    <div class="home-banner-copy"><span class="home-banner-eyebrow">Thêm một bước nâng niu</span>
+                        <h2>Chăm da mỗi ngày.<br><em>Yêu mình hơn chút.</em></h2>
+                        <p>Khám phá serum phù hợp<br>với chu trình của bạn.</p>
+                        <a class="home-banner-link" href="/products?category=serum">Khám phá serum <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+                    </div>
+                </article>
+                <div class="home-banner-controls" data-banner-controls hidden>
+                    <div class="home-banner-arrows"><button type="button" data-banner-prev aria-label="Banner trước"><i class="bi bi-chevron-left" aria-hidden="true"></i></button><button type="button" data-banner-next aria-label="Banner tiếp theo"><i class="bi bi-chevron-right" aria-hidden="true"></i></button></div>
+                    <div class="home-banner-dots" aria-label="Chọn banner"><button type="button" data-banner-dot="0" aria-label="Xem banner 1: Chăm sóc da" aria-current="true"></button><button type="button" data-banner-dot="1" aria-label="Xem banner 2: Trang điểm"></button><button type="button" data-banner-dot="2" aria-label="Xem banner 3: Serum"></button></div>
+                    <button type="button" class="home-banner-toggle" data-banner-toggle aria-label="Tạm dừng chuyển banner" aria-pressed="false"><i class="bi bi-pause-fill" aria-hidden="true"></i><span>Tạm dừng</span></button>
+                </div>
+                <span class="visually-hidden" role="status" aria-live="polite" data-banner-status></span>
+            </div>
+            <div class="home-banner-side">
+                <a class="home-mini-banner makeup" href="/products?category=trang-diem">
+                    <img src="/images/home/banner-makeup-v1.webp" alt="" width="1536" height="1024" decoding="async">
+                    <div><span class="home-banner-eyebrow">Chạm nhẹ sắc màu</span><h2>Sắc son<br><em>bạn yêu.</em></h2><span class="home-mini-cta">Khám phá trang điểm <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></div>
+                </a>
+                <a class="home-mini-banner serum" href="/products?category=serum">
+                    <img src="/images/home/banner-serum-v1.webp" alt="" width="1536" height="1024" decoding="async">
+                    <div><span class="home-banner-eyebrow">Chăm da cùng OneShop</span><h2>Từng giọt<br><em>nâng niu.</em></h2><span class="home-mini-cta">Khám phá serum <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span></div>
                 </a>
             </div>
         </div>
@@ -98,5 +107,6 @@
         </div>
     </section>
 </div>
+<script src="/js/home-banner.js" defer></script>
 </body>
 </html>
