@@ -99,8 +99,8 @@ OneShop/
 ├── src/main/resources/
 │   ├── catalog/             # Catalog và ánh xạ ảnh màu
 │   ├── db/                  # SQL bổ sung cho khôi phục mật khẩu
-│   ├── static/              # CSS, JavaScript và ảnh đi kèm
-│   ├── templates/           # Thymeleaf pages và decorators
+│   ├── static/              # CSS, JavaScript, ảnh và decorators SiteMesh
+│   ├── templates/           # Thymeleaf pages và mẫu email
 │   └── application*.yml     # Cấu hình chung / dev / prod
 ├── src/test/                # Kiểm thử Java
 ├── deploy/                  # Script khởi động Docker, env mẫu
@@ -277,7 +277,9 @@ ORDER BY id DESC
 LIMIT 50;
 ```
 
-Local và Aiven là hai database riêng. Chạy web local không mặc nhiên cập nhật dữ liệu trên Aiven. Mật khẩu trong bảng được băm BCrypt, không đọc lại được dưới dạng mật khẩu gốc.
+Local và Aiven là hai database riêng khi JDBC URL được cấu hình như các ví dụ trên. Ứng dụng lưu vào server/database mà `MYSQL_URL` chỉ định; chạy trên máy cá nhân vẫn có thể ghi vào Aiven nếu đổi URL sang Aiven. Hai nơi không tự đồng bộ dữ liệu.
+
+Tài khoản, sản phẩm, giỏ của tài khoản và đơn hàng trong MySQL vẫn còn sau khi tắt/chạy lại ứng dụng. Riêng giỏ khách chưa đăng nhập nằm trong session: profile `dev` giữ session trong bộ nhớ nên giỏ này có thể mất khi restart; profile `prod` lưu session qua JDBC, còn phụ thuộc thời hạn session và cookie của trình duyệt. Mật khẩu trong bảng được băm BCrypt, không đọc lại được dưới dạng mật khẩu gốc.
 
 ### Luồng đặt và xử lý đơn
 

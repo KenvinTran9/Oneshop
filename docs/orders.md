@@ -11,8 +11,8 @@ Khách tự hủy được khi NEW. Admin hủy được khi NEW/CONFIRMED/PACKI
 - Giá và tổng tiền tính từ giỏ phía server; phí giao hàng cố định cho project mặc định 30.000 ₫, cấu hình `ORDER_SHIPPING_FEE`.
 - Lưu bản chụp tên, ảnh, màu, dung tích, đơn giá và phí giao hàng vào đơn; sửa sản phẩm sau đó không đổi lịch sử mua.
 - Khóa tài khoản và tồn kho trong transaction, trừ kho khi tạo đơn thành công, xóa giỏ cùng transaction. Token checkout unique ngăn cùng một lần gửi form tạo/trừ tồn hai lần.
-- Email chỉ gửi sau khi commit. Lỗi SMTP không xóa đơn hay trả lại giỏ. Trạng thái PENDING/NOT_CONFIGURED/FAILED/SENT lưu ở đơn. Admin có nút gửi lại khi chưa SENT, trừ đơn đã hủy. Nếu ứng dụng dừng giữa commit và gửi email, admin có thể gửi lại đơn PENDING; chưa có hàng đợi tự retry.
-- SENT nghĩa là SMTP đã tiếp nhận, không bảo đảm vào Inbox. SMTP không có bảo đảm exactly-once nếu mất kết nối sau khi máy chủ đã nhận thư; cần đối chiếu hộp thư khi retry lỗi không rõ kết quả.
+- Email chỉ gửi sau khi commit, qua SMTP hoặc Resend HTTPS tùy cấu hình. Lỗi gửi không xóa đơn hay trả lại giỏ. Trạng thái PENDING/NOT_CONFIGURED/FAILED/SENT lưu ở đơn. Admin có nút gửi lại khi chưa SENT, trừ đơn đã hủy. Nếu ứng dụng dừng giữa commit và gửi email, admin có thể gửi lại đơn PENDING; chưa có hàng đợi tự retry.
+- SENT nghĩa là dịch vụ gửi đã tiếp nhận, không bảo đảm vào Inbox. Cần đối chiếu trạng thái ở nhà cung cấp/hộp thư khi retry lỗi không rõ kết quả.
 - Các đơn cũ không có customer_email chưa được tự gán cho tài khoản; admin vẫn xem được, không mở tra cứu công khai.
 
 ## Gmail SMTP
@@ -23,6 +23,7 @@ Khách tự hủy được khi NEW. Admin hủy được khi NEW/CONFIRMED/PACKI
 
 ```properties
 MAIL_ENABLED=true
+MAIL_PROVIDER=smtp
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
 MAIL_USERNAME=your-shop@gmail.com
@@ -43,4 +44,4 @@ Tham khảo chính thức: [Spring Boot 3.5 mail](https://docs.spring.io/spring-
 
 `OrderFlowTest` dùng schema MySQL riêng và JavaMailSender giả lập: snapshot/giá server, gửi trùng form, lỗi email và retry, quyền sở hữu/CSRF/admin, chuyển trạng thái, hủy/hoàn tồn và hai khách mua cùng lúc. Test không gửi email thật. Profile test luôn tắt mail trừ lớp test có mock sender.
 
-Local `dev` tự thêm bảng/cột qua Hibernate update. Schema mới nằm ở `docs/schema/mysql.sql`; đó là file tạo database trống, không phải script ghi đè dữ liệu hiện có. Production cần migration có sao lưu; không bật dev cùng prod.
+Local `dev` tự thêm bảng/cột qua Hibernate update. `docs/schema/mysql.sql` là snapshot DDL ở thời điểm xuất, cần đối chiếu entity và SQL bổ sung hiện tại. Production cần chuẩn bị schema/migration có sao lưu; không bật dev cùng prod. Cấu hình Resend cho bản deploy và chuyển dữ liệu xem [deploy-render-aiven.md](deploy-render-aiven.md); giới hạn địa chỉ gửi thử áp dụng cả email đơn hàng.

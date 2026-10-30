@@ -19,15 +19,16 @@ mvn spring-boot:run '-Dspring-boot.run.profiles=dev'
 
 Truy cập `http://localhost:8080/`. Trong Workbench, dùng hostname `127.0.0.1`, port `3306`, và tài khoản MySQL đã cấu hình. Tài khoản MySQL khác với tài khoản khách hàng/admin của website.
 
-Profile `dev` dùng `ddl-auto=update` cho local. Profile `prod` dùng `validate`, không tự sửa schema hay nạp dữ liệu demo; phải tạo schema trước. File [schema/mysql.sql](schema/mysql.sql) chứa DDL không có dữ liệu để khởi tạo một database mới. Không dùng tài khoản root hoặc kết nối không xác minh TLS cho triển khai từ xa.
+Profile `dev` dùng `ddl-auto=update` cho local. Profile `prod` dùng `validate`, không tự cập nhật toàn bộ schema hay nạp dữ liệu demo; phải chuẩn bị schema trước. File [schema/mysql.sql](schema/mysql.sql) là snapshot DDL ở thời điểm xuất, cần đối chiếu với entity hiện tại và SQL bổ sung trong `src/main/resources/db`; không coi đây là migration đầy đủ cho mọi phiên bản. Quy trình chuyển dữ liệu hiện tại nằm trong [deploy-render-aiven.md](deploy-render-aiven.md). Không dùng tài khoản root hoặc kết nối không xác minh TLS cho triển khai từ xa.
 
 ## Cấu trúc dữ liệu
 
-14 bảng: `roles`, `users`, `stores`, `categories`, `brands`, `products`, `product_sizes`, `product_shades`, `store_stocks`, `shopping_carts`, `shopping_cart_items`, `orders`, `order_items`, `order_events`.
+15 bảng ứng dụng: `roles`, `users`, `stores`, `categories`, `brands`, `products`, `product_sizes`, `product_shades`, `store_stocks`, `shopping_carts`, `shopping_cart_items`, `orders`, `order_items`, `order_events`, `password_reset_accounts`. Production còn có `SPRING_SESSION` và `SPRING_SESSION_ATTRIBUTES` để lưu session JDBC.
 
 ```mermaid
 erDiagram
     ROLES ||--o{ USERS : role
+    USERS ||--o| PASSWORD_RESET_ACCOUNTS : password_reset
     STORES o|--o{ USERS : assigned_store
     CATEGORIES o|--o{ PRODUCTS : category
     BRANDS o|--o{ PRODUCTS : brand
