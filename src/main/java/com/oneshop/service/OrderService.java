@@ -29,14 +29,18 @@ public class OrderService {
     private final ApplicationEventPublisher events;
     private final BigDecimal shippingFee;
     private final com.oneshop.security.StoreAccess storeAccess;
+    private final BankTransferSettings bankTransfer;
+    @Value("${app.support.phone:${SUPPORT_PHONE:}}")
+    private String supportPhone;
 
     public OrderService(OrderRepository orders, UserRepository users, ProductRepository products,
             StoreRepository stores, StoreStockRepository stocks, CartService carts,
-            ApplicationEventPublisher events, com.oneshop.security.StoreAccess storeAccess, @Value("${app.orders.shipping-fee:30000}") BigDecimal shippingFee) {
+            ApplicationEventPublisher events, com.oneshop.security.StoreAccess storeAccess, BankTransferSettings bankTransfer,
+            @Value("${app.orders.shipping-fee:30000}") BigDecimal shippingFee) {
         this.orders = orders; this.users = users; this.products = products; this.stores = stores;
         this.stocks = stocks; this.carts = carts; this.events = events;
         if (shippingFee.signum() < 0) throw new IllegalStateException("Shipping fee cannot be negative");
-        this.shippingFee = shippingFee; this.storeAccess = storeAccess;
+        this.shippingFee = shippingFee; this.storeAccess = storeAccess; this.bankTransfer = bankTransfer;
     }
 
     public BigDecimal getShippingFee() { return shippingFee; }
@@ -51,6 +55,9 @@ public class OrderService {
             if (customer.getEmail().equalsIgnoreCase(previous.get().getCustomerEmail())) return previous.get().getCode();
             throw new OrderOperationException("Phiên đặt hàng không hợp lệ. Vui lòng tải lại trang.");
         }
+        if (form.getPaymentMethod() == null) throw new OrderOperationException("Vui lòng chọn phương thức thanh toán.");
+        if (form.getPaymentMethod() == PaymentMethod.BANK_TRANSFER && !bankTransfer.isConfigured())
+            throw new OrderOperationException("Chuyển khoản đang tạm ngừng. Vui lòng chọn COD hoặc liên hệ OneShop.");
         var cart = carts.getCart(email, null);
         if (cart.items().isEmpty()) throw new OrderOperationException("Giỏ hàng đang trống. Hãy chọn sản phẩm trước nhé.");
         if (cart.items().stream().anyMatch(line -> line.warning() != null))
@@ -65,6 +72,12 @@ public class OrderService {
         order.setCustomerPhone(form.getCustomerPhone()); order.setShippingAddress(form.getShippingAddress());
         order.setNote(form.getNote()); order.setStore(store); order.setShippingFee(shippingFee);
         order.setTotalAmount(cart.subtotal().add(shippingFee));
+        order.setPaymentMethod(form.getPaymentMethod());
+        order.setPaymentStatus(PaymentStatus.UNPAID);
+        if (form.getPaymentMethod() == PaymentMethod.BANK_TRANSFER) {
+            order.setBankName(bankTransfer.getBankName()); order.setBankAccountNumber(bankTransfer.getAccountNumber());
+            order.setBankAccountHolder(bankTransfer.getAccountHolder()); order.setBankQrImage(bankTransfer.getQrImage());
+        }
         for (var line : cart.items()) {
             OrderItem item = new OrderItem(); item.setOrder(order);
             item.setProduct(products.getReferenceById(line.productId())); item.setProductName(line.name());
@@ -72,7 +85,8 @@ public class OrderService {
             item.setQuantity(line.quantity()); item.setUnitPrice(line.unitPrice()); item.setLineTotal(line.lineTotal());
             order.getItems().add(item);
         }
-        addEvent(order, "OneShop đã nhận đơn hàng của bạn. Thanh toán khi nhận hàng (COD).");
+        addEvent(order, "OneShop đã nhận đơn hàng của bạn. " + (order.getPaymentMethod() == PaymentMethod.COD
+                ? "Thanh toán khi nhận hàng (COD)." : "Vui lòng chuyển khoản đúng số tiền và nội dung mã đơn; đơn chờ đối soát thanh toán."));
         orders.saveAndFlush(order);
         carts.clearCart(email, null);
         events.publishEvent(new Placed(order.getCode()));
@@ -166,6 +180,17 @@ public class OrderService {
             throw new OrderOperationException("Chỉ có thể tự hủy đơn đang chờ xác nhận.");
         transition(order, OrderStatus.CANCELLED, "Khách hàng đã hủy đơn trước khi xác nhận.");
     }
+    @Transactional
+    public void confirmReceived(String email, String code) {
+        Order order = orders.findForUpdate(code).orElseThrow(this::notFound);
+        if (!email.equalsIgnoreCase(order.getCustomerEmail())) throw notFound();
+        if (order.getStatus() == OrderStatus.COMPLETED) return;
+        if (order.getStatus() != OrderStatus.SHIPPING)
+            throw new OrderOperationException("Chỉ xác nhận nhận hàng khi đơn đang được giao.");
+        if (order.getPaymentMethod() == PaymentMethod.BANK_TRANSFER && order.getPaymentStatus() != PaymentStatus.PAID)
+            throw new OrderOperationException("OneShop cần xác nhận thanh toán trước khi hoàn thành đơn.");
+        transition(order, OrderStatus.COMPLETED, "Khách hàng đã xác nhận nhận được hàng. Đơn hàng đã giao và hoàn thành.");
+    }
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void updateStatus(String code, OrderStatus next) {
@@ -175,6 +200,14 @@ public class OrderService {
     private void updateStatus(Order order, OrderStatus next) {
         if (!order.getStatus().getNextStatuses().contains(next))
             throw new OrderOperationException("Không thể chuyển sang trạng thái này. Vui lòng tải lại đơn hàng.");
+        if (next == OrderStatus.COMPLETED)
+            throw new OrderOperationException("Khách hàng cần xác nhận đã nhận hàng để hoàn thành đơn.");
+        if (next == OrderStatus.SHIPPING && (order.getShipperName() == null || order.getShipperName().isBlank()
+                || order.getShipperPhone() == null || order.getShipperPhone().isBlank()))
+            throw new OrderOperationException("Nhập tên và số điện thoại shipper sau khi chuẩn bị hàng, rồi mới bàn giao.");
+        if (next != OrderStatus.CANCELLED && next != OrderStatus.CONFIRMED && order.getPaymentMethod() == PaymentMethod.BANK_TRANSFER
+                && order.getPaymentStatus() != PaymentStatus.PAID)
+            throw new OrderOperationException("Đơn đã được xác nhận. Admin cần đối soát tiền chuyển khoản trước khi bắt đầu chuẩn bị hàng.");
         String message = switch (next) {
             case CONFIRMED -> "Cửa hàng đã xác nhận đơn hàng.";
             case PACKING -> "Sản phẩm đang được chuẩn bị và đóng gói.";
@@ -214,6 +247,12 @@ public class OrderService {
     }
     private void transition(Order order, OrderStatus next, String message) {
         if (next == OrderStatus.CANCELLED) {
+            if (order.getPaymentStatus() == PaymentStatus.PAID) {
+                order.setPaymentStatus(PaymentStatus.REFUND_PENDING);
+                message += " Đơn đã thanh toán; OneShop sẽ đối soát và xử lý hoàn tiền.";
+            } else if (order.getPaymentStatus() == PaymentStatus.REPORTED) {
+                message += " Khách đã báo chuyển khoản; OneShop cần kiểm tra giao dịch và hoàn tiền nếu đã nhận.";
+            }
             Map<Long, Integer> quantities = new TreeMap<>();
             order.getItems().forEach(item -> quantities.merge(item.getProduct().getId(), item.getQuantity(), Integer::sum));
             if (!quantities.isEmpty() && order.getStore() != null) {
@@ -225,7 +264,19 @@ public class OrderService {
                 }
             }
         }
+        if (next == OrderStatus.COMPLETED && order.getPaymentMethod() == PaymentMethod.COD) {
+            order.setPaymentStatus(PaymentStatus.PAID); order.setPaidAt(java.time.LocalDateTime.now());
+            message += " Đã xác nhận thu tiền COD.";
+        }
+        if (next == OrderStatus.COMPLETED) {
+            String phone = supportPhone == null || supportPhone.isBlank()
+                    ? (order.getStore() == null ? null : order.getStore().getPhone()) : supportPhone.trim();
+            message += " Cảm ơn bạn đã mua sắm tại OneShop! Nếu muốn góp ý hoặc cần hỗ trợ, "
+                    + (phone == null || phone.isBlank() ? "vui lòng xem thông tin liên hệ tại mục Cửa hàng trên website."
+                    : "vui lòng liên hệ OneShop qua số điện thoại " + phone + ".");
+        }
         order.setStatus(next); addEvent(order, message); orders.saveAndFlush(order);
+        events.publishEvent(OrderUpdateMail.of(order, next.getLabel(), message));
     }
     private void addEvent(Order order, String message) {
         OrderEvent event = new OrderEvent(); event.setOrder(order); event.setStatus(order.getStatus()); event.setMessage(message);
@@ -239,7 +290,11 @@ public class OrderService {
                 order.getCustomerEmail(), order.getCustomerPhone(), order.getShippingAddress(),
                 order.getStore() == null ? "OneShop" : order.getStore().getName(), order.getNote(),
                 order.getTotalAmount().subtract(order.getShippingFee()), order.getShippingFee(), order.getTotalAmount(),
-                items, history, order.getEmailStatus(), order.getEmailSentAt());
+                items, history, order.getEmailStatus(), order.getEmailSentAt(),
+                new OrderView.Payment(order.getPaymentMethod(), order.getPaymentStatus(), order.getPaidAt(), order.getPaymentReference(),
+                        order.getBankName(), order.getBankAccountNumber(), order.getBankAccountHolder(), order.getBankQrImage(), order.getCode().replace("-", "")),
+                new OrderView.Delivery(order.getCarrier(), order.getShipperName(), order.getShipperPhone(), order.getTrackingCode(),
+                        order.getEstimatedDelivery(), order.getDeliveryNote()), order.getVersion() == null ? 0L : order.getVersion());
     }
     private Pageable pageable(int page) { return PageRequest.of(Math.max(0, page), 12, Sort.by("id").descending()); }
     private ResponseStatusException notFound() { return new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng."); }

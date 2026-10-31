@@ -17,6 +17,10 @@ public class CheckoutForm {
     @NotBlank
     @Pattern(regexp = "[a-f0-9-]{36}")
     private String checkoutToken;
+    @NotNull(message = "Vui lòng chọn phương thức thanh toán.")
+    private com.oneshop.entity.PaymentMethod paymentMethod = com.oneshop.entity.PaymentMethod.COD;
+    public com.oneshop.entity.PaymentMethod getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(com.oneshop.entity.PaymentMethod value) { paymentMethod = value; }
     public String getCustomerName() { return customerName; }
     public void setCustomerName(String v) { customerName = v == null ? null : v.trim(); }
     public String getCustomerPhone() { return customerPhone; }

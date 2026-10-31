@@ -10,6 +10,7 @@
 </div>
 
 <div class="alert alert-success" role="status" th:if="${successMessage}" th:text="${successMessage}"></div>
+<div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
 <section class="admin-panel">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <p class="text-muted mb-0" th:text="${productPage.totalElements} + ' sản phẩm trong danh mục'"></p>
@@ -38,9 +39,16 @@
                     <div class="d-flex flex-wrap gap-1">
                         <a class="btn btn-outline-secondary btn-sm" th:href="@{/admin/products/{id}(id=${product.id})}">Chi tiết</a>
                         <a class="btn btn-outline-dark btn-sm" th:href="@{/admin/products/{id}/edit(id=${product.id})}">Sửa</a>
+                        <form th:if="${product.active and (product.status.name() == 'ACTIVE' or product.status.name() == 'OUT_OF_STOCK')}" th:action="@{/admin/products/{id}/stock-status(id=${product.id})}" method="post">
+                            <input type="hidden" name="soldOut" th:value="${product.status.name() != 'OUT_OF_STOCK'}">
+                            <button class="btn btn-outline-warning btn-sm" type="submit" th:text="${product.status.name() == 'OUT_OF_STOCK' ? 'Có hàng trở lại' : 'Hết hàng'}"></button>
+                        </form>
+                        <form th:if="${product.active}" th:action="@{/admin/products/{id}/delete(id=${product.id})}" method="post">
+                            <button class="btn btn-outline-danger btn-sm" type="submit">Xóa khỏi shop</button>
+                        </form>
                         <form th:action="@{/admin/products/{id}/status(id=${product.id})}" method="post">
                             <button class="btn btn-outline-primary btn-sm" type="submit"
-                                    th:text="${product.active and product.status.name() == 'ACTIVE'} ? 'Ngừng bán' : 'Mở bán'">Đổi trạng thái</button>
+                                    th:text="${product.active and (product.status.name() == 'ACTIVE' or product.status.name() == 'OUT_OF_STOCK')} ? 'Ngừng bán' : 'Mở bán'">Đổi trạng thái</button>
                         </form>
                     </div>
                 </td>

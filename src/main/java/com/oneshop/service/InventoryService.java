@@ -62,6 +62,8 @@ public class InventoryService {
         int after = Math.addExact(before, form.getDelta());
         if (after < 0 || after > 1000000) throw new IllegalArgumentException("Tồn kho sau thay đổi phải từ 0 đến 1.000.000.");
         stock.setQuantity(after); stock.setActive(true); stocks.saveAndFlush(stock);
+        if (form.getDelta() > 0 && after > 0 && product.isActive() && product.getStatus() == ProductStatus.OUT_OF_STOCK)
+            product.setStatus(ProductStatus.ACTIVE);
         StockMovement movement = new StockMovement(); movement.setStore(store); movement.setProduct(product);
         movement.setActorEmail(access.current().getEmail()); movement.setReason(form.getReason().trim());
         movement.setRequestToken(form.getRequestToken()); movement.setDelta(form.getDelta());

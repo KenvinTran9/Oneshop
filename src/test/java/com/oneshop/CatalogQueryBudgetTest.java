@@ -33,8 +33,8 @@ class CatalogQueryBudgetTest extends MySqlIntegrationTestSupport {
         assertThat(products.searchCatalog("", "", PageRequest.of(0,12)).getContent()).hasSize(12);
         long catalogQueries = statistics.getPrepareStatementCount();
         System.out.println("Catalog SQL budgets: home=" + homeQueries + ", listing=" + catalogQueries);
-        assertThat(homeQueries).isLessThanOrEqualTo(6);
-        assertThat(catalogQueries).isLessThanOrEqualTo(4);
+        assertThat(homeQueries).isLessThanOrEqualTo(7);
+        assertThat(catalogQueries).isLessThanOrEqualTo(5);
         var user = new com.oneshop.entity.User(); user.setEmail("counter@oneshop.test"); user.setFullName("Counter test");
         user.setPassword("test-only"); user = users.saveAndFlush(user);
         var cart = new com.oneshop.entity.Cart(); cart.setUser(user);

@@ -126,6 +126,19 @@ public class AdminController {
         return "redirect:/admin/products";
     }
 
+    @PostMapping("/products/{id}/stock-status")
+    public String stockStatus(@PathVariable Long id,@RequestParam boolean soldOut,RedirectAttributes redirect){
+        try{adminService.markStockStatus(id,soldOut);redirect.addFlashAttribute("successMessage",soldOut
+            ? "Đã đánh dấu hết hàng. Khách vẫn xem được và có thể theo dõi sản phẩm."
+            : "Đã bỏ đánh dấu hết hàng. Khách theo dõi sẽ nhận email khi sản phẩm có tồn kho tại cửa hàng đang hoạt động.");}
+        catch(IllegalArgumentException failure){redirect.addFlashAttribute("errorMessage",failure.getMessage());}
+        return "redirect:/admin/products";
+    }
+    @PostMapping("/products/{id}/delete")
+    public String removeProduct(@PathVariable Long id,RedirectAttributes redirect){
+        adminService.deactivateProduct(id);redirect.addFlashAttribute("successMessage","Đã xóa sản phẩm khỏi shop. Lịch sử đơn hàng được giữ nguyên.");
+        return "redirect:/admin/products";
+    }
     @PostMapping("/products/{id}/deactivate")
     public String deactivateProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         adminService.deactivateProduct(id);

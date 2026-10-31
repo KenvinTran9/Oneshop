@@ -75,9 +75,22 @@ public class SecurityConfig {
     }
 
     @Bean
+    com.oneshop.security.VersionedRememberMeServices rememberMeServices(JwtProperties jwt,
+            com.oneshop.security.CustomUserDetailsService users,com.oneshop.repository.PasswordResetAccountRepository accounts,
+            org.springframework.core.env.Environment environment){
+        var remember = new com.oneshop.security.VersionedRememberMeServices("oneshop-remember-v1:"+jwt.secret(),users,accounts);
+        remember.setParameter("remember-me"); remember.setCookieName("ONESHOP_REMEMBER");
+        remember.setTokenValiditySeconds(30*24*60*60);
+        remember.setUseSecureCookie(environment.getProperty("server.servlet.session.cookie.secure",Boolean.class,false));
+        remember.setCookieCustomizer(cookie -> {cookie.setHttpOnly(true);cookie.setAttribute("SameSite","Lax");});
+        return remember;
+    }
+
+    @Bean
     @Order(2)
     SecurityFilterChain webSecurity(HttpSecurity http, CartLoginSuccessHandler success,
-                                   AuthenticationThrottleFilter throttle, com.oneshop.security.CredentialVersionFilter credentials) throws Exception {
+                                   AuthenticationThrottleFilter throttle, com.oneshop.security.CredentialVersionFilter credentials,
+                                   com.oneshop.security.VersionedRememberMeServices remember, JwtProperties jwt) throws Exception {
         http.csrf(csrf -> csrf.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
@@ -88,9 +101,10 @@ public class SecurityConfig {
                         .requestMatchers("/branch", "/branch/**").hasAnyRole("ADMIN", "BRANCH_MANAGER")
                         .anyRequest().authenticated())
                 .formLogin(login -> login.loginPage("/login").successHandler(success).permitAll())
+                .rememberMe(config -> config.rememberMeServices(remember).key("oneshop-remember-v1:"+jwt.secret()))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout").deleteCookies("JSESSIONID").permitAll())
+                        .logoutSuccessUrl("/login?logout").deleteCookies("JSESSIONID", "ONESHOP_REMEMBER").permitAll())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .sessionFixation(fixation -> fixation.changeSessionId()))

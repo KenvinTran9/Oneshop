@@ -23,7 +23,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @EntityGraph(attributePaths = {"category", "brand"})
     @Query("""
             select p from Product p left join p.category c left join p.brand b
-            where p.status = :status
+            where (p.status = :status or (:status = com.oneshop.entity.ProductStatus.ACTIVE and p.status = com.oneshop.entity.ProductStatus.OUT_OF_STOCK)) and p.active = true
               and (:category = '' or c.slug = :category)
               and (:search = '' or lower(p.name) like lower(concat('%', :search, '%')) escape '!'
                    or lower(b.name) like lower(concat('%', :search, '%')) escape '!')
@@ -60,14 +60,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             select ranked.id from (
                 select p.id, p.category_id,
                     row_number() over (partition by p.category_id order by p.created_at desc, p.id desc) as category_rank
-                from products p where p.status = :status and p.category_id is not null
+                from products p where (p.status = :status or (:status = 'ACTIVE' and p.status = 'OUT_OF_STOCK')) and p.active = true and p.category_id is not null
             ) ranked where ranked.category_rank <= 2
             order by ranked.category_id, ranked.category_rank
             """, nativeQuery = true)
     List<Long> findHomeCategoryCandidateIds(@Param("status") String status, Pageable pageable);
 
     @EntityGraph(attributePaths = {"category", "brand"})
-    @Query("select p from Product p where p.id in :ids and p.status = :status")
+    @Query("select p from Product p where p.id in :ids and (p.status = :status or (:status = com.oneshop.entity.ProductStatus.ACTIVE and p.status = com.oneshop.entity.ProductStatus.OUT_OF_STOCK)) and p.active = true")
     List<Product> findHomeCandidates(@Param("ids") java.util.Collection<Long> ids, @Param("status") ProductStatus status);
 
     interface HomeCategory {
@@ -85,19 +85,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("""
             select c.id as id, c.name as name, c.slug as slug, count(p) as productCount
-            from Product p join p.category c where p.status = :status
+            from Product p join p.category c where (p.status = :status or (:status = com.oneshop.entity.ProductStatus.ACTIVE and p.status = com.oneshop.entity.ProductStatus.OUT_OF_STOCK)) and p.active = true
             group by c.id, c.name, c.slug order by c.id
             """)
     List<HomeCategory> summarizeHomeCategories(@Param("status") ProductStatus status);
 
     @Query("""
             select b.name as name, count(p) as productCount
-            from Product p join p.brand b where p.status = :status
+            from Product p join p.brand b where (p.status = :status or (:status = com.oneshop.entity.ProductStatus.ACTIVE and p.status = com.oneshop.entity.ProductStatus.OUT_OF_STOCK)) and p.active = true
             group by b.id, b.name order by count(p) desc, b.name asc
             """)
     List<HomeBrand> summarizeHomeBrands(@Param("status") ProductStatus status, Pageable pageable);
 
 
     @EntityGraph(attributePaths = {"category", "brand"})
+    @Query("select p from Product p where p.slug = :slug and p.active = true and (p.status = :status or (:status = com.oneshop.entity.ProductStatus.ACTIVE and p.status = com.oneshop.entity.ProductStatus.OUT_OF_STOCK))")
     Optional<Product> findBySlugAndStatus(String slug, ProductStatus status);
 }

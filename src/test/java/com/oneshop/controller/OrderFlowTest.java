@@ -130,11 +130,22 @@ class OrderFlowTest extends MySqlIntegrationTestSupport {
         assertThat(stock()).isEqualTo(8);
     }
     @Test void adminProgressAppearsInCustomerTimelineAndRejectsSkippingOrRewinding() throws Exception {
+        addUser("admin@example.com");
+        var admin = users.findByEmail("admin@example.com").orElseThrow();
+        var role = roles.findByName("ADMIN").orElseGet(() -> { var r = new Role(); r.setName("ADMIN"); return roles.saveAndFlush(r); });
+        admin.setRole(role); users.saveAndFlush(admin);
         String code = place();
         update(code,"COMPLETED"); assertThat(orders.forCustomer(EMAIL,code).status()).isEqualTo(OrderStatus.NEW);
-        for (String state : List.of("CONFIRMED","PACKING","SHIPPING","COMPLETED")) update(code,state);
+        for (String state : List.of("CONFIRMED","PACKING")) update(code,state);
+        mvc.perform(post("/admin/orders/{code}/delivery",code).with(user("admin@example.com").roles("ADMIN")).with(csrf())
+                .param("expectedVersion",Long.toString(orders.forCustomer(EMAIL,code).version()))
+                .param("shipperName","Nguyễn An").param("shipperPhone","0901234567"))
+                .andExpect(status().is3xxRedirection()).andExpect(flash().attributeExists("orderSuccess"));
+        update(code,"SHIPPING"); update(code,"COMPLETED");
+        assertThat(orders.forCustomer(EMAIL,code).status()).isEqualTo(OrderStatus.SHIPPING);
+        mvc.perform(post("/orders/{code}/received",code).with(user(EMAIL)).with(csrf())).andExpect(status().is3xxRedirection());
         OrderView result = orders.forCustomer(EMAIL,code);
-        assertThat(result.events()).extracting(OrderView.Event::status).containsExactly(OrderStatus.NEW,OrderStatus.CONFIRMED,OrderStatus.PACKING,OrderStatus.SHIPPING,OrderStatus.COMPLETED);
+        assertThat(result.events()).extracting(OrderView.Event::status).containsExactly(OrderStatus.NEW,OrderStatus.CONFIRMED,OrderStatus.PACKING,OrderStatus.PACKING,OrderStatus.SHIPPING,OrderStatus.COMPLETED);
         update(code,"CANCELLED"); assertThat(stock()).isEqualTo(8);
         mvc.perform(get("/orders/{code}",code).with(user(EMAIL))).andExpect(status().isOk())
                 .andExpect(view().name("pages/order-detail"))
@@ -213,7 +224,8 @@ class OrderFlowTest extends MySqlIntegrationTestSupport {
         assertThat(orders.forCustomer(EMAIL,code).events()).hasSize(2);
         orders.cancel(EMAIL,code);
         assertThat(stock()).isEqualTo(10); assertThat(stock(branch)).isEqualTo(10);
-        verify(mail,times(1)).send(any(MimeMessage.class));
+        // Initial confirmation plus the new cancellation update; store assignment sends no mail.
+        verify(mail,times(2)).send(any(MimeMessage.class));
     }
     @Test void failedAdminAssignmentLeavesBothReservationsAndHistoryUnchanged() throws Exception {
         Store branch = otherStore(1); String code = place();

@@ -1,10 +1,15 @@
 <!doctype html><html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head><title>Theo dõi đơn hàng - OneShop</title><link href="/css/orders.css" rel="stylesheet"></head>
-<body><section class="orders-page"><div class="container">
+<head><title>Theo dõi đơn hàng - OneShop</title><link href="/css/orders.css" rel="stylesheet"><script th:src="@{/js/order-tracking.js}" defer></script></head>
+<body><section class="orders-page" data-order-tracking th:attr="data-progress-url=@{/orders/{code}/progress(code=${order.code})},data-order-version=${order.version}"><div class="container">
     <a class="order-back" href="/orders"><i class="bi bi-arrow-left" aria-hidden="true"></i> Đơn hàng của tôi</a>
     <div class="order-alert success" th:if="${orderSuccess}" th:text="${orderSuccess}" role="status"></div><div class="order-alert error" th:if="${orderError}" th:text="${orderError}" role="alert"></div>
     <div class="orders-heading"><span class="order-eyebrow">Hành trình yêu chiều</span><h1>Theo dõi <em>đơn hàng.</em></h1><div class="order-title-meta"><strong th:text="${order.code}"></strong><span class="order-status" th:attr="data-status=${order.status}" th:text="${order.status.label}"></span></div><p th:text="${'Đặt ngày ' + #temporals.format(order.createdAt,'dd/MM/yyyy · HH:mm')}"></p></div>
     <div th:replace="~{fragments/order-content :: content(${order})}"></div>
+    <div class="order-alert success" data-progress-notice hidden role="status">Đơn hàng có cập nhật mới. <a th:href="@{/orders/{code}(code=${order.code})}">Xem trạng thái mới</a></div>
+    <section class="order-panel transfer-report" th:if="${order.transferReportAllowed}"><h2>Bạn đã chuyển khoản?</h2><p>Sau khi chuyển đúng số tiền và nội dung mã đơn, thông báo để OneShop đối soát.</p><form th:action="@{/orders/{code}/transfer(code=${order.code})}" method="post"><button class="order-button" type="submit">Tôi đã chuyển khoản</button></form><p class="order-help">Thông báo này không thay thế xác nhận nhận tiền của OneShop.</p></section>
+    <p class="order-help" th:if="${order.status.name() != 'CANCELLED' and order.payment.status.name() == 'REPORTED'}">Đang chờ OneShop xác nhận tiền chuyển khoản. Bạn không cần thanh toán thêm.</p>
+    <section class="order-panel" th:if="${order.status.name() == 'SHIPPING'}"><h2>Bạn đã nhận được hàng?</h2><p>Chỉ xác nhận sau khi đã nhận và kiểm tra sản phẩm. Đơn hàng sẽ được hoàn thành sau khi bạn xác nhận.</p><form th:action="@{/orders/{code}/received(code=${order.code})}" method="post"><button class="order-button" type="submit">Tôi đã nhận được hàng</button></form></section>
+    <section class="order-panel" th:if="${order.status.name() == 'COMPLETED'}"><h2>Đơn hàng đã giao và hoàn thành</h2><p>Cảm ơn bạn đã mua sắm tại OneShop! Nếu muốn góp ý hoặc cần hỗ trợ, hãy liên hệ cửa hàng.</p><a class="order-button secondary" href="/stores">Thông tin liên hệ OneShop</a></section>
     <div class="order-detail-actions"><a class="order-button secondary" th:href="@{/orders/{code}(code=${order.code})}"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Cập nhật tiến trình</a><form th:if="${order.customerCancellable}" th:action="@{/orders/{code}/cancel(code=${order.code})}" method="post"><button class="order-cancel" type="submit">Hủy đơn hàng</button></form></div>
-    <p class="order-help" th:if="${order.customerCancellable}">Bạn có thể tự hủy khi đơn chưa được cửa hàng xác nhận.</p>
-</div></section></body></html>
+    <p class="order-help" th:if="${order.customerCancellable}">Bạn có thể tự hủy khi đơn chưa được cửa hàng xác nhận. Nếu đã chuyển tiền, OneShop sẽ kiểm tra và xử lý hoàn tiền.</p>
+<p class="order-help">Tiến trình tự kiểm tra cập nhật mỗi 15 giây khi trang đang mở.</p></div></section></body></html>

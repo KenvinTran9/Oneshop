@@ -24,6 +24,30 @@
 .order-button.secondary:hover { background:#f7eded; }
 .order-button:disabled { opacity:.5;cursor:not-allowed; }
 .order-summary > .order-button { width:100%; }
+.payment-choices { border:0;padding:0;margin:24px 0;min-width:0; }
+.payment-choices legend { font-size:15px;font-weight:600;margin-bottom:12px; }
+.payment-choice { display:flex;align-items:flex-start;gap:12px;padding:16px;border:1px solid var(--order-line);border-radius:12px;margin-bottom:10px;cursor:pointer; }
+.payment-choice:has(input:checked) { border-color:var(--order-rose);background:#fcf3f5; }
+.payment-choice:has(input:disabled) { opacity:.65;cursor:default; }
+.payment-choice input { width:auto;margin-top:5px;accent-color:var(--order-rose); }
+.payment-choice strong,.payment-choice small { display:block; }
+.payment-choice small { color:var(--order-muted);margin-top:5px;line-height:1.6; }
+.payment-status { display:inline-block;padding:6px 10px;background:#fff4df;color:#77531c;border-radius:8px;font-size:12px;font-weight:600;line-height:1.6;white-space:normal; }
+.payment-status[data-payment-status="PAID"],.payment-status[data-payment-status="REFUNDED"] { background:#e9f3ed;color:#315643; }
+.payment-summary { display:grid;gap:12px;border-top:1px solid var(--order-line);padding-top:18px;margin-top:20px; }
+.bank-details dt,.delivery-details dt { color:var(--order-muted);font-size:12px;margin:15px 0 5px; }
+.bank-details dd,.delivery-details dd { margin:0;overflow-wrap:anywhere; }
+.bank-amount { font-size:22px;font-weight:600;color:var(--order-rose); }
+.transfer-content { display:inline-block;background:#f8eef1;padding:8px 12px;border-radius:7px;letter-spacing:1px; }
+.bank-qr-link { display:flex;flex-direction:column;align-items:center;gap:10px;margin:24px auto 0;font-size:12px; }
+/* Display the original bank-provided QR screenshot without changing its encoded pixels. */
+.bank-qr-window { display:block;width:240px;height:240px;overflow:hidden;position:relative;background:#fff;border-radius:8px;max-width:100%; }
+.bank-qr-window img { position:absolute;width:493px;max-width:none;left:-127px;top:-300px; }
+.payment-review-form { display:grid;gap:12px;max-width:650px; }
+.delivery-edit-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px; }
+.delivery-edit-grid label { display:block;margin-bottom:7px;font-size:14px; }
+.delivery-edit-grid :is(input,textarea),.payment-review-form :is(input,select) { display:block;width:100%;border:1px solid var(--order-line);padding:12px;border-radius:9px;background:#fff;color:inherit; }
+@media(max-width:575px) { .delivery-edit-grid { grid-template-columns:1fr; } }
 .order-alert { padding:16px 20px;border-radius:12px;margin:16px 0 24px;font-size:14px;line-height:1.7; }
 .order-alert.success { background:#edf4ef;color:#315643;border:1px solid #d4e5d9; }
 .order-alert.error { background:#fcf0f0;color:#943e4a;border:1px solid #eccfd3; }

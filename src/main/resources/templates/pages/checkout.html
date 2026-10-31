@@ -23,8 +23,12 @@
             <div class="order-money"><span>Tiền sản phẩm</span><strong th:text="${#numbers.formatDecimal(cart.subtotal,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div>
             <div class="order-money"><span>Phí giao hàng</span><strong th:text="${#numbers.formatDecimal(shippingFee,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div>
             <div class="order-money order-total"><span>Tổng thanh toán</span><strong th:text="${#numbers.formatDecimal(checkoutTotal,0,'POINT',0,'COMMA') + ' ₫'}"></strong></div>
-            <div class="order-cod"><i class="bi bi-cash-coin" aria-hidden="true"></i><div><strong>Thanh toán khi nhận hàng</strong><small>COD · Thanh toán cho nhân viên giao hàng.</small></div></div>
-            <button class="order-button" type="submit" th:disabled="${#lists.isEmpty(cart.items)}">Đặt hàng COD <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+            <fieldset class="payment-choices"><legend>Phương thức thanh toán</legend>
+                <label class="payment-choice"><input type="radio" th:field="*{paymentMethod}" value="COD"><span><strong>Thanh toán khi nhận hàng</strong><small>COD · Thanh toán cho người giao hàng.</small></span></label>
+                <label class="payment-choice"><input type="radio" th:field="*{paymentMethod}" value="BANK_TRANSFER" th:disabled="${!bankTransfer.configured}"><span><strong>Chuyển khoản ngân hàng</strong><small th:if="${bankTransfer.configured}" th:text="${bankTransfer.bankName + ' · Thông tin và mã QR hiện sau khi tạo đơn.'}"></small><small th:unless="${bankTransfer.configured}">Tạm chưa khả dụng. Vui lòng chọn COD.</small></span></label>
+                <p class="field-error" th:errors="*{paymentMethod}"></p>
+            </fieldset>
+            <button class="order-button" type="submit" th:disabled="${#lists.isEmpty(cart.items)}">Đặt hàng <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
             <p class="order-help">Mã đơn và tiến trình xử lý sẽ được lưu trong “Đơn hàng của tôi”.</p>
         </aside>
     </form>

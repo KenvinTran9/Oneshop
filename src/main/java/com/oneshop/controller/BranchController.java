@@ -12,7 +12,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/branch")
 public class BranchController {
     private final OrderService orders;
-    public BranchController(OrderService orders){this.orders=orders;}
+    private final com.oneshop.service.OrderFulfillmentService fulfillment;
+    public BranchController(OrderService orders, com.oneshop.service.OrderFulfillmentService fulfillment){this.orders=orders;this.fulfillment=fulfillment;}
     @GetMapping public String home(){return "redirect:/branch/orders";}
     @GetMapping("/orders") public String list(@RequestParam(required=false) OrderStatus status,
             @RequestParam(defaultValue="0") int page,Model model){
@@ -26,5 +27,14 @@ public class BranchController {
         try{orders.branchUpdate(code,status);redirect.addFlashAttribute("orderSuccess","Đã cập nhật trạng thái đơn.");}
         catch(OrderOperationException e){redirect.addFlashAttribute("orderError",e.getMessage());}
         return "redirect:/branch/orders/"+code;
+    }
+    @PostMapping("/orders/{code}/delivery")
+    public String delivery(@PathVariable String code, @jakarta.validation.Valid @ModelAttribute com.oneshop.dto.request.DeliveryForm form,
+            org.springframework.validation.BindingResult errors, RedirectAttributes redirect) {
+        try {
+            if (errors.hasErrors()) throw new OrderOperationException("Kiểm tra thông tin giao hàng: tên và điện thoại shipper, mã vận đơn và ngày dự kiến.");
+            fulfillment.updateDelivery(code,form); redirect.addFlashAttribute("orderSuccess", "Đã cập nhật thông tin giao hàng cho khách.");
+        } catch (OrderOperationException failure) { redirect.addFlashAttribute("orderError",failure.getMessage()); }
+        return "redirect:/branch/orders/" + code;
     }
 }

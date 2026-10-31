@@ -35,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class CatalogIntegrationTests extends com.oneshop.MySqlIntegrationTestSupport {
     @Autowired ProductRepository products;
+    @Autowired com.oneshop.repository.StoreRepository stores;
+    @Autowired com.oneshop.repository.StoreStockRepository stocks;
     @Autowired CategoryRepository categories;
     @Autowired BrandRepository brands;
     @Autowired CatalogDataInitializer initializer;
@@ -43,7 +45,14 @@ class CatalogIntegrationTests extends com.oneshop.MySqlIntegrationTestSupport {
     @Autowired HomeCatalogService homeCatalog;
 
     @org.junit.jupiter.api.BeforeEach
-    void restoreCatalogFixture() throws Exception { initializer.run(); }
+    void restoreCatalogFixture() throws Exception {
+        initializer.run();
+        var store=new com.oneshop.entity.Store();store.setCode("CATALOG-TEST");store.setName("Catalog test");store.setAddress("Địa chỉ thử");stores.saveAndFlush(store);
+        for(var p:products.findAll()){
+            var row=new com.oneshop.entity.StoreStock();row.setStore(store);row.setProduct(p);row.setQuantity(10);stocks.save(row);
+        }
+        stocks.flush();
+    }
 
     @Test
     @Transactional(propagation = org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED)

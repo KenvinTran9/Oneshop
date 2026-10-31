@@ -20,8 +20,10 @@ public class OrderController {
     private final CartService carts;
     private final UserRepository users;
     private final com.oneshop.service.CustomerProfileService profiles;
-    public OrderController(OrderService orders, CartService carts, UserRepository users, com.oneshop.service.CustomerProfileService profiles) {
-        this.orders = orders; this.carts = carts; this.users = users; this.profiles = profiles;
+    private final com.oneshop.service.BankTransferSettings bankTransfer;
+    private final com.oneshop.service.OrderFulfillmentService fulfillment;
+    public OrderController(OrderService orders, CartService carts, UserRepository users, com.oneshop.service.CustomerProfileService profiles, com.oneshop.service.BankTransferSettings bankTransfer, com.oneshop.service.OrderFulfillmentService fulfillment) {
+        this.orders = orders; this.carts = carts; this.users = users; this.profiles = profiles; this.bankTransfer = bankTransfer; this.fulfillment = fulfillment;
     }
     @GetMapping("/checkout")
     public String checkout(Principal principal, @RequestParam(required=false) Long addressId, Model model) {
@@ -63,12 +65,33 @@ public class OrderController {
         catch (OrderOperationException failure) { redirect.addFlashAttribute("orderError", failure.getMessage()); }
         return "redirect:/orders/" + code;
     }
+    @PostMapping("/orders/{code}/received")
+    public String received(Principal principal, @PathVariable String code, RedirectAttributes redirect) {
+        try {
+            orders.confirmReceived(principal.getName(), code);
+            redirect.addFlashAttribute("orderSuccess", "Cảm ơn bạn đã xác nhận nhận hàng! Đơn hàng đã giao và hoàn thành.");
+        } catch (OrderOperationException failure) { redirect.addFlashAttribute("orderError", failure.getMessage()); }
+        return "redirect:/orders/" + code;
+    }
+    @PostMapping("/orders/{code}/transfer")
+    public String reportTransfer(Principal principal, @PathVariable String code, RedirectAttributes redirect) {
+        try { fulfillment.reportTransfer(principal.getName(), code); redirect.addFlashAttribute("orderSuccess", "Đã ghi nhận thông báo chuyển khoản. OneShop sẽ đối soát và xác nhận tiền."); }
+        catch (OrderOperationException failure) { redirect.addFlashAttribute("orderError", failure.getMessage()); }
+        return "redirect:/orders/" + code;
+    }
+    @GetMapping("/orders/{code}/progress")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<com.oneshop.service.OrderFulfillmentService.Progress> progress(Principal principal, @PathVariable String code) {
+        return org.springframework.http.ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore())
+                .body(fulfillment.progress(principal.getName(), code));
+    }
     private void checkoutModel(Principal principal, Model model) {
         var cart = carts.getCart(principal.getName(), null);
         model.addAttribute("cart", cart);
         model.addAttribute("shippingFee", orders.getShippingFee());
         model.addAttribute("checkoutTotal", cart.subtotal().add(orders.getShippingFee()));
         model.addAttribute("customerEmail", principal.getName());
+        model.addAttribute("bankTransfer", bankTransfer);
         model.addAttribute("savedAddresses", profiles.addresses(principal.getName()));
     }
 }

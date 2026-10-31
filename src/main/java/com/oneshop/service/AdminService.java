@@ -181,12 +181,20 @@ public class AdminService {
     @Transactional
     public Product toggleBusinessStatus(Long id) {
         Product product = findProduct(id);
-        boolean activate = !product.isActive() || product.getStatus() != ProductStatus.ACTIVE;
+        boolean activate = !product.isActive() || (product.getStatus() != ProductStatus.ACTIVE && product.getStatus() != ProductStatus.OUT_OF_STOCK);
         product.setActive(activate);
         product.setStatus(activate ? ProductStatus.ACTIVE : ProductStatus.DISCONTINUED);
         return productRepository.saveAndFlush(product);
     }
 
+    @Transactional
+    public Product markStockStatus(Long id, boolean soldOut) {
+        Product product = findProduct(id);
+        if (!product.isActive() || product.getStatus() == ProductStatus.DISCONTINUED)
+            throw new IllegalArgumentException("Mở bán lại sản phẩm trước khi đổi tình trạng tồn hàng.");
+        product.setStatus(soldOut ? ProductStatus.OUT_OF_STOCK : ProductStatus.ACTIVE);
+        return productRepository.saveAndFlush(product);
+    }
     @Transactional
     public Product deactivateProduct(Long id) {
         Product product = findProduct(id);

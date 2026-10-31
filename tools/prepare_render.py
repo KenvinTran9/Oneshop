@@ -31,7 +31,8 @@ def prepare():
     # Render provides RENDER_EXTERNAL_URL after creation; APP_BASE_URL is optional.
     if previous.get("APP_BASE_URL"):
         values["APP_BASE_URL"] = previous["APP_BASE_URL"]
-    for key in ("CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"):
+    for key in ("CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET",
+                "BANK_NAME", "BANK_ACCOUNT_NUMBER", "BANK_ACCOUNT_HOLDER", "BANK_QR_IMAGE", "SUPPORT_PHONE"):
         values[key] = previous.get(key) or local.get(key, "")
     if any("\n" in value or "\r" in value for value in values.values()):
         raise ValueError("Environment values must be single-line")

@@ -16,29 +16,34 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    private final CatalogAvailability availability;
+    public ProductService(ProductRepository productRepository, CatalogAvailability availability) {
+        this.availability = availability;
         this.productRepository = productRepository;
     }
 
     public Page<Product> findActiveProducts(Pageable pageable) {
-        return productRepository.findByStatus(ProductStatus.ACTIVE, pageable).map(this::withOptions);
+        return searchCatalog("", "", pageable);
     }
 
     public Page<Product> findActiveProducts(String categorySlug, Pageable pageable) {
         return categorySlug == null || categorySlug.isBlank()
                 ? findActiveProducts(pageable)
-                : productRepository.findByStatusAndCategory_Slug(ProductStatus.ACTIVE, categorySlug, pageable).map(this::withOptions);
+                : searchCatalog(categorySlug, "", pageable);
     }
 
     public Page<Product> searchCatalog(String category, String search, Pageable pageable) {
-        return productRepository.searchCatalog(ProductStatus.ACTIVE,
-                category == null ? "" : category.trim(), search == null ? "" : search.trim(), pageable).map(this::withOptions);
+        var page = productRepository.searchCatalog(ProductStatus.ACTIVE,
+                category == null ? "" : category.trim(), search == null ? "" : search.trim(), pageable);
+        availability.load(page.getContent());
+        return page.map(this::withOptions);
     }
 
     public Product findActiveProductBySlug(String slug) {
-        return productRepository.findBySlugAndStatus(slug, ProductStatus.ACTIVE)
-                .map(this::withOptions)
+        var product = productRepository.findBySlugAndStatus(slug, ProductStatus.ACTIVE)
                 .orElseThrow(() -> new ProductNotFoundException(slug));
+        availability.load(java.util.List.of(product));
+        return withOptions(product);
     }
 
     private Product withOptions(Product product) {

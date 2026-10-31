@@ -54,6 +54,11 @@ server:
     include-exception: false
 
 app:
+  payments:
+    bank-name: ${BANK_NAME:}
+    account-number: ${BANK_ACCOUNT_NUMBER:}
+    account-holder: ${BANK_ACCOUNT_HOLDER:}
+    qr-image: ${BANK_QR_IMAGE:}
   orders:
     shipping-fee: ${ORDER_SHIPPING_FEE:30000}
   mail:

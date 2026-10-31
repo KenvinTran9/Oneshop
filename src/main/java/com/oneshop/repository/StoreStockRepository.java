@@ -28,4 +28,8 @@ public interface StoreStockRepository extends JpaRepository<StoreStock, Long> {
     @Query("select coalesce(sum(stock.quantity), 0) from StoreStock stock "
             + "where stock.product.id = :productId and stock.active = true and stock.store.active = true")
     long sumAvailableQuantityByProductId(@Param("productId") Long productId);
+    interface Availability { Long getProductId(); long getQuantity(); }
+    @Query("select s.product.id as productId, sum(s.quantity) as quantity from StoreStock s where s.product.id in :ids and s.active = true and s.store.active = true group by s.product.id")
+    List<Availability> availability(@Param("ids") java.util.Collection<Long> ids);
+
 }

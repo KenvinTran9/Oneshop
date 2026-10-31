@@ -33,6 +33,12 @@ public class ResendMailSender {
     public void send(String from, String to, String subject, String text, String html, String orderCode) throws Exception {
         sendMessage(from, to, subject, text, html, "oneshop-confirmation-" + orderCode);
     }
+    public void sendProductRestock(String from, String to, String subject, String text, String html, String deliveryId) throws Exception {
+        sendMessage(from,to,subject,text,html,"oneshop-restock-"+deliveryId);
+    }
+    public void sendOrderUpdate(String from, String to, String subject, String text, String html, String deliveryId) throws Exception {
+        sendMessage(from, to, subject, text, html, "oneshop-order-update-" + deliveryId);
+    }
     public void sendPasswordReset(String from, String to, String subject, String text, String html, String deliveryId) throws Exception {
         sendMessage(from, to, subject, text, html, "oneshop-password-reset-" + deliveryId);
     }

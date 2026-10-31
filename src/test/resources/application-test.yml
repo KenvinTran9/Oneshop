@@ -4,6 +4,8 @@ spring:
       ddl-auto: create-drop
     open-in-view: false
 app:
+  watches:
+    enabled: false
   security:
     auth-rate-limit:
       enabled: false

@@ -14,6 +14,60 @@ import java.math.BigDecimal;
 @Table(name = "orders")
 public class Order extends BaseEntity {
 
+    @Enumerated(EnumType.STRING) @Column(length = 30)
+    private PaymentMethod paymentMethod = PaymentMethod.COD;
+    @Enumerated(EnumType.STRING) @Column(length = 30)
+    private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
+    private java.time.LocalDateTime paidAt;
+    @Column(length = 120) private String paymentReference;
+    @Column(length = 120) private String paymentCheckedBy;
+    @Column(length = 120) private String refundReference;
+    @Column(length = 100) private String bankName;
+    @Column(length = 34) private String bankAccountNumber;
+    @Column(length = 120) private String bankAccountHolder;
+    @Column(length = 300) private String bankQrImage;
+    @Column(length = 100) private String carrier;
+    @Column(length = 100) private String shipperName;
+    @Column(length = 20) private String shipperPhone;
+    @Column(length = 100) private String trackingCode;
+    private java.time.LocalDate estimatedDelivery;
+    @Column(length = 300) private String deliveryNote;
+
+    public PaymentMethod getPaymentMethod() { return paymentMethod == null ? PaymentMethod.COD : paymentMethod; }
+    public void setPaymentMethod(PaymentMethod v) { paymentMethod = v; }
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus == null ? (getPaymentMethod() == PaymentMethod.COD && status == OrderStatus.COMPLETED ? PaymentStatus.PAID : PaymentStatus.UNPAID) : paymentStatus;
+    }
+    public void setPaymentStatus(PaymentStatus v) { paymentStatus = v; }
+    public java.time.LocalDateTime getPaidAt() { return paidAt; }
+    public void setPaidAt(java.time.LocalDateTime v) { paidAt = v; }
+    public String getPaymentReference() { return paymentReference; }
+    public void setPaymentReference(String v) { paymentReference = v; }
+    public String getPaymentCheckedBy() { return paymentCheckedBy; }
+    public void setPaymentCheckedBy(String v) { paymentCheckedBy = v; }
+    public String getRefundReference() { return refundReference; }
+    public void setRefundReference(String v) { refundReference = v; }
+    public String getBankName() { return bankName; }
+    public void setBankName(String v) { bankName = v; }
+    public String getBankAccountNumber() { return bankAccountNumber; }
+    public void setBankAccountNumber(String v) { bankAccountNumber = v; }
+    public String getBankAccountHolder() { return bankAccountHolder; }
+    public void setBankAccountHolder(String v) { bankAccountHolder = v; }
+    public String getBankQrImage() { return bankQrImage; }
+    public void setBankQrImage(String v) { bankQrImage = v; }
+    public String getCarrier() { return carrier; }
+    public void setCarrier(String v) { carrier = v; }
+    public String getShipperName() { return shipperName; }
+    public void setShipperName(String v) { shipperName = v; }
+    public String getShipperPhone() { return shipperPhone; }
+    public void setShipperPhone(String v) { shipperPhone = v; }
+    public String getTrackingCode() { return trackingCode; }
+    public void setTrackingCode(String v) { trackingCode = v; }
+    public java.time.LocalDate getEstimatedDelivery() { return estimatedDelivery; }
+    public void setEstimatedDelivery(java.time.LocalDate v) { estimatedDelivery = v; }
+    public String getDeliveryNote() { return deliveryNote; }
+    public void setDeliveryNote(String v) { deliveryNote = v; }
+
     @Column(unique = true, length = 36)
     private String checkoutToken;
     @Column(length = 120)

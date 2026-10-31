@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"><body style="margin:0;background:#faf5f3;color:#30272c;font:15px Arial,sans-serif">
+<table role="presentation" style="width:100%"><tr><td style="padding:30px 16px"><table role="presentation" style="width:100%;max-width:600px;margin:auto;background:white"><tr><td style="padding:32px">
+<p style="color:#805260;font-size:24px;font-weight:bold">OneShop</p>
+<h1 style="font-size:25px" th:text="${update.title}"></h1>
+<p>Chào <span th:text="${update.customerName}"></span>,</p>
+<p th:text="${update.message}"></p>
+<p>Mã đơn: <strong th:text="${update.code}"></strong></p>
+<p>Trạng thái đơn: <strong th:text="${update.status}"></strong></p>
+<p>Thanh toán: <strong th:text="${update.paymentStatus}"></strong></p>
+<div th:if="${update.carrier != null or update.shipperName != null or update.trackingCode != null or update.estimatedDelivery != null or update.deliveryNote != null}" style="padding:16px;background:#faf0f3">
+<p th:if="${update.carrier != null}">Đơn vị vận chuyển: <strong th:text="${update.carrier}"></strong></p>
+<p th:if="${update.shipperName != null}">Người giao hàng: <strong th:text="${update.shipperName}"></strong></p>
+<p th:if="${update.shipperPhone != null}">Số điện thoại shipper: <strong th:text="${update.shipperPhone}"></strong></p>
+<p th:if="${update.trackingCode != null}">Mã vận đơn: <strong th:text="${update.trackingCode}"></strong></p>
+<p th:if="${update.estimatedDelivery != null}">Ngày giao dự kiến: <strong th:text="${update.estimatedDelivery}"></strong></p>
+<p th:if="${update.deliveryNote != null}" th:text="${update.deliveryNote}"></p>
+</div>
+<p style="margin:30px 0"><a th:href="${trackingUrl}" style="padding:15px 24px;background:#805260;color:white;text-decoration:none">Theo dõi đơn hàng →</a></p>
+<p>Đăng nhập bằng tài khoản đã đặt hàng để xem chi tiết.</p>
+<p>Nếu nút không mở được: <a th:href="${trackingUrl}" th:text="${trackingUrl}"></a></p>
+<p>Cảm ơn bạn đã lựa chọn OneShop!</p>
+</td></tr></table></td></tr></table></body></html>

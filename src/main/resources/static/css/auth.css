@@ -75,3 +75,5 @@
     .account-field-row { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .account-page * { transition: none !important; } }
+
+.account-remember{display:flex;align-items:center;gap:10px;font-size:15px;line-height:1.5;font-weight:500;cursor:pointer}.account-remember input{width:18px;height:18px;accent-color:#805260;flex-shrink:0}

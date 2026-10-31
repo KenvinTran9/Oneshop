@@ -5,6 +5,7 @@
          th:attr="data-sku=${product.sku},data-name=${product.name},data-price=${product.sellingPrice},data-image=${product.imageUrl},data-url=@{/products/{slug}(slug=${product.slug})},data-size=${!#lists.isEmpty(product.sizes) ? product.sizes[0] : product.packageSize}">
     <a class="shop-card-image" th:href="@{/products/{slug}(slug=${product.slug})}">
         <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/product-placeholder.svg'}" loading="lazy" th:alt="${product.name}">
+        <span class="shop-stock-badge" th:if="${product.soldOut}">Hết hàng</span>
         <span class="shop-category-tag" th:text="${product.category != null ? product.category.name : 'Mỹ phẩm'}">Mỹ phẩm</span>
     </a>
     <div class="shop-card-content">
@@ -17,9 +18,10 @@
             <span class="small text-muted" th:text="${#lists.size(product.shades)} + ' màu'"></span>
         </div>
         <div class="shop-card-bottom">
+            <a th:if="${product.soldOut}" class="shop-card-add" th:href="@{/products/{slug}(slug=${product.slug})}">Nhận thông báo có hàng</a>
             <strong class="shop-card-price" th:text="${product.displayPrice}">0 ₫</strong>
-            <a th:if="${product.requiresSelection}" class="shop-card-add" th:href="@{/products/{slug}(slug=${product.slug})}" aria-label="Chọn màu sản phẩm"><i class="bi bi-arrow-up-right"></i><span>Chọn màu</span></a>
-            <form th:unless="${product.requiresSelection}" th:action="@{/cart/items}" method="post">
+            <a th:if="${!product.soldOut and product.requiresSelection}" class="shop-card-add" th:href="@{/products/{slug}(slug=${product.slug})}" aria-label="Chọn màu sản phẩm"><i class="bi bi-arrow-up-right"></i><span>Chọn màu</span></a>
+            <form th:if="${!product.soldOut and !product.requiresSelection}" th:action="@{/cart/items}" method="post">
                 <input type="hidden" name="productId" th:value="${product.id}">
                 <input type="hidden" name="quantity" value="1">
                 <button class="shop-card-add" type="submit" th:attr="aria-label=${'Thêm ' + product.name + ' vào giỏ hàng'}"><i class="bi bi-bag-plus"></i><span>Thêm vào giỏ</span></button>

@@ -17,7 +17,9 @@ public class HomeCatalogService {
     private static final int SUGGESTION_LIMIT = 8;
     private final ProductRepository products;
 
-    public HomeCatalogService(ProductRepository products) {
+    private final CatalogAvailability availability;
+    public HomeCatalogService(ProductRepository products, CatalogAvailability availability) {
+        this.availability = availability;
         this.products = products;
     }
 
@@ -51,12 +53,13 @@ public class HomeCatalogService {
             }
         }
         if (selected.size() < SUGGESTION_LIMIT) {
-            for (var product : products.findByStatusOrderByCreatedAtDescIdDesc(status, PageRequest.of(0, SUGGESTION_LIMIT))) {
+            for (var product : products.searchCatalog(status, "", "", PageRequest.of(0, SUGGESTION_LIMIT, org.springframework.data.domain.Sort.by("createdAt").descending().and(org.springframework.data.domain.Sort.by("id").descending()))).getContent()) {
                 if (selected.size() == SUGGESTION_LIMIT) break;
                 selected.putIfAbsent(product.getId(), product);
             }
         }
         var suggestions = List.copyOf(selected.values());
+        availability.load(suggestions);
         // Load only the displayed products' options before the view loses its persistence context.
         suggestions.forEach(product -> {
             org.hibernate.Hibernate.initialize(product.getSizes());

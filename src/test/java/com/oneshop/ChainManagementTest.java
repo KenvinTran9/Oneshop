@@ -39,6 +39,9 @@ class ChainManagementTest extends MySqlIntegrationTestSupport {
     @Autowired StockMovementRepository movements;
     @Autowired InventoryService inventory;
     @Autowired OrderService orders;
+    @Autowired OrderFulfillmentService fulfillment;
+    @Autowired ProductWatchService watches;
+    @Autowired ProductWatchDelivery watchDelivery;
     @Autowired CartService carts;
     @Autowired SalesReportService reports;
     @Autowired AccountManagementService accounts;
@@ -90,7 +93,9 @@ class ChainManagementTest extends MySqlIntegrationTestSupport {
     @Test @WithMockUser(username="admin@chain.test",roles="ADMIN")
     void onlyCompletedOrdersAppearInRevenueAndExcelIsAWorkbook() throws Exception {
         String code=place();var today=LocalDate.now();assertThat(reports.report(today,today,null).revenue()).isEqualByComparingTo("0");
-        for(OrderStatus next:List.of(OrderStatus.CONFIRMED,OrderStatus.PACKING,OrderStatus.SHIPPING,OrderStatus.COMPLETED))orders.updateStatus(code,next);
+        for(OrderStatus next:List.of(OrderStatus.CONFIRMED,OrderStatus.PACKING))orders.updateStatus(code,next);
+        fulfillment.updateDelivery(code,new DeliveryForm("Giao nội bộ","Nguyễn An","0901234567",null,null,null,orders.forAdmin(code).version()));
+        orders.updateStatus(code,OrderStatus.SHIPPING); orders.confirmReceived(customer.getEmail(),code);
         var report=reports.report(today,today,null);assertThat(report.completed()).isEqualTo(1);assertThat(report.revenue()).isEqualByComparingTo("200000");assertThat(report.products().getFirst().quantity()).isEqualTo(2);
         assertThat(reports.report(today,today,second.getId()).completed()).isZero();
         byte[] bytes=SalesReportWorkbook.write(report);assertThat(bytes[0]).isEqualTo((byte)'P');assertThat(bytes[1]).isEqualTo((byte)'K');
@@ -175,4 +180,16 @@ class ChainManagementTest extends MySqlIntegrationTestSupport {
         assertThat(stocks.findByStoreIdAndProductId(first.getId(),product.getId()).orElseThrow().getQuantity()).isEqualTo(13);
         assertThat(movements.count()).isEqualTo(1);
     }
+    @Test @WithMockUser(username="admin@chain.test",roles="ADMIN")
+    void stockReceiptRestoresSoldOutProductAndCreatesWebNotification(){
+        product.setStatus(ProductStatus.OUT_OF_STOCK);products.saveAndFlush(product);
+        watches.subscribe(customer.getEmail(),product.getId());
+        Long id=watches.list(customer.getEmail()).getFirst().id();
+        inventory.change(receipt(first,2));
+        assertThat(products.findById(product.getId()).orElseThrow().getStatus()).isEqualTo(ProductStatus.ACTIVE);
+        watchDelivery.send(id);
+        assertThat(watches.unread(customer.getEmail())).isEqualTo(1);
+        assertThat(watches.list(customer.getEmail()).getFirst().emailEnabled()).isFalse();
+    }
+
 }

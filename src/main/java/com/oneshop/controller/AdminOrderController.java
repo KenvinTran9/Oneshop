@@ -12,7 +12,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/admin/orders")
 public class AdminOrderController {
     private final OrderService orders;
-    public AdminOrderController(OrderService orders) { this.orders = orders; }
+    private final com.oneshop.service.OrderFulfillmentService fulfillment;
+    public AdminOrderController(OrderService orders, com.oneshop.service.OrderFulfillmentService fulfillment) { this.orders = orders; this.fulfillment = fulfillment; }
     @GetMapping
     public String list(@RequestParam(required = false) OrderStatus status,
             @RequestParam(defaultValue = "0") int page, Model model) {
@@ -43,6 +44,24 @@ public class AdminOrderController {
     public String retry(@PathVariable String code, RedirectAttributes redirect) {
         try { orders.retryEmail(code); redirect.addFlashAttribute("orderSuccess", "Đã xử lý yêu cầu gửi email. Xem kết quả ở mục email xác nhận."); }
         catch (OrderOperationException failure) { redirect.addFlashAttribute("orderError", failure.getMessage()); }
+        return "redirect:/admin/orders/" + code;
+    }
+    @PostMapping("/{code}/delivery")
+    public String delivery(@PathVariable String code, @jakarta.validation.Valid @ModelAttribute com.oneshop.dto.request.DeliveryForm form,
+            org.springframework.validation.BindingResult errors, RedirectAttributes redirect) {
+        try {
+            if (errors.hasErrors()) throw new OrderOperationException("Kiểm tra thông tin giao hàng: tên và điện thoại shipper, mã vận đơn và ngày dự kiến.");
+            fulfillment.updateDelivery(code,form); redirect.addFlashAttribute("orderSuccess", "Đã cập nhật thông tin giao hàng cho khách.");
+        } catch (OrderOperationException failure) { redirect.addFlashAttribute("orderError",failure.getMessage()); }
+        return "redirect:/admin/orders/" + code;
+    }
+    @PostMapping("/{code}/payment")
+    public String payment(@PathVariable String code, @jakarta.validation.Valid @ModelAttribute com.oneshop.dto.request.PaymentReviewForm form,
+            org.springframework.validation.BindingResult errors, RedirectAttributes redirect) {
+        try {
+            if (errors.hasErrors()) throw new OrderOperationException("Chọn thao tác và nhập mã giao dịch hoặc lý do đối soát tối đa 120 ký tự.");
+            fulfillment.reviewPayment(code,form); redirect.addFlashAttribute("orderSuccess", "Đã lưu kết quả đối soát thanh toán.");
+        } catch (OrderOperationException failure) { redirect.addFlashAttribute("orderError",failure.getMessage()); }
         return "redirect:/admin/orders/" + code;
     }
 }

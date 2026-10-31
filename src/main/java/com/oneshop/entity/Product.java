@@ -107,6 +107,11 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "brand_id")
     private Brand brand;
 
+    @jakarta.persistence.Transient
+    private long availableQuantity = -1;
+    public void setAvailableQuantity(long quantity) { availableQuantity = quantity; }
+    public boolean isSoldOut() { return status == ProductStatus.OUT_OF_STOCK || availableQuantity == 0; }
+
     public String getName() {
         return name;
     }

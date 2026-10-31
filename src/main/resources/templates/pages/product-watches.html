@@ -1,0 +1,14 @@
+<!doctype html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><title>Thông báo và sản phẩm theo dõi - OneShop</title></head><body>
+<main class="container py-5"><a href="/account/profile">← Tài khoản của bạn</a><h1 class="mt-3">Thông báo &amp; sản phẩm theo dõi</h1>
+
+<div class="alert alert-success" role="status" th:if="${watchSuccess}" th:text="${watchSuccess}"></div><div class="alert alert-danger" role="alert" th:if="${watchError}" th:text="${watchError}"></div>
+<p th:if="${#lists.isEmpty(watches)}">Bạn chưa theo dõi sản phẩm nào. <a href="/products">Khám phá sản phẩm</a></p>
+<div class="row g-3"><div class="col-md-6" th:each="watch : ${watches}"><section class="border rounded-3 p-4 h-100" th:classappend="${watch.unread ? 'border-dark' : ''}">
+<span class="badge text-bg-dark mb-2" th:if="${watch.unread}">Thông báo mới</span><h2 class="h5" th:text="${watch.name}"></h2>
+<p th:text="${watch.discontinued ? 'Sản phẩm đã ngừng kinh doanh' : (watch.available ? 'Sản phẩm đã có hàng trở lại! Xem tồn hàng hiện tại trên trang sản phẩm.' : 'Đang chờ có hàng trở lại')}"></p>
+<p class="small text-muted" th:text="${watch.emailEnabled ? (watch.notified ? 'Đã gửi email thông báo có hàng.' : 'Bạn đã chọn nhận thêm email khi có hàng.') : 'Chỉ nhận thông báo trên web, không gửi email.'}"></p>
+<form th:action="@{/account/watches/{id}/preferences(id=${watch.id})}" method="post" class="mb-3"><label><input type="checkbox" name="emailEnabled" value="true" th:checked="${watch.emailEnabled}"> Nhận thêm email khi có hàng</label><button type="submit" class="btn btn-sm btn-outline-dark ms-2">Lưu lựa chọn</button></form>
+<div class="d-flex gap-3 align-items-center flex-wrap"><a th:unless="${watch.discontinued}" th:href="@{/products/{slug}(slug=${watch.slug})}">Xem sản phẩm</a>
+<form th:if="${watch.unread}" th:action="@{/account/watches/{id}/read(id=${watch.id})}" method="post"><button class="btn btn-outline-dark btn-sm" type="submit">Đánh dấu đã đọc</button></form>
+<form th:action="@{/account/watches/{id}/cancel(id=${watch.id})}" method="post"><button class="btn btn-outline-secondary btn-sm" type="submit">Bỏ theo dõi</button></form></div>
+</section></div></div></main></body></html>

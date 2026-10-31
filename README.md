@@ -2,6 +2,10 @@
 
 Các chức năng quản lý kho, chi nhánh, phân quyền quản lý cửa hàng, báo cáo doanh thu và hồ sơ khách hàng được hướng dẫn tại [Quản trị chuỗi cửa hàng](docs/chain-management.md).
 
+Quản lý hết hàng, gỡ sản phẩm và thông báo có hàng: [Hướng dẫn theo dõi sản phẩm](docs/product-watches.md).
+
+Luồng chuyển khoản, admin đối soát thanh toán và cập nhật shipper được mô tả tại [Thanh toán và vận chuyển](docs/payment-and-delivery.md).
+
 OneShop là đồ án website bán mỹ phẩm, xây dựng bằng **Spring Boot, Thymeleaf, Bootstrap, JPA, MySQL, SiteMesh, JWT và Cloudinary**. Dự án phục vụ giao diện khách hàng, trang quản trị và backend trong cùng một ứng dụng Java; dữ liệu tài khoản, giỏ hàng, đơn hàng và tồn kho được lưu bằng MySQL.
 
 - **Website demo:** [oneshop-7gim.onrender.com](https://oneshop-7gim.onrender.com/)
@@ -36,7 +40,7 @@ OneShop là đồ án website bán mỹ phẩm, xây dựng bằng **Spring Boot
 - Thêm, sửa số lượng và xóa sản phẩm trong giỏ. Giỏ khách chưa đăng nhập nằm trong session; giỏ tài khoản lưu MySQL và nhận các món từ giỏ khách khi đăng nhập trên web.
 - Đăng ký, đăng nhập, đăng xuất; kiểm tra email trùng và xác nhận mật khẩu khi đăng ký.
 - Quên mật khẩu: nhận liên kết xác thực qua email đã đăng ký, đặt mật khẩu mới bằng token dùng một lần, có hạn 15 phút.
-- Đặt hàng giao tận nơi, thanh toán khi nhận hàng (**COD**).
+- Đặt hàng giao tận nơi, thanh toán khi nhận hàng (**COD**) hoặc chuyển khoản do admin đối soát.
 - Nhận email xác nhận đơn nếu dịch vụ email đã được cấu hình và cho phép gửi đến địa chỉ đó.
 - Xem lịch sử, chi tiết và timeline đơn của chính mình; hủy đơn khi còn chờ xác nhận.
 - Xem thông tin hệ thống cửa hàng.
@@ -463,10 +467,10 @@ Xem thêm [phân tích hiệu năng](docs/performance.md). Dự án đã giảm 
 
 Đây là **đồ án có luồng mua hàng và backend lưu dữ liệu**, chưa phải hệ thống thương mại hoàn thiện mọi nghiệp vụ. Những phần có thể tiếp tục phát triển:
 
-- Thanh toán trực tuyến và đối soát; hiện chỉ COD.
-- Tích hợp đơn vị vận chuyển, vận đơn và trạng thái giao hàng thực tế.
-- UI quản trị khách hàng, cửa hàng và nhập/xuất/điều chuyển kho đầy đủ.
-- Phân quyền nhân viên theo chi nhánh; tồn kho độc lập theo biến thể.
+- Tích hợp cổng thanh toán/webhook ngân hàng để tự đối soát; hiện đã có COD và chuyển khoản xác nhận thủ công.
+- Tích hợp API đơn vị vận chuyển; hiện cửa hàng nhập shipper, mã vận đơn và ngày giao dự kiến.
+- Điều chuyển kho giữa cửa hàng và quản lý lô/hạn dùng; hiện đã có UI nhập/điều chỉnh kho, quản lý tài khoản và cửa hàng.
+- Mở rộng quyền nhân viên; hiện đã có quản lý chi nhánh. Bổ sung tồn kho độc lập theo biến thể.
 - Chia đơn nhiều kho, mã giảm giá và chương trình khách hàng thân thiết.
 - Tên miền email đã xác thực để gửi cho mọi khách, giám sát gửi và retry bền vững.
 - Quy trình migration schema có phiên bản, backup/restore định kỳ, monitoring và rate limit phân tán khi mở rộng nhiều instance.
@@ -489,3 +493,10 @@ Xem thêm [phân tích hiệu năng](docs/performance.md). Dự án đã giảm 
 | [Đối chiếu yêu cầu đồ án](docs/project-requirements.md) | Công nghệ và phạm vi yêu cầu; một số ghi chú phản ánh thời điểm kiểm tra riêng |
 
 **OneShop · 2026**
+
+
+### Ghi nhớ đăng nhập
+
+Trang đăng nhập có lựa chọn “Ghi nhớ đăng nhập trong 30 ngày”, mặc định không chọn. Session vẫn hết hạn sau 30 phút không hoạt động; khi đã chọn ghi nhớ, cookie ONESHOP_REMEMBER có chữ ký sẽ khôi phục đăng nhập khi session hết hạn, đóng/mở trình duyệt hoặc khởi động lại ứng dụng. Khóa ký ổn định được dẫn xuất theo namespace riêng từ JWT_SECRET; đổi khóa sẽ vô hiệu hóa cookie ghi nhớ cũ. Không lưu mật khẩu thô trong cookie hoặc localStorage.
+
+Cookie đặt HttpOnly, SameSite=Lax và Secure theo cấu hình HTTPS production. Đăng xuất xóa cookie trên trình duyệt hiện tại. Đổi mật khẩu hoặc tăng credentialVersion khi khóa/đổi quyền tài khoản làm cookie cũ không còn hợp lệ. API /api/** vẫn chỉ nhận JWT, không dùng cookie ghi nhớ. Trình duyệt ẩn danh hoặc tự xóa cookie sẽ không giữ được đăng nhập sau khi đóng phiên.
