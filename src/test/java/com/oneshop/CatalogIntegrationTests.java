@@ -209,5 +209,15 @@ class CatalogIntegrationTests extends com.oneshop.MySqlIntegrationTestSupport {
                 .andExpect(status().isOk()).andReturn();
         assertThat(((Page<Product>) combined.getModelAndView().getModel().get("productPage")).getTotalElements()).isZero();
     }
+    @Test void salePriceDisplaysOriginalAndDiscountedAmountsOnCardsAndDetail() throws Exception {
+        var product=products.findBySku("CATALOG-001").orElseThrow();product.setPrice(new BigDecimal("200000"));product.setSalePrice(new BigDecimal("150000"));products.saveAndFlush(product);
+        String detail=mvc.perform(get("/products/"+product.getSlug())).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(detail).contains("200.000 ₫","150.000 ₫","Giá khuyến mãi","shop-original-price");
+        String listing=mvc.perform(get("/products").param("q",product.getName())).andExpect(status().isOk()).andReturn().getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(listing).contains("200.000 ₫","150.000 ₫","shop-original-price");
+        product.setSalePrice(product.getPrice());assertThat(product.isDiscounted()).isFalse();
+        product.setSalePrice(null);assertThat(product.isDiscounted()).isFalse();
+    }
+
 }
 

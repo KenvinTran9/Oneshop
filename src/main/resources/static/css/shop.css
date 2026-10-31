@@ -38,3 +38,5 @@
 .shop-stock-badge{position:absolute;bottom:14px;left:14px;background:#30272c;color:#fff;border-radius:20px;padding:7px 14px;font-size:14px;font-weight:600;z-index:2}.shop-stock-notice{background:#faf0f3;border:1px solid #ead8df;border-radius:14px;padding:24px;margin:20px 0}.shop-stock-notice p{line-height:1.7}
 
 .shop-notification-link{position:relative}.shop-notification-link[hidden]{display:none!important}
+
+.shop-price-stack{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 12px}.shop-original-price{color:#81777c;font-size:15px;font-weight:400;text-decoration-thickness:1px}.shop-detail-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 16px}.shop-detail-price .shop-original-price{font-size:20px}.shop-sale-label{font-size:13px;letter-spacing:0;color:#805260;background:#faeef2;border-radius:5px;padding:4px 8px}

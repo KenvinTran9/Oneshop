@@ -75,6 +75,8 @@ class AdminProductCrudTest extends com.oneshop.MySqlIntegrationTestSupport {
     @Autowired private RoleRepository roleRepository;
     @MockBean private CloudinaryService cloudinaryService;
 
+    @Autowired private com.oneshop.repository.StockMovementRepository movements;
+    private com.oneshop.entity.Store stockStore;
     private Category category;
     private Brand brand;
 
@@ -92,6 +94,9 @@ class AdminProductCrudTest extends com.oneshop.MySqlIntegrationTestSupport {
         brand.setName("One Beauty");
         brand.setSlug("one-beauty-admin-test");
         brand = brandRepository.saveAndFlush(brand);
+        stockStore=new com.oneshop.entity.Store();stockStore.setCode("CREATE-STOCK");stockStore.setName("Kho tạo sản phẩm");stockStore.setAddress("Địa chỉ thử");stockStore=storeRepository.saveAndFlush(stockStore);
+        var role=new com.oneshop.entity.Role();role.setName("ADMIN");role=roleRepository.saveAndFlush(role);
+        var admin=new com.oneshop.entity.User();admin.setEmail(ADMIN);admin.setFullName("Admin test");admin.setPassword("test-not-login");admin.setRole(role);userRepository.saveAndFlush(admin);
     }
 
     @AfterEach
@@ -143,7 +148,8 @@ class AdminProductCrudTest extends com.oneshop.MySqlIntegrationTestSupport {
                         .param("name", "  Serum mới  ").param("slug", "SERUM-MOI")
                         .param("sku", "serum-new-001").param("price", "125000.50")
                         .param("categoryId", category.getId().toString())
-                        .param("brandId", brand.getId().toString()).param("status", "ACTIVE"))
+                        .param("brandId", brand.getId().toString()).param("status", "ACTIVE")
+                        .param("stockQuantity","12").param("stockStoreId",stockStore.getId().toString()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(flash().attributeExists("successMessage"));
 
@@ -154,6 +160,8 @@ class AdminProductCrudTest extends com.oneshop.MySqlIntegrationTestSupport {
         assertThat(saved.getPrice()).isEqualByComparingTo("125000.50");
         assertThat(saved.getCategory().getId()).isEqualTo(category.getId());
         assertThat(saved.getBrand().getId()).isEqualTo(brand.getId());
+        assertThat(storeStockRepository.sumAvailableQuantityByProductId(saved.getId())).isEqualTo(12);
+        assertThat(movements.count()).isEqualTo(1);
     }
 
     @Test
@@ -302,6 +310,39 @@ class AdminProductCrudTest extends com.oneshop.MySqlIntegrationTestSupport {
         assertThat(productRepository.count()).isZero();
     }
 
+
+    @Test void activeNewProductNeedsRealStockButDraftDoesNot() throws Exception {
+        var request=post("/admin/products").with(user(ADMIN).roles("ADMIN")).with(csrf())
+                .param("name","Sản phẩm chưa nhập kho").param("slug","chua-nhap-kho").param("sku","NO-STOCK")
+                .param("price","100000").param("categoryId",category.getId().toString()).param("status","ACTIVE");
+        mockMvc.perform(request).andExpect(status().isOk()).andExpect(model().attributeHasFieldErrors("productForm","stockQuantity"));
+        assertThat(productRepository.count()).isZero();
+        mockMvc.perform(post("/admin/products").with(user(ADMIN).roles("ADMIN")).with(csrf())
+                .param("name","Bản nháp").param("slug","ban-nhap").param("sku","DRAFT-NO-STOCK")
+                .param("price","100000").param("categoryId",category.getId().toString()).param("status","DRAFT"))
+                .andExpect(status().is3xxRedirection());
+        assertThat(movements.count()).isZero();
+    }
+    @Test void editProductCanReceiveStockWithoutDuplicateReceiptOnResubmit() throws Exception {
+        Product p=persistProduct("restock-edit","RESTOCK-EDIT");String token=java.util.UUID.randomUUID().toString();
+        for(int attempt=0;attempt<2;attempt++)mockMvc.perform(post("/admin/products/{id}",p.getId()).with(user(ADMIN).roles("ADMIN")).with(csrf())
+                .param("name",p.getName()).param("slug",p.getSlug()).param("sku",p.getSku())
+                .param("price","100000").param("salePrice","80000").param("categoryId",category.getId().toString()).param("status","ACTIVE")
+                .param("stockQuantity","5").param("stockStoreId",stockStore.getId().toString()).param("stockRequestToken",token))
+                .andExpect(status().is3xxRedirection());
+        assertThat(storeStockRepository.sumAvailableQuantityByProductId(p.getId())).isEqualTo(5);
+        assertThat(movements.count()).isEqualTo(1);
+        var product=productRepository.findById(p.getId()).orElseThrow();
+        assertThat(product.isDiscounted()).isTrue();assertThat(product.getDisplayPrice()).isEqualTo("80.000 ₫");assertThat(product.getDisplayOriginalPrice()).isEqualTo("100.000 ₫");
+    }
+    @Test void invalidStockStoreDoesNotCreateProductOrInventory() throws Exception {
+        mockMvc.perform(post("/admin/products").with(user(ADMIN).roles("ADMIN")).with(csrf())
+                .param("name","Sai kho").param("slug","sai-kho").param("sku","BAD-STORE")
+                .param("price","100000").param("categoryId",category.getId().toString()).param("status","ACTIVE")
+                .param("stockQuantity","5").param("stockStoreId","99999999"))
+                .andExpect(model().attributeHasFieldErrors("productForm","stockStoreId"));
+        assertThat(productRepository.count()).isZero();assertThat(movements.count()).isZero();
+    }
     private Product persistProduct(String slug, String sku) {
         Product product = new Product();
         product.setName("Test Product");
@@ -320,6 +361,7 @@ class AdminProductCrudTest extends com.oneshop.MySqlIntegrationTestSupport {
     }
 
     private void clearFixtures() {
+        movements.deleteAll();
         orderItemRepository.deleteAll();
         orderRepository.deleteAll();
         cartItemRepository.deleteAll();

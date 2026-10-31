@@ -42,6 +42,7 @@ public class AdminService {
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
     private final CloudinaryService cloudinaryService;
+    private final InventoryService inventory;
 
     public AdminService(ProductRepository productRepository,
                         StoreRepository storeRepository,
@@ -49,7 +50,8 @@ public class AdminService {
                         UserRepository userRepository,
                         CategoryRepository categoryRepository,
                         BrandRepository brandRepository,
-                        CloudinaryService cloudinaryService) {
+                        CloudinaryService cloudinaryService, InventoryService inventory) {
+        this.inventory = inventory;
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
         this.orderRepository = orderRepository;
@@ -72,6 +74,7 @@ public class AdminService {
         return productRepository.findAll(pageable);
     }
 
+    public java.util.List<com.oneshop.entity.Store> activeStores() { return storeRepository.findByActiveTrueOrderByIdAsc(); }
     public Product findProduct(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(String.valueOf(id)));
@@ -131,6 +134,14 @@ public class AdminService {
             throw new DuplicateProductFieldException("sku", "SKU đã được sử dụng.");
         }
 
+        int quantity = form.getStockQuantity() == null ? 0 : form.getStockQuantity();
+        if (quantity < 0 || quantity > 100000 || (id == null && form.getStatus() == ProductStatus.ACTIVE && quantity == 0))
+            throw new InvalidProductReferenceException("stockQuantity", "Nhập số lượng thực tế từ 1 đến 100.000 để mở bán sản phẩm mới, hoặc lưu Bản nháp.");
+        if (quantity > 0 && (form.getStockStoreId() == null || storeRepository.findById(form.getStockStoreId()).filter(com.oneshop.entity.Store::isActive).isEmpty()))
+            throw new InvalidProductReferenceException("stockStoreId", "Chọn chi nhánh nhận hàng đang hoạt động.");
+        if (quantity > 0 && (form.getStockRequestToken() == null || !form.getStockRequestToken().matches("[a-fA-F0-9-]{36}")))
+            throw new InvalidProductReferenceException("stockQuantity", "Phiếu nhập không hợp lệ. Vui lòng tải lại trang.");
+
         Category category = categoryRepository.findById(form.getCategoryId())
                 .filter(Category::isActive)
                 .orElseThrow(() -> new InvalidProductReferenceException("categoryId", "Danh mục không hợp lệ hoặc đã ngừng hoạt động."));
@@ -172,7 +183,14 @@ public class AdminService {
         }
 
         try {
-            return productRepository.saveAndFlush(product);
+            productRepository.saveAndFlush(product);
+            if (quantity > 0) {
+                var receipt = new com.oneshop.dto.request.InventoryChangeForm();
+                receipt.setStoreId(form.getStockStoreId()); receipt.setProductId(product.getId()); receipt.setDelta(quantity);
+                receipt.setReason(id == null ? "Nhập kho khi tạo sản phẩm" : "Nhập bổ sung từ trang sản phẩm");
+                receipt.setRequestToken(form.getStockRequestToken()); inventory.change(receipt);
+            }
+            return product;
         } catch (DataIntegrityViolationException exception) {
             throw new DuplicateProductFieldException("sku", "SKU hoặc slug đã tồn tại. Vui lòng kiểm tra lại.");
         }

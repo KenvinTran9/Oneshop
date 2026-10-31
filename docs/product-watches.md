@@ -29,3 +29,12 @@
 Production chạy migration lặp được tại src/main/resources/db/product-watches-mysql.sql trước Hibernate validate. Bảng product_watches liên kết users và products, lưu lựa chọn email, thời điểm có hàng/đọc/gửi thư và khóa lần gửi. Migration chỉ bổ sung, không xóa dữ liệu cũ. Profile dev dùng Hibernate update.
 
 Kiểm thử dùng schema MySQL riêng: xem sản phẩm hết hàng, chặn giỏ hàng, gỡ khỏi shop, theo dõi lặp, email mặc định tắt, đổi lựa chọn, retry mail, thông báo chưa đọc, CSRF và quyền sở hữu. Công cụ chuyển Aiven đã bổ sung product_watches.
+
+
+## Tạo sản phẩm kèm nhập kho
+
+Form sản phẩm có chi nhánh nhận hàng và số lượng nhập. Sản phẩm mới chọn Đang bán phải có số lượng thực tế từ 1 đến 100.000 và một chi nhánh đang hoạt động; chưa nhập hàng có thể lưu Bản nháp hoặc Hết hàng. Tạo sản phẩm và phiếu nhập kho nằm trong cùng transaction. Phiếu nhập ghi người thao tác, lý do, tồn trước/sau và request token để gửi lại cùng form không cộng tồn hai lần.
+
+Khi sửa sản phẩm, số lượng là lượng nhập thêm, không phải số tồn cuối cùng. Để 0 chỉ sửa thông tin; chọn chi nhánh và số lượng dương để bổ sung tồn. Các sản phẩm cũ chưa có tồn vẫn hiển thị hết hàng cho tới khi nhập số lượng thực tế.
+
+Nếu giá khuyến mãi hợp lệ thấp hơn giá gốc, thẻ sản phẩm và trang chi tiết hiển thị giá gốc gạch ngang bên cạnh giá khuyến mãi. Không có khuyến mãi thì chỉ hiển thị giá bán, không tạo giá gốc giả.

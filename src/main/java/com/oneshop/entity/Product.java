@@ -181,7 +181,8 @@ public class Product extends BaseEntity {
     public List<String> getSizes() { return sizes; }
     public void setSizes(List<String> sizes) { this.sizes = new ArrayList<>(sizes); }
     public boolean isRequiresSelection() { return !shades.isEmpty() || sizes.size() > 1; }
-    public BigDecimal getSellingPrice() { return salePrice != null ? salePrice : price; }
+    public boolean isDiscounted() { return price != null && salePrice != null && salePrice.signum() >= 0 && salePrice.compareTo(price) < 0; }
+    public BigDecimal getSellingPrice() { return isDiscounted() ? salePrice : price; }
 
     public String getBrandCountry() { return brandCountry; }
     public void setBrandCountry(String brandCountry) { this.brandCountry = brandCountry; }
@@ -225,8 +226,9 @@ public class Product extends BaseEntity {
     public String getPriceCurrency() { return priceCurrency; }
     public void setPriceCurrency(String priceCurrency) { this.priceCurrency = priceCurrency; }
 
-    public String getDisplayPrice() {
-        BigDecimal amount = salePrice != null ? salePrice : price;
+    public String getDisplayPrice() { return formatPrice(getSellingPrice()); }
+    public String getDisplayOriginalPrice() { return formatPrice(price); }
+    private String formatPrice(BigDecimal amount) {
         if (amount == null) { return "Liên hệ"; }
         boolean vnd = priceCurrency == null || "VND".equals(priceCurrency);
         NumberFormat format = NumberFormat.getNumberInstance(vnd ? Locale.forLanguageTag("vi-VN") : Locale.UK);

@@ -24,7 +24,7 @@
         <div class="shop-product-meta"><span class="shop-card-brand" th:text="${product.brand != null ? product.brand.name : 'OneShop'}"></span><span class="product-category-label" th:if="${product.category != null}" th:text="${product.category.name}"></span></div>
         <h1 th:text="${product.name}">Tên sản phẩm</h1>
         <p class="shop-product-intro" th:text="${product.shortDescription}"></p>
-        <div class="shop-detail-price" th:text="${product.displayPrice}">0 ₫</div>
+        <div class="shop-detail-price"><del class="shop-original-price" th:if="${product.discounted}" th:text="${product.displayOriginalPrice}" aria-label="Giá gốc"></del><strong th:text="${product.displayPrice}">0 ₫</strong><span class="shop-sale-label" th:if="${product.discounted}">Giá khuyến mãi</span></div>
         <form class="shop-product-form" data-product-form th:action="@{/cart/items}" method="post"
               th:attr="data-sku=${product.sku},data-name=${product.name},data-price=${product.sellingPrice},data-image=${product.imageUrl},data-url=@{/products/{slug}(slug=${product.slug})}">
             <input type="hidden" name="productId" th:value="${product.id}">

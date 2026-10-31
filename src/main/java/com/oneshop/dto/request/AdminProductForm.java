@@ -49,6 +49,16 @@ public class AdminProductForm {
     @NotNull(message = "Vui lòng chọn trạng thái.")
     private ProductStatus status = ProductStatus.ACTIVE;
 
+    @jakarta.validation.constraints.Min(value=0,message="Số lượng không được âm.")
+    @jakarta.validation.constraints.Max(value=100000,message="Mỗi lần nhập tối đa 100.000 sản phẩm.")
+    private Integer stockQuantity = 0;
+    private Long stockStoreId;
+    @Pattern(regexp="[a-fA-F0-9-]{36}",message="Phiếu nhập chưa hợp lệ. Vui lòng tải lại trang.")
+    private String stockRequestToken = java.util.UUID.randomUUID().toString();
+    public Integer getStockQuantity(){return stockQuantity;} public void setStockQuantity(Integer value){stockQuantity=value;}
+    public Long getStockStoreId(){return stockStoreId;} public void setStockStoreId(Long value){stockStoreId=value;}
+    public String getStockRequestToken(){return stockRequestToken;} public void setStockRequestToken(String value){stockRequestToken=value;}
+
     private MultipartFile image;
 
     @Size(max = 10000, message = "Nội dung quá dài.")

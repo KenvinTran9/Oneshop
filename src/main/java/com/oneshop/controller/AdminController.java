@@ -67,7 +67,7 @@ public class AdminController {
         }
         try {
             Product product = adminService.saveProduct(null, form);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã tạo sản phẩm.");
+            redirectAttributes.addFlashAttribute("successMessage", "Đã tạo sản phẩm" + (form.getStockQuantity() != null && form.getStockQuantity() > 0 ? " và nhập kho " + form.getStockQuantity() + " sản phẩm." : "."));
             return "redirect:/admin/products/" + product.getId();
         } catch (DuplicateProductFieldException exception) {
             bindingResult.rejectValue(exception.getField(), "product.duplicate", exception.getMessage());
@@ -75,6 +75,8 @@ public class AdminController {
             bindingResult.rejectValue("image", "product.image.upload", exception.getMessage());
         } catch (InvalidProductReferenceException exception) {
             bindingResult.rejectValue(exception.getField(), "product.reference.invalid", exception.getMessage());
+        } catch (IllegalArgumentException exception) {
+            bindingResult.rejectValue("stockQuantity", "product.stock.invalid", exception.getMessage());
         }
         populateForm(model, form, null);
         return "admin/product-form";
@@ -113,6 +115,8 @@ public class AdminController {
             bindingResult.rejectValue("image", "product.image.upload", exception.getMessage());
         } catch (InvalidProductReferenceException exception) {
             bindingResult.rejectValue(exception.getField(), "product.reference.invalid", exception.getMessage());
+        } catch (IllegalArgumentException exception) {
+            bindingResult.rejectValue("stockQuantity", "product.stock.invalid", exception.getMessage());
         }
         populateForm(model, form, id);
         return "admin/product-form";
@@ -152,6 +156,7 @@ public class AdminController {
         model.addAttribute("formTitle", productId == null ? "Thêm sản phẩm" : "Cập nhật sản phẩm");
         model.addAttribute("formAction", productId == null ? "/admin/products" : "/admin/products/" + productId);
         model.addAttribute("categories", adminService.activeCategories());
+        model.addAttribute("stockStores", adminService.activeStores());
         model.addAttribute("brands", adminService.activeBrands());
         model.addAttribute("currentImageUrl", productId == null ? null : adminService.findProduct(productId).getImageUrl());
     }

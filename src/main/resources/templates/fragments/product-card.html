@@ -18,8 +18,8 @@
             <span class="small text-muted" th:text="${#lists.size(product.shades)} + ' màu'"></span>
         </div>
         <div class="shop-card-bottom">
+            <div class="shop-price-stack"><del class="shop-original-price" th:if="${product.discounted}" th:text="${product.displayOriginalPrice}" aria-label="Giá gốc"></del><strong class="shop-card-price" th:text="${product.displayPrice}" th:attr="aria-label=${product.discounted ? 'Giá khuyến mãi' : 'Giá bán'}">0 ₫</strong></div>
             <a th:if="${product.soldOut}" class="shop-card-add" th:href="@{/products/{slug}(slug=${product.slug})}">Nhận thông báo có hàng</a>
-            <strong class="shop-card-price" th:text="${product.displayPrice}">0 ₫</strong>
             <a th:if="${!product.soldOut and product.requiresSelection}" class="shop-card-add" th:href="@{/products/{slug}(slug=${product.slug})}" aria-label="Chọn màu sản phẩm"><i class="bi bi-arrow-up-right"></i><span>Chọn màu</span></a>
             <form th:if="${!product.soldOut and !product.requiresSelection}" th:action="@{/cart/items}" method="post">
                 <input type="hidden" name="productId" th:value="${product.id}">
