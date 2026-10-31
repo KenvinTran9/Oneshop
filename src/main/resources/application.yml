@@ -83,3 +83,7 @@ sitemesh:
         decorator: admin.html
       - path: /admin/*
         decorator: admin.html
+      - path: /branch
+        decorator: branch.html
+      - path: /branch/*
+        decorator: branch.html

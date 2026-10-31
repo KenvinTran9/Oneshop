@@ -18,7 +18,8 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 TABLES = ("roles", "stores", "categories", "brands", "users", "products",
           "product_sizes", "product_shades", "store_stocks", "shopping_carts",
-          "shopping_cart_items", "orders", "order_items", "order_events", "password_reset_accounts")
+          "shopping_cart_items", "orders", "order_items", "order_events", "password_reset_accounts",
+          "stock_movements", "customer_addresses")
 SESSIONS = {"SPRING_SESSION", "SPRING_SESSION_ATTRIBUTES"}
 
 

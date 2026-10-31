@@ -5,6 +5,7 @@
     <a class="order-back" href="/cart"><i class="bi bi-arrow-left" aria-hidden="true"></i> Quay lại giỏ hàng</a>
     <div class="orders-heading"><span class="order-eyebrow">Sắp đến tay bạn</span><h1>Hoàn tất <em>đơn hàng.</em></h1><p>Kiểm tra thông tin để OneShop gửi những lựa chọn yêu thích đến bạn.</p></div>
     <div class="order-alert error" th:if="${orderError}" th:text="${orderError}" role="alert"></div>
+    <form th:if="${not #lists.isEmpty(savedAddresses)}" th:action="@{/checkout}" method="get" class="order-admin-filter mb-4"><label for="saved-address">Địa chỉ đã lưu</label><select id="saved-address" name="addressId"><option th:each="a : ${savedAddresses}" th:value="${a.id}" th:text="${a.label + ' — ' + a.recipient + ' — ' + a.address}"></option></select><button class="order-button secondary">Sử dụng địa chỉ</button></form>
     <form th:action="@{/checkout}" method="post" th:object="${checkoutForm}" class="order-layout">
         <section class="order-panel">
             <h2>Thông tin nhận hàng</h2>

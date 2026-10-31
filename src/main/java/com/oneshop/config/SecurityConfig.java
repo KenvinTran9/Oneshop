@@ -85,6 +85,7 @@ public class SecurityConfig {
                                 "/login", "/register", "/forgot-password", "/reset-password", "/account/status", "/account/header", "/css/**", "/js/**",
                                 "/images/**", "/decorators/**", "/webjars/**").permitAll()
                         .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/branch", "/branch/**").hasAnyRole("ADMIN", "BRANCH_MANAGER")
                         .anyRequest().authenticated())
                 .formLogin(login -> login.loginPage("/login").successHandler(success).permitAll())
                 .logout(logout -> logout

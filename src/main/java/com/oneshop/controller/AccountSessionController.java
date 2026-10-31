@@ -23,7 +23,8 @@ public class AccountSessionController {
         var account = authentication.getCurrentUser(current);
         String email = account.map(user -> user.email()).orElse(null);
         return new com.oneshop.dto.response.HeaderStatusResponse(account.isPresent(), email,
-                account.map(user -> user.isAdmin()).orElse(false), carts.getItemCount(email, request.getSession(false)));
+                account.map(user -> user.isAdmin()).orElse(false), carts.getItemCount(email, request.getSession(false)),
+                account.map(user -> user.authorities().contains("ROLE_BRANCH_MANAGER")).orElse(false));
     }
 
     @GetMapping("/status")

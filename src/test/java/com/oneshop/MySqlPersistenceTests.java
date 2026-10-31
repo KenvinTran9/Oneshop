@@ -118,7 +118,7 @@ class MySqlPersistenceTests extends MySqlIntegrationTestSupport {
         assertThat(page.getContent()).extracting(Product::getPrice).isSorted();
         assertThat(brands.count()).isEqualTo(59);
         roleSeed.run(); roleSeed.run();
-        assertThat(roles.count()).isEqualTo(2);
+        assertThat(roles.count()).isEqualTo(3);
         assertThat(jdbc.queryForObject("select database()", String.class)).startsWith("oneshop_test_");
     }
 }

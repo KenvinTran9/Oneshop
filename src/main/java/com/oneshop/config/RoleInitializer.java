@@ -16,7 +16,7 @@ public class RoleInitializer implements CommandLineRunner {
     public RoleInitializer(RoleRepository roles) { this.roles = roles; }
 
     public void run(String... args) {
-        for (String name : java.util.List.of("ADMIN", "CUSTOMER")) {
+        for (String name : java.util.List.of("ADMIN", "CUSTOMER", "BRANCH_MANAGER")) {
             if (roles.findByName(name).isPresent()) continue;
             Role role = new Role(); role.setName(name); role.setDescription(name);
             try { roles.save(role); }

@@ -2,7 +2,7 @@ spring:
   sql:
     init:
       mode: always
-      schema-locations: classpath:db/password-reset-mysql.sql
+      schema-locations: classpath:db/password-reset-mysql.sql,classpath:db/chain-management-mysql.sql
   datasource:
     url: ${MYSQL_URL}
     username: ${MYSQL_USERNAME}

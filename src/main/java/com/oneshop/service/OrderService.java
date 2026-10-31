@@ -28,14 +28,15 @@ public class OrderService {
     private final CartService carts;
     private final ApplicationEventPublisher events;
     private final BigDecimal shippingFee;
+    private final com.oneshop.security.StoreAccess storeAccess;
 
     public OrderService(OrderRepository orders, UserRepository users, ProductRepository products,
             StoreRepository stores, StoreStockRepository stocks, CartService carts,
-            ApplicationEventPublisher events, @Value("${app.orders.shipping-fee:30000}") BigDecimal shippingFee) {
+            ApplicationEventPublisher events, com.oneshop.security.StoreAccess storeAccess, @Value("${app.orders.shipping-fee:30000}") BigDecimal shippingFee) {
         this.orders = orders; this.users = users; this.products = products; this.stores = stores;
         this.stocks = stocks; this.carts = carts; this.events = events;
         if (shippingFee.signum() < 0) throw new IllegalStateException("Shipping fee cannot be negative");
-        this.shippingFee = shippingFee;
+        this.shippingFee = shippingFee; this.storeAccess = storeAccess;
     }
 
     public BigDecimal getShippingFee() { return shippingFee; }
@@ -169,6 +170,9 @@ public class OrderService {
     @Transactional
     public void updateStatus(String code, OrderStatus next) {
         Order order = orders.findForUpdate(code).orElseThrow(this::notFound);
+        updateStatus(order, next);
+    }
+    private void updateStatus(Order order, OrderStatus next) {
         if (!order.getStatus().getNextStatuses().contains(next))
             throw new OrderOperationException("Không thể chuyển sang trạng thái này. Vui lòng tải lại đơn hàng.");
         String message = switch (next) {
@@ -188,6 +192,25 @@ public class OrderService {
         if ("SENT".equals(order.getEmailStatus())) throw new OrderOperationException("Email xác nhận đã được gửi.");
         if (order.getStatus() == OrderStatus.CANCELLED) throw new OrderOperationException("Đơn đã hủy không gửi lại email đặt hàng thành công.");
         events.publishEvent(new Placed(code));
+    }
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
+    @Transactional(readOnly = true)
+    public Page<OrderView> forBranch(OrderStatus status, int page) {
+        Long scope = storeAccess.scope(null);
+        if (scope == null) return (status == null ? orders.findAll(pageable(page)) : orders.findByStatus(status,pageable(page))).map(this::view);
+        return orders.findBranchOrders(scope,status,pageable(page)).map(this::view);
+    }
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
+    @Transactional(readOnly = true)
+    public OrderView branchDetail(String code) {
+        Order order = orders.findByCode(code).orElseThrow(this::notFound);
+        storeAccess.requireStore(order.getStore() == null ? null : order.getStore().getId()); return view(order);
+    }
+    @PreAuthorize("hasAnyRole('ADMIN','BRANCH_MANAGER')")
+    @Transactional
+    public void branchUpdate(String code, OrderStatus status) {
+        Order order = orders.findForUpdate(code).orElseThrow(this::notFound);
+        storeAccess.requireStore(order.getStore() == null ? null : order.getStore().getId()); updateStatus(order,status);
     }
     private void transition(Order order, OrderStatus next, String message) {
         if (next == OrderStatus.CANCELLED) {

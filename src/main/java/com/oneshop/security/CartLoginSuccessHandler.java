@@ -41,6 +41,7 @@ public class CartLoginSuccessHandler implements AuthenticationSuccessHandler {
                 response.sendRedirect(request.getContextPath() + local); return;
             }
         }
-        response.sendRedirect(request.getContextPath() + (admin ? "/admin" : "/"));
+        boolean manager = authentication.getAuthorities().stream().anyMatch(authority -> "ROLE_BRANCH_MANAGER".equals(authority.getAuthority()));
+        response.sendRedirect(request.getContextPath() + (admin ? "/admin" : manager ? "/branch" : "/"));
     }
 }

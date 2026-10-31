@@ -27,4 +27,8 @@ public class DecoratorController {
     public Resource admin() {
         return new ClassPathResource("static/decorators/admin.html");
     }
+    @ResponseBody
+    @RequestMapping(value = "/decorators/branch.html", produces = MediaType.TEXT_HTML_VALUE,
+            method = {RequestMethod.GET, RequestMethod.HEAD, RequestMethod.POST})
+    public Resource branch() { return new ClassPathResource("static/decorators/branch.html"); }
 }

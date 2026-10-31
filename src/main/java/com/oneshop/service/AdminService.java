@@ -94,6 +94,13 @@ public class AdminService {
         form.setCategoryId(product.getCategory() == null ? null : product.getCategory().getId());
         form.setBrandId(product.getBrand() == null ? null : product.getBrand().getId());
         form.setStatus(product.getStatus());
+        form.setIngredients(product.getIngredients());
+        form.setSuitableFor(product.getSuitableFor());
+        form.setDirections(product.getDirections());
+        form.setPrecautions(product.getPrecautions());
+        form.setPackageSize(product.getPackageSize());
+        form.setSizesText(String.join("\n", product.getSizes()));
+        form.setShadesText(product.getShades().stream().map(shade -> shade.getLabel() + " | " + (shade.getColor() == null ? "" : shade.getColor()) + " | " + (shade.getImageUrl() == null ? "" : shade.getImageUrl())).collect(java.util.stream.Collectors.joining("\n")));
         return form;
     }
 
@@ -131,7 +138,15 @@ public class AdminService {
                 .filter(Brand::isActive)
                 .orElseThrow(() -> new InvalidProductReferenceException("brandId", "Thương hiệu không hợp lệ hoặc đã ngừng hoạt động."));
 
+        var sizes = parseSizes(form.getSizesText());
+        var shades = parseShades(form.getShadesText());
         Product product = id == null ? new Product() : findProduct(id);
+        // Preserve existing image metadata when the editor did not change this shade.
+        var savedShades = shades.stream().map(edited -> product.getShades().stream()
+                .filter(existing -> java.util.Objects.equals(existing.getLabel(), edited.getLabel())
+                        && java.util.Objects.equals(existing.getColor(), edited.getColor())
+                        && java.util.Objects.equals(existing.getImageUrl(), edited.getImageUrl()))
+                .findFirst().orElse(edited)).toList();
         String uploadedImageUrl = uploadImageIfProvided(form.getImage());
 
         product.setName(form.getName().trim());
@@ -139,6 +154,13 @@ public class AdminService {
         product.setSku(sku);
         product.setShortDescription(trimToNull(form.getShortDescription()));
         product.setDescription(trimToNull(form.getDescription()));
+        product.setIngredients(trimToNull(form.getIngredients()));
+        product.setSuitableFor(trimToNull(form.getSuitableFor()));
+        product.setDirections(trimToNull(form.getDirections()));
+        product.setPrecautions(trimToNull(form.getPrecautions()));
+        product.setPackageSize(trimToNull(form.getPackageSize()));
+        product.getSizes().clear(); product.getSizes().addAll(sizes);
+        product.getShades().clear(); product.getShades().addAll(savedShades);
         product.setPrice(form.getPrice());
         product.setSalePrice(form.getSalePrice());
         product.setCategory(category);
@@ -172,6 +194,42 @@ public class AdminService {
         product.setStatus(ProductStatus.DISCONTINUED);
         // Never hard-delete: order_items and carts may refer to this product.
         return productRepository.saveAndFlush(product);
+    }
+
+    private java.util.List<String> parseSizes(String text) {
+        if (text == null || text.isBlank()) return java.util.List.of();
+        var values = text.lines().map(String::trim).filter(value -> !value.isEmpty()).toList();
+        if (values.size() > 50 || values.stream().anyMatch(value -> value.length() > 100)
+                || values.stream().map(value -> value.toLowerCase(Locale.ROOT)).distinct().count() != values.size())
+            throw new InvalidProductReferenceException("sizesText", "Tối đa 50 quy cách, mỗi dòng tối đa 100 ký tự và không trùng nhau.");
+        return values;
+    }
+
+    private java.util.List<com.oneshop.entity.ProductShade> parseShades(String text) {
+        var result = new java.util.ArrayList<com.oneshop.entity.ProductShade>();
+        var labels = new java.util.HashSet<String>();
+        if (text == null || text.isBlank()) return result;
+        for (String line : text.lines().filter(value -> !value.isBlank()).toList()) {
+            String[] parts = line.split("\\|", -1);
+            String label = parts[0].trim();
+            String color = parts.length > 1 ? parts[1].trim() : "";
+            String image = parts.length > 2 ? parts[2].trim() : "";
+            if (parts.length > 3 || label.isBlank() || label.length() > 100 || !labels.add(label.toLowerCase(Locale.ROOT))
+                    || (!color.isEmpty() && !color.matches("#[a-fA-F0-9]{6}")) || image.length() > 300)
+                throw new InvalidProductReferenceException("shadesText", "Màu không hợp lệ hoặc bị trùng. Dùng mẫu: Tên màu | #RRGGBB | URL ảnh HTTPS.");
+            if (!image.isEmpty()) {
+                try {
+                    var uri = java.net.URI.create(image);
+                    if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null || uri.getUserInfo() != null) throw new IllegalArgumentException();
+                } catch (IllegalArgumentException invalid) {
+                    throw new InvalidProductReferenceException("shadesText", "Ảnh màu phải là URL HTTPS hợp lệ.");
+                }
+            }
+            result.add(new com.oneshop.entity.ProductShade(label, color.isEmpty() ? null : color,
+                    image.isEmpty() ? null : image, label, image.isEmpty() ? null : "product"));
+        }
+        if (result.size() > 50) throw new InvalidProductReferenceException("shadesText", "Tối đa 50 màu cho một sản phẩm.");
+        return result;
     }
 
     private String uploadImageIfProvided(MultipartFile image) {

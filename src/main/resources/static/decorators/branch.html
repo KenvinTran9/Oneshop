@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="vi" xmlns:sitemesh="http://www.sitemesh.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/images/brand/oneshop-icon-v1.ico" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="/images/brand/oneshop-icon-v1.svg">
+    <title><sitemesh:write property="title">Chi nhánh OneShop</sitemesh:write></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="/css/branch.css" rel="stylesheet">
+    <sitemesh:write property="head"/>
+</head>
+<body class="admin-shell">
+<aside class="admin-sidebar">
+    <a class="admin-brand" href="/branch">Chi nhánh OneShop</a>
+    <nav class="admin-menu">
+        <a href="/branch"><i class="bi bi-grid"></i> Tổng quan</a>
+
+        <a href="/branch/orders"><i class="bi bi-box-seam"></i> Đơn hàng</a>
+        <a href="/branch/inventory"><i class="bi bi-boxes"></i> Kho hàng</a>
+
+        <a href="/branch/reports"><i class="bi bi-bar-chart"></i> Doanh thu</a>
+
+        <a href="/"><i class="bi bi-house"></i> Về website</a>
+    </nav>
+</aside>
+
+<section class="admin-main">
+    <header class="admin-topbar">
+        <div>
+            <span class="small text-muted">Hệ thống chuỗi cửa hàng</span>
+            <h1 class="h5 mb-0">OneShop</h1>
+        </div>
+        <a class="btn btn-outline-dark btn-sm" href="/">Trang chủ</a>
+    </header>
+    <main class="admin-content">
+        <sitemesh:write property="body"/>
+    </main>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

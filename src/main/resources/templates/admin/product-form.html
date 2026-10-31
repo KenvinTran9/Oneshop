@@ -70,6 +70,13 @@
                 <textarea class="form-control" id="description" rows="5" th:field="*{description}" maxlength="10000"></textarea>
                 <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
             </div>
+<div class="col-md-6"><label class="form-label" for="ingredients">Thành phần</label><textarea class="form-control" id="ingredients" th:field="*{ingredients}" rows="3" maxlength="10000"></textarea><div class="invalid-feedback d-block" th:if="${#fields.hasErrors('ingredients')}" th:errors="*{ingredients}"></div></div>
+<div class="col-md-6"><label class="form-label" for="suitableFor">Loại da / nhu cầu phù hợp</label><textarea class="form-control" id="suitableFor" th:field="*{suitableFor}" rows="3" maxlength="3000"></textarea><div class="invalid-feedback d-block" th:if="${#fields.hasErrors('suitableFor')}" th:errors="*{suitableFor}"></div></div>
+<div class="col-md-6"><label class="form-label" for="directions">Hướng dẫn sử dụng</label><textarea class="form-control" id="directions" th:field="*{directions}" rows="3" maxlength="5000"></textarea><div class="invalid-feedback d-block" th:if="${#fields.hasErrors('directions')}" th:errors="*{directions}"></div></div>
+<div class="col-md-6"><label class="form-label" for="precautions">Lưu ý sử dụng</label><textarea class="form-control" id="precautions" th:field="*{precautions}" rows="3" maxlength="3000"></textarea><div class="invalid-feedback d-block" th:if="${#fields.hasErrors('precautions')}" th:errors="*{precautions}"></div></div>
+<div class="col-md-6"><label class="form-label" for="packageSize">Dung tích / khối lượng</label><textarea class="form-control" id="packageSize" th:field="*{packageSize}" rows="3" maxlength="150"></textarea><div class="invalid-feedback d-block" th:if="${#fields.hasErrors('packageSize')}" th:errors="*{packageSize}"></div></div>
+<div class="col-md-6"><label class="form-label" for="sizesText">Quy cách (mỗi dòng một lựa chọn)</label><textarea class="form-control" id="sizesText" th:field="*{sizesText}" rows="3" maxlength="5000"></textarea><div class="invalid-feedback d-block" th:if="${#fields.hasErrors('sizesText')}" th:errors="*{sizesText}"></div></div>
+<div class="col-md-6"><label class="form-label" for="shadesText">Màu sắc và ảnh từng màu</label><textarea class="form-control" id="shadesText" th:field="*{shadesText}" rows="3" maxlength="15000"></textarea><div class="form-text">Mỗi dòng: Tên màu | #RRGGBB | URL ảnh HTTPS. Ví dụ: Đỏ gạch | #A64446 | https://…</div><div class="invalid-feedback d-block" th:if="${#fields.hasErrors('shadesText')}" th:errors="*{shadesText}"></div></div>
             <div class="col-md-8">
                 <label class="form-label" for="image">Ảnh sản phẩm</label>
                 <input class="form-control" id="image" type="file" th:field="*{image}" accept="image/jpeg,image/png,image/gif,image/webp">
@@ -82,7 +89,7 @@
             </div>
         </div>
         <div class="d-flex flex-wrap gap-2 mt-4">
-            <button class="btn btn-dark" type="submit"><i class="bi bi-check2 me-1"></i>Lưu sản phẩm</button>
+            <p class="text-muted w-100">Sau khi thêm sản phẩm, vào Kho hàng để nhập số lượng tại cửa hàng bán.</p><button class="btn btn-dark" type="submit"><i class="bi bi-check2 me-1"></i>Lưu sản phẩm</button>
             <a class="btn btn-outline-secondary" th:href="@{/admin/products}">Hủy</a>
         </div>
     </form>

@@ -8,6 +8,11 @@
     --admin-teal: #214e45;
 }
 
+.report-day { display: grid; grid-template-columns: 7rem minmax(2rem,1fr) 9rem; gap: 1rem; align-items: center; margin-top: 1rem; font-size: .9rem; }
+.report-track { background: #f7edf0; border-radius: 6px; overflow: hidden; height: 18px; }
+.report-bar { background: var(--admin-accent); height: 100%; }
+@media (max-width: 575px) { .report-day { grid-template-columns: 1fr 1fr; } .report-track { grid-column: 1 / -1; grid-row: auto; } }
+
 body {
     margin: 0;
     color: var(--admin-ink);

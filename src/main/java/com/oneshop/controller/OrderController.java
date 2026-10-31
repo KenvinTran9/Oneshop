@@ -19,16 +19,21 @@ public class OrderController {
     private final OrderService orders;
     private final CartService carts;
     private final UserRepository users;
-    public OrderController(OrderService orders, CartService carts, UserRepository users) {
-        this.orders = orders; this.carts = carts; this.users = users;
+    private final com.oneshop.service.CustomerProfileService profiles;
+    public OrderController(OrderService orders, CartService carts, UserRepository users, com.oneshop.service.CustomerProfileService profiles) {
+        this.orders = orders; this.carts = carts; this.users = users; this.profiles = profiles;
     }
     @GetMapping("/checkout")
-    public String checkout(Principal principal, Model model) {
+    public String checkout(Principal principal, @RequestParam(required=false) Long addressId, Model model) {
         if (carts.getCart(principal.getName(), null).items().isEmpty()) return "redirect:/cart";
         CheckoutForm form = new CheckoutForm(); form.setCheckoutToken(UUID.randomUUID().toString());
         users.findByEmail(principal.getName()).ifPresent(user -> {
             form.setCustomerName(user.getFullName()); form.setCustomerPhone(user.getPhone());
         });
+        if(addressId != null) {
+            var address = profiles.address(principal.getName(),addressId);
+            form.setCustomerName(address.getRecipient()); form.setCustomerPhone(address.getPhone()); form.setShippingAddress(address.getAddress());
+        }
         model.addAttribute("checkoutForm", form); checkoutModel(principal, model);
         return "pages/checkout";
     }
@@ -64,5 +69,6 @@ public class OrderController {
         model.addAttribute("shippingFee", orders.getShippingFee());
         model.addAttribute("checkoutTotal", cart.subtotal().add(orders.getShippingFee()));
         model.addAttribute("customerEmail", principal.getName());
+        model.addAttribute("savedAddresses", profiles.addresses(principal.getName()));
     }
 }

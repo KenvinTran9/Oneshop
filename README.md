@@ -1,5 +1,7 @@
 # OneShop — Website bán mỹ phẩm theo mô hình chuỗi cửa hàng
 
+Các chức năng quản lý kho, chi nhánh, phân quyền quản lý cửa hàng, báo cáo doanh thu và hồ sơ khách hàng được hướng dẫn tại [Quản trị chuỗi cửa hàng](docs/chain-management.md).
+
 OneShop là đồ án website bán mỹ phẩm, xây dựng bằng **Spring Boot, Thymeleaf, Bootstrap, JPA, MySQL, SiteMesh, JWT và Cloudinary**. Dự án phục vụ giao diện khách hàng, trang quản trị và backend trong cùng một ứng dụng Java; dữ liệu tài khoản, giỏ hàng, đơn hàng và tồn kho được lưu bằng MySQL.
 
 - **Website demo:** [oneshop-7gim.onrender.com](https://oneshop-7gim.onrender.com/)
@@ -98,7 +100,7 @@ OneShop/
 │   └── validation/          # Validation bổ sung
 ├── src/main/resources/
 │   ├── catalog/             # Catalog và ánh xạ ảnh màu
-│   ├── db/                  # SQL bổ sung cho khôi phục mật khẩu
+│   ├── db/                  # SQL bổ sung cho khôi phục mật khẩu, kho và địa chỉ
 │   ├── static/              # CSS, JavaScript, ảnh và decorators SiteMesh
 │   ├── templates/           # Thymeleaf pages và mẫu email
 │   └── application*.yml     # Cấu hình chung / dev / prod

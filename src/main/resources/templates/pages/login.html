@@ -31,6 +31,7 @@
                 <div class="account-notice account-notice-success" role="status" th:if="${registrationSuccessMessage}">
                     <i class="bi bi-check-circle" aria-hidden="true"></i><span th:text="${registrationSuccessMessage}"></span>
                 </div>
+                <div class="alert alert-success" th:if="${param.passwordChanged}">Đã đổi mật khẩu. Vui lòng đăng nhập lại.</div>
                 <form th:action="@{/login}" method="post" class="account-form" data-account-form>
                     <div class="account-field">
                         <label for="username">Email</label>

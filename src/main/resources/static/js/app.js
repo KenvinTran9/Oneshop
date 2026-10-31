@@ -76,7 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const adminMenuItem = document.getElementById("adminMenuItem");
         const adminNavLink = document.getElementById("adminNavLink");
 
+        const branchMenuItem = document.getElementById("branchMenuItem");
+        if (branchMenuItem) branchMenuItem.style.setProperty("display", "none", "important");
         if (data && data.authenticated) {
+            if (branchMenuItem && (data.isAdmin || data.isBranchManager)) branchMenuItem.style.removeProperty("display");
             if (guestNav) guestNav.style.setProperty("display", "none", "important");
             if (userDropdown) userDropdown.style.removeProperty("display");
             

@@ -51,6 +51,41 @@ public class AdminProductForm {
 
     private MultipartFile image;
 
+    @Size(max = 10000, message = "Nội dung quá dài.")
+    private String ingredients;
+    public String getIngredients() { return ingredients; }
+    public void setIngredients(String value) { ingredients = value; }
+
+    @Size(max = 3000, message = "Nội dung quá dài.")
+    private String suitableFor;
+    public String getSuitableFor() { return suitableFor; }
+    public void setSuitableFor(String value) { suitableFor = value; }
+
+    @Size(max = 5000, message = "Nội dung quá dài.")
+    private String directions;
+    public String getDirections() { return directions; }
+    public void setDirections(String value) { directions = value; }
+
+    @Size(max = 3000, message = "Nội dung quá dài.")
+    private String precautions;
+    public String getPrecautions() { return precautions; }
+    public void setPrecautions(String value) { precautions = value; }
+
+    @Size(max = 150, message = "Nội dung quá dài.")
+    private String packageSize;
+    public String getPackageSize() { return packageSize; }
+    public void setPackageSize(String value) { packageSize = value; }
+
+    @Size(max = 5000, message = "Nội dung quá dài.")
+    private String sizesText;
+    public String getSizesText() { return sizesText; }
+    public void setSizesText(String value) { sizesText = value; }
+
+    @Size(max = 15000, message = "Nội dung quá dài.")
+    private String shadesText;
+    public String getShadesText() { return shadesText; }
+    public void setShadesText(String value) { shadesText = value; }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getSlug() { return slug; }
